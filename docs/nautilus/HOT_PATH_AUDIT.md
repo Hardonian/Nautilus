@@ -2,33 +2,59 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Nautilus Omega Hot Path Audit
 
-## Hot paths reviewed
-- Execution planning and queueing
-- Runtime adapter dispatch
-- Event emission and contract validation
-- Trace/proofpack generation
-- Memory/intelligence recording
-- Policy evaluation and denial reporting
+Date: 2026-05-18
 
-## Findings
+## Audited paths
 
-### 1) Execution planner and runtime dispatch
-- Deterministic plan wiring exists, but heterogeneous runtime calls can still accumulate serial latency under fan-out conditions.
-- Recommendation: add bounded parallelism limits and per-adapter timeout metrics for operator visibility.
+1. execution planner / dispatch
+2. runtime adapter probes and calls
+3. event emission and validation
+4. trace/memory write path
+5. retrieval execution
+6. policy evaluation
+7. proofpack generation
+8. operator reporting
 
-### 2) Event emission and validation
-- Event envelopes and contract checks exist; backpressure and retention controls remain incomplete for high-volume paths.
-- Recommendation: enforce bounded queue or drop-policy telemetry where persistent sinks are unavailable.
+## Highest-risk findings
 
-### 3) Trace + proofpack pipeline
-- Replay artifacts are generated with lineage intent; missing upstream evidence currently propagates as partial proof material.
-- Recommendation: enforce explicit `missing_evidence` blocks in every proofpack terminal section.
+### 1) Event serialization/validation duplication
+- Risk: contract drift produces branching validation logic, replay mismatch, and potential silent drops in downstream consumers.
+- Impact: high correctness risk, medium performance risk (duplicate transforms).
+- Priority: **P0**.
 
-### 4) Memory and retrieval pathways
-- RecallForge/MeshRAG correctly model degraded states instead of simulating success.
-- Recommendation: add stricter performance SLO envelopes for retrieval timeout/cancellation and annotate operator reports.
+### 2) In-memory-first lineage on key seams
+- Risk: process restart loses continuity for trace/memory/event references.
+- Impact: high auditability risk.
+- Priority: **P0**.
 
-## Highest-risk performance/hardening gaps
-1. Unbounded growth risk when durable sinks are unavailable.
-2. Incomplete timeout/cancellation consistency across all runtime adapters.
-3. Potential N+1 lineage resolution patterns during proofpack assembly.
+### 3) Probe fanout/backpressure controls are incomplete
+- Risk: runtime probe storms can increase latency or block operator/report paths in degraded environments.
+- Impact: medium availability risk.
+- Priority: **P1**.
+
+### 4) Proofpack generation can re-walk repeated structures
+- Risk: duplicate work on large runs.
+- Impact: medium CPU/latency risk.
+- Priority: **P1**.
+
+## Blocking-call and resilience checklist
+
+- Timeout coverage: partial.
+- Retry policy consistency: partial.
+- Cancellation propagation: partial.
+- Queue bounds/backpressure: partial.
+- Idempotency keys for repeated writes: partial.
+
+## Safe improvements proposed
+
+1. Single canonical event codec package with compatibility adapter.
+2. Bounded async queues for event/trace/memory write fanout.
+3. Proofpack incremental build mode keyed by executionId + span watermark.
+4. Probe scheduler with jittered interval, max concurrency, and deadline budget.
+5. Structured error taxonomy (`transient`, `policy_denied`, `unavailable`, `schema_violation`).
+
+## Measurable targets
+
+- Reduce duplicate event parsing/validation by >50% per run.
+- Keep P95 planner+report path latency under controlled degraded test scenarios.
+- Zero silent lineage gaps (all gaps explicit in output artifacts).

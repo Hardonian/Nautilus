@@ -2,27 +2,34 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Nautilus Omega Optimization Audit
 
-## Optimization doctrine
-- Prioritize measurable correctness-preserving gains.
-- No optimization that obscures degraded truth or evidence continuity.
+Date: 2026-05-18
+
+## Optimization principles
+
+- No optimization without integrity.
+- Prioritize measurable operator-facing or cost-facing impact.
+- Preserve deterministic semantics and explicit degraded truth.
 
 ## Prioritized opportunities
 
-1. **Proofpack incremental assembly** (High)
-   - Avoid recomputing unchanged lineage slices per operator refresh.
-2. **Event batching with bounded flush windows** (High)
-   - Reduce serialization overhead while preserving ordering/causality markers.
-3. **Retrieval dedup + trust-score cache** (High)
-   - Reuse recent evidence signatures with explicit freshness labels.
-4. **Topology snapshot caching** (Medium)
-   - Cache capability snapshots with short TTL and explicit stale markers.
-5. **Adapter call coalescing** (Medium)
-   - Collapse duplicate runtime probe calls during one planning epoch.
-6. **Trace compression for archival payloads** (Medium)
-   - Keep operator-visible summaries uncompressed; compress archival blobs only.
-7. **Dependency surface cleanup** (Low)
-   - Remove non-essential packages from hot runtime paths.
+### P1 (high leverage)
+1. Event batching with bounded flush interval for non-critical telemetry.
+2. Retrieval deduplication cache by normalized query + policy context.
+3. Proofpack incremental generation from immutable lineage fragments.
+4. Topology snapshot caching with TTL + invalidation on runtime state change.
 
-## Non-goals
-- No “smooth UI” optimization that hides unavailable lineage.
-- No speculative caching without confidence/degradation labeling.
+### P2 (medium leverage)
+5. Lazy-load heavy operator report sections unless requested.
+6. Reduce duplicate JSON serialization across event/report/proofpack pathways.
+7. Introduce span compression for long-running replay timelines.
+8. Parallelize independent adapter probes with strict concurrency limits.
+
+### P3 (situational)
+9. Dependency surface pruning in CLI/plugin runtime bundles.
+10. Background compaction for historical evidence indices.
+
+## Guardrails
+
+- Every optimization PR must include before/after measurements.
+- No hidden fallback that masks degraded or unavailable states.
+- No trust-score extrapolation without provenance evidence.

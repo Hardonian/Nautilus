@@ -1,34 +1,44 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-# Nautilus Omega Release Readiness (Truthful)
+# Nautilus Omega Release Readiness
 
-## Readiness verdict
-**Conditional GO with explicit degraded states.**
+Date: 2026-05-18
 
-The repository is viable for alpha iteration with deterministic doctrine alignment, but not yet a fully hardened distributed production release.
+## Verdict
 
-## Verified strengths
-- Nautilus identity + NemoClaw runtime boundary is coherent.
-- Fail-closed governance baseline exists for policy unavailability.
-- Truth-loop, replay, and provenance contracts are represented in core runtime code and tests.
-- Degraded retrieval/governance states are explicit instead of simulated.
+**Conditional GO** for continued alpha progression, **NO-GO** for claiming full distributed production readiness.
 
-## Blocking/non-blocking gaps
+## What is release-ready
 
-### Blocking for production-grade federated release
-1. Durable multi-node replay/event/memory continuity.
-2. Uniform bounded retention/backpressure across high-volume paths.
-3. Full policy lineage + approval traceability for distributed operations.
+- Local deterministic truth-loop foundations.
+- Explicit degraded-state reporting patterns.
+- Core policy-denial semantics and governance-first posture.
+- Baseline verification and test infrastructure.
 
-### Non-blocking for current alpha
-1. Additional adapter matrix depth and capability normalization.
-2. Performance tuning for proofpack and retrieval hot paths.
-3. Extended CI smoke and topology-failure chaos coverage.
+## What is not release-ready for production claims
 
-## Known degraded states
-- Policy engine unavailable ⇒ fail-closed denial.
-- Retrieval subsystem unavailable ⇒ explicit unavailable state.
-- Persistence backends unavailable ⇒ continuity is partial/in-memory.
+- Unified canonical event contract across all paths.
+- End-to-end durable lineage continuity (event/trace/memory/proofpack).
+- Full distributed edge mesh trust boundaries and replay guarantees.
+- Comprehensive device/runtime topology reliability under heterogeneous fleets.
 
-## Operator truth statement
-No claim in this release should imply complete distributed replay/provenance continuity where only local/in-memory seams are currently implemented.
+## Required release notes truth (must include)
+
+1. Distributed execution/federation remains limited/scaffold-level.
+2. Several persistence paths are in-memory by default.
+3. Degraded/unavailable states are expected in unsupported environments.
+4. Governance fail-closed applies to high-risk policy checks; coverage expansion ongoing.
+
+## Pre-release gate checklist
+
+- [ ] Single canonical event schema adopted or compatibility matrix documented.
+- [ ] Proofpack includes explicit missing-evidence declarations.
+- [ ] CI includes lineage continuity gate tests.
+- [ ] Smoke scripts cover happy path + forced degraded path.
+- [ ] Runtime capability matrix updated with explicit unsupported states.
+
+## Known limitations
+
+- Remote runtime capabilities are not uniformly equivalent to local runtime behavior.
+- Replay/provenance durability is incomplete for all operating modes.
+- Some topology telemetry is best-effort, not guaranteed.

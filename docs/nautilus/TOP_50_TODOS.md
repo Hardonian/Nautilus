@@ -2,60 +2,55 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Nautilus Omega Top 50 TODOs
 
-Priority legend: P0 (urgent), P1 (near-term), P2 (strategic)
+Priority ordered. Categories: **Maintenance**, **Leverage**, **Moat**.
 
-## Maintenance
-1. [P0][Maintenance] Enforce bounded event queue limits in all runtime emitters.
-2. [P0][Maintenance] Add retention eviction telemetry for event/memory adapters.
-3. [P0][Maintenance] Standardize adapter timeout defaults and classification.
-4. [P0][Maintenance] Standardize retry policies by adapter capability class.
-5. [P0][Maintenance] Add idempotency keys to proofpack persistence writes.
-6. [P0][Maintenance] Add idempotency keys to replay snapshot persistence writes.
-7. [P0][Maintenance] Add explicit `missing_evidence` payload to proofpack terminal schema.
-8. [P0][Maintenance] Fail CI on docs claims that exceed implemented capability tags.
-9. [P0][Maintenance] Expand policy-denial reason codes to complete operator taxonomy.
-10. [P0][Maintenance] Add chaos tests for policy-engine-unavailable fail-closed branch.
-11. [P1][Maintenance] Add chaos tests for retrieval unavailable + timeout paths.
-12. [P1][Maintenance] Add restart continuity tests for in-memory adapter degradation.
-13. [P1][Maintenance] Add schema migration harness for event contract versions.
-14. [P1][Maintenance] Add schema migration harness for memory/recall records.
-15. [P1][Maintenance] Add schema migration harness for trace/replay records.
-16. [P1][Maintenance] Tighten error classes across runtime adapters and planners.
-17. [P1][Maintenance] Normalize degraded-state enum usage across all pillars.
-18. [P1][Maintenance] Add deterministic replay checksum assertions in CI.
-19. [P1][Maintenance] Add bounded operator timeline pagination guardrails.
-20. [P1][Maintenance] Add dead-letter queue contract for rejected events.
-
-## Leverage
-21. [P0][Leverage] Implement durable local event-fabric storage adapter.
-22. [P0][Leverage] Implement durable RecallForge storage with provenance indexes.
-23. [P0][Leverage] Implement durable OperatorGraph trace/replay storage adapter.
-24. [P0][Leverage] Unify replay reference key across event/trace/proofpack/reporting.
-25. [P0][Leverage] Add runtime capability snapshot API with explicit stale markers.
-26. [P1][Leverage] Add incremental proofpack generation cache keyed by lineage hash.
-27. [P1][Leverage] Batch event writes with bounded flush intervals.
-28. [P1][Leverage] Add retrieval dedup cache with confidence/freshness labels.
-29. [P1][Leverage] Coalesce duplicate runtime probes within one planning epoch.
-30. [P1][Leverage] Add correlation-aware operator report drill-down endpoints.
-31. [P1][Leverage] Add lineage completeness score in operator reporting.
-32. [P1][Leverage] Add topology snapshot cache with deterministic invalidation rules.
-33. [P1][Leverage] Add policy-pack explainability bundles for operator denials.
-34. [P1][Leverage] Add distributed replay stitching contract for edge nodes.
-35. [P1][Leverage] Add remote execution approval receipt chaining.
-36. [P2][Leverage] Add trace archival compression for cold storage paths.
-37. [P2][Leverage] Add build-time contract drift checker across docs/code.
-38. [P2][Leverage] Add “truth-loop continuity” synthetic benchmark suite.
-39. [P2][Leverage] Add adapter capability matrix generator from runtime probes.
-40. [P2][Leverage] Add dependency graph budget checks for runtime-critical packages.
-
-## Moat
-41. [P0][Moat] Enforce end-to-end evidence-linked recommendations in RecallForge outputs.
-42. [P0][Moat] Enforce no-simulation policy for retrieval claims at API boundary.
-43. [P0][Moat] Introduce signed policy lineage receipts for high-risk approvals.
-44. [P1][Moat] Add cross-node trust score attestation with expiry semantics.
-45. [P1][Moat] Add operator-facing proofpack integrity verification workflow.
-46. [P1][Moat] Add tamper-evident event lineage chain checkpoints.
-47. [P1][Moat] Add federated degraded-state doctrine for offline/partitioned mesh.
-48. [P2][Moat] Add replay determinism certification profile for regulated deployments.
-49. [P2][Moat] Add tenant-isolated evidence export packages with policy snapshots.
-50. [P2][Moat] Add governance drift detector for policy-pack vs runtime behavior.
+1. **[Maintenance]** Unify `core/event-fabric/contracts.ts` and `src/lib/core/nautilus-event-fabric.ts` into one canonical schema.
+2. **[Maintenance]** Add migration adapter for legacy event types (`memory.learned`-style drift).
+3. **[Maintenance]** Add CI gate asserting zero event family/type mismatches.
+4. **[Maintenance]** Add durable append-only event store adapter with deterministic write receipts.
+5. **[Maintenance]** Add durable trace store adapter and replay watermark tracking.
+6. **[Maintenance]** Add durable RecallForge memory store with provenance-required inserts.
+7. **[Maintenance]** Require executionId/correlationId on all terminal events.
+8. **[Maintenance]** Add retention policy config for events/traces/memory/proofpacks.
+9. **[Maintenance]** Add schema version migration tests for all persisted pillar artifacts.
+10. **[Maintenance]** Add explicit error taxonomy shared across runtime/retrieval/policy adapters.
+11. **[Maintenance]** Enforce timeout budgets for runtime probe calls.
+12. **[Maintenance]** Enforce bounded concurrency and backpressure in probe fanout.
+13. **[Maintenance]** Add idempotency keys for replayed memory writes.
+14. **[Maintenance]** Add idempotency keys for proofpack regeneration jobs.
+15. **[Maintenance]** Ensure high-risk remote operations fail closed when governance unavailable.
+16. **[Maintenance]** Add denial reason normalization and operator-facing classification.
+17. **[Maintenance]** Add replay continuity tests from event→trace→memory→proofpack.
+18. **[Maintenance]** Add degraded-state completeness test suite for all pillar adapters.
+19. **[Maintenance]** Remove stale docs claims that imply production distributed orchestration.
+20. **[Maintenance]** Create canonical runtime capability matrix doc with explicit unsupported states.
+21. **[Leverage]** Build incremental proofpack generation using lineage fragment cache.
+22. **[Leverage]** Add event batching for non-critical telemetry with bounded flush intervals.
+23. **[Leverage]** Add retrieval deduplication cache keyed by normalized query + policy context.
+24. **[Leverage]** Add operator timeline compression for long-running traces.
+25. **[Leverage]** Add topology snapshot TTL cache with invalidation hooks.
+26. **[Leverage]** Add lazy hydration for heavy operator report sections.
+27. **[Leverage]** Add policy evaluation memoization for deterministic repeated checks.
+28. **[Leverage]** Add runtime adapter capability fingerprint cache.
+29. **[Leverage]** Add smoke command to force degraded retrieval and verify explicit operator output.
+30. **[Leverage]** Add smoke command to force policy-engine-unavailable and assert fail-closed deny.
+31. **[Leverage]** Add synthetic load benchmark for planner/event/report hot path.
+32. **[Leverage]** Add proofpack size/latency metrics to release checklist.
+33. **[Leverage]** Add dead-code detection pass to release gating.
+34. **[Leverage]** Add route audit script for operator console integrity.
+35. **[Leverage]** Add dependency churn report and risk scoring in CI.
+36. **[Leverage]** Add deterministic replay snapshot checksum validation.
+37. **[Leverage]** Add distributed node heartbeat expiry + explicit offline state transitions.
+38. **[Leverage]** Add explicit federation degraded mode in operator console with lineage gaps listed.
+39. **[Leverage]** Add runtime placement rationale export to proofpack.
+40. **[Leverage]** Add retrieval source trust-score rationale export to proofpack.
+41. **[Moat]** Implement cross-pillar lineage graph index (event/trace/memory/policy/retrieval).
+42. **[Moat]** Implement verifiable governance chain-of-custody for approvals and overrides.
+43. **[Moat]** Build multi-tenant evidence isolation verifier for proofpack exports.
+44. **[Moat]** Build deterministic replay attestation signatures for audit exports.
+45. **[Moat]** Add adaptive risk escalation that remains policy-supervised and provenance-backed.
+46. **[Moat]** Add operator-facing contradiction detector between policy outcome and runtime execution.
+47. **[Moat]** Add lineage-aware retrieval confidence model with explicit low-confidence labeling.
+48. **[Moat]** Add anomaly detection on event lineage gaps and orphan spans.
+49. **[Moat]** Add trust-boundary verifier for distributed mesh registration and token provenance.
+50. **[Moat]** Publish nautilus doctrine conformance scorecard as part of release readiness.

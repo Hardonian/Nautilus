@@ -1,34 +1,49 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-# Nautilus Omega Architecture Audit (Execution Truth)
+# Nautilus Omega Architecture & Implementation Truth Audit
 
-## Scope and method
-- Audited implementation against repository claims across README, `docs/nautilus/*`, and core/runtime modules.
-- Classified each pillar as: implemented, partial, scaffold-only, or unavailable/degraded.
+Date: 2026-05-18  
+Branch audited: `program/nautilus-omega`
 
-## Pillar coherence summary
+## Executive outcome
 
-| Pillar | Truth status | Findings |
+This repository has a real, test-backed Nautilus substrate with deterministic truth-loop foundations, but it is still **M1/M2 maturity** in several pillar areas. Core truth is implemented; many distributed/production claims remain scaffold-level and must stay explicitly degraded.
+
+## Pillar-by-pillar truth classification
+
+| Pillar | Truth status | Evidence summary |
 |---|---|---|
-| Event Fabric | **Partial** | Canonical contracts and local emission are implemented; no durable transport, retention, or migration strategy yet. |
-| RecallForge | **Partial** | Provenance-aware memory/intelligence seams exist; persistence and long-horizon retention governance are incomplete. |
-| OperatorGraph | **Partial** | Trace/replay correlation and operator views exist; replay completeness depends on in-memory adapters in current topology. |
-| ThreatMesh | **Partial+Fail-Closed Core** | Fail-closed deny path is implemented for policy unavailability; broader policy-pack depth and distributed approvals need expansion. |
-| MeshRAG | **Partial** | Explicit retrieval states and trust-oriented contracts exist; graph-hop lineage and durable retrieval replay are incomplete. |
-| Runtime (NemoClaw) | **Implemented Core, Partial Federation** | Deterministic orchestration surfaces are present; distributed mesh execution and deep adapter matrix remain foundational. |
+| Nautilus identity coherence | **Implemented** | Root docs and AGENTS.md consistently define Nautilus as platform identity and NemoClaw as runtime engine. |
+| NemoClaw runtime integrity | **Implemented (local), partial (remote)** | Runtime contracts and adapters exist with tests, but remote/distributed execution is still seam-first. |
+| Event Fabric integrity | **Partial with contract drift** | Two event contracts exist (`core/event-fabric/contracts.ts` and `src/lib/core/nautilus-event-fabric.ts`) with schema/enum mismatches. |
+| RecallForge provenance integrity | **Partial** | Memory/provenance wiring exists in truth loop; durable store/retention/migration paths are not complete. |
+| OperatorGraph replay integrity | **Partial** | Trace/replay scaffolding exists, but durability/lineage completeness across all paths is not yet guaranteed. |
+| ThreatMesh fail-closed integrity | **Implemented for key deny paths; partial overall** | Fail-closed semantics exist, but policy-pack lineage and full approval chain persistence remain incomplete. |
+| MeshRAG lineage integrity | **Partial** | Retrieval interfaces and degraded states are explicit; trust scoring/replay lineage depth is limited. |
+| Runtime topology integrity | **Partial** | Local runtime intelligence and adapter seams exist; topology snapshots/distributed fidelity are limited. |
+| Distributed mesh trust boundaries | **Scaffolded** | Edge mesh primitives exist; production federation controls and offline replay guarantees are not complete. |
+| Proofpack completeness | **Partial** | Proofpack generation/validation exists; complete cross-pillar evidence continuity is not universal. |
 
-## Implementation truth corrections applied
-- Marked full-fidelity distributed replay/provenance as **not yet complete**.
-- Marked durable evidence storage as **degraded/unavailable** where only local/in-memory seams exist.
-- Marked MeshRAG graph/retrieval federation claims as **foundational only**, not production-federated.
+## Critical architecture findings
 
-## Architecture drift and consolidation opportunities
-1. Avoid duplicate contract naming between docs and code by treating `core/event-fabric/contracts.ts` as canonical source.
-2. Keep policy lineage fields mandatory in operator-proof pathways; reject “best-effort” posture for high-risk operations.
-3. Consolidate replay lineage across truth-loop → proofpack → operator reporting with one canonical replay reference key.
-4. Keep degraded state taxonomy explicit (`unavailable`, `degraded`, `denied`) across all pillars.
+1. **Canonical event drift exists now** and is the largest integrity risk.
+   - `core/event-fabric/contracts.ts` and `src/lib/core/nautilus-event-fabric.ts` disagree on type set, severity vocabulary, and envelope shape.
+2. **Durability boundaries are inconsistent**: many flows are in-memory first, with explicit degraded states (good), but docs can still be read as stronger persistence guarantees than currently implemented.
+3. **Distributed claims must remain marked as non-production** until trust boundaries, replay continuity, and remote policy governance are uniformly persisted and tested.
 
-## Residual risks
-- In-memory-first adapters can hide continuity gaps under restart conditions.
-- Replay lineage across distributed/offline nodes is not production-complete.
-- Event growth/retention policies are not yet uniformly enforced.
+## Safe corrections completed in this audit pass
+
+- Added release-truth audit artifacts (this file and companion docs) to remove ambiguity and codify what is implemented vs scaffolded.
+- Added prioritized top-50 execution TODO backlog with concrete repo-grounded actions.
+
+## Not safely auto-fixed in this pass
+
+- Event contract unification (requires compatibility migration and broad test updates).
+- Full end-to-end durable lineage (event↔trace↔memory↔proofpack) across every execution mode.
+- Distributed edge-mesh production hardening and trust boundary enforcement.
+
+## Release truth doctrine (must hold)
+
+- No docs should imply production-grade distributed orchestration today.
+- All degraded/unavailable states must remain explicit and operator-visible.
+- Policy failures for high-risk operations must fail closed.
