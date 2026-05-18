@@ -1,11 +1,22 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# NemoClaw Fork: Local Operator-Grade Execution and Governance
+# Nautilus: Deterministic Operational AI Infrastructure Platform
 
-This fork of NemoClaw is being shaped into a governed heterogeneous execution substrate for local operator-grade AI execution with explicit release-truth boundaries.
+Nautilus is the platform identity for deterministic operational AI infrastructure. NemoClaw remains the runtime/orchestration engine inside the platform.
 
-## Why this fork exists
+## Why Nautilus exists
+## Nautilus platform structure
+
+- **NemoClaw Runtime** (`src/`, `nemoclaw/src/`, `bin/`)
+- **RecallForge** (`core/recallforge/`)
+- **OperatorGraph** (`core/operatorgraph/`, `operator-console/`)
+- **ThreatMesh** (`core/threatmesh/`, security and policy modules)
+- **MeshRAG** (`core/meshrag/`)
+- **Canonical Event Fabric** (`core/event-fabric/contracts.ts`)
+
+See the architecture truth + migration plan: [docs/nautilus/platform-evolution.md](docs/nautilus/platform-evolution.md).
+
 
 The fork prioritizes deterministic and auditable control over opaque autonomy. It focuses on:
 - execution plane and control plane separation,
