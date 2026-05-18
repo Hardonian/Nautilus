@@ -10,7 +10,7 @@ export const CANONICAL_EVENT_TYPES = [
   'retrieval.completed',
   'gpu.overloaded',
   'gpu.thermal_alert',
-  'memory.learned',
+  'memory.recorded',
   'trace.recorded',
   'agent.escalated',
   'runtime.degraded',
@@ -25,6 +25,8 @@ export type NautilusEvent = {
   runId: string;
   pillar: 'runtime' | 'recallforge' | 'operatorgraph' | 'threatmesh' | 'meshrag';
   severity: 'info' | 'warning' | 'error';
+  correlationId?: string;
+  state?: 'started' | 'completed' | 'failed' | 'degraded' | 'restored' | 'denied';
   payload: Record<string, unknown>;
 };
 
@@ -47,6 +49,8 @@ export function validateNautilusEvent(candidate: unknown): candidate is Nautilus
     ['runtime', 'recallforge', 'operatorgraph', 'threatmesh', 'meshrag'].includes(event.pillar) &&
     typeof event.severity === 'string' &&
     ['info', 'warning', 'error'].includes(event.severity) &&
+    (event.correlationId === undefined || typeof event.correlationId === 'string') &&
+    (event.state === undefined || ['started', 'completed', 'failed', 'degraded', 'restored', 'denied'].includes(event.state)) &&
     !!event.payload &&
     typeof event.payload === 'object'
   );
