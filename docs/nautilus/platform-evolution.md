@@ -66,3 +66,22 @@ Deprecated ambiguous language: dashboard, AI hub, command center, cockpit.
 3. Add RecallForge lineage persistence format for receipts + degraded transitions.
 4. Add OperatorGraph replay graph adapter from existing replay/diagnostic events.
 5. Add MeshRAG retrieval provenance envelope and trust score schema.
+
+
+## M1 truth loop checkpoint (2026-05-18)
+
+### Implemented now
+- `src/lib/core/nautilus-truth-loop.ts` orchestrates a minimal Event → Policy → Retrieval → Runtime → Memory report loop.
+- Fail-closed deny is enforced when policy engine is missing.
+- Retrieval unavailability is explicit and degraded, never fabricated.
+- Runtime failure emits `execution.failed` with preserved execution/correlation context.
+- RecallForge provenance is required for stored completion memory records.
+
+### Scaffolded
+- In-memory adapters for event bus, trace writer, and memory writer are canonical seam defaults.
+
+### Degraded/unavailable
+- Missing trace store and memory store are reported as degraded states in the final operator report.
+
+### Planned later
+- Durable storage adapters and production telemetry/runtime health integration beyond in-memory seam coverage.
