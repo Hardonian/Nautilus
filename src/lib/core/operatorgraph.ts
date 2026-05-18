@@ -18,17 +18,28 @@ export interface OperatorGraphSpan {
   endedAt?: string;
   errorBoundary?: string;
 }
+export type ExecutionEdgeType = "dependency" | "retry" | "fallback" | "retrieval" | "policy_checkpoint" | "memory_checkpoint";
+export interface ExecutionEdge { fromSpanId: string; toSpanId: string; type: ExecutionEdgeType; reason: string; }
+export interface ReplaySnapshot { snapshotId: string; capturedAt: string; state: "ready" | "running" | "completed" | "failed" | "degraded"; notes?: string[]; }
 
-export interface OperatorGraphReplayRecord { traceId: string; spans: OperatorGraphSpan[]; unavailableReason?: string; }
-export interface OperatorGraphTraceWriter { append(span: OperatorGraphSpan): void; }
+export interface OperatorGraphReplayRecord { traceId: string; spans: OperatorGraphSpan[]; edges: ExecutionEdge[]; snapshots: ReplaySnapshot[]; unavailableReason?: string; }
+export interface OperatorGraphTraceWriter {
+  append(span: OperatorGraphSpan): void;
+  addEdge(traceId: string, edge: ExecutionEdge): void;
+  addSnapshot(traceId: string, snapshot: ReplaySnapshot): void;
+}
 export interface OperatorGraphTraceReader { get(traceId: string): OperatorGraphReplayRecord | null; }
 
 export class InMemoryOperatorGraph implements OperatorGraphTraceWriter, OperatorGraphTraceReader {
   private readonly spans: OperatorGraphSpan[] = [];
+  private readonly edges = new Map<string, ExecutionEdge[]>();
+  private readonly snapshots = new Map<string, ReplaySnapshot[]>();
   append(span: OperatorGraphSpan): void { this.spans.push(span); }
+  addEdge(traceId: string, edge: ExecutionEdge): void { this.edges.set(traceId, [...(this.edges.get(traceId) ?? []), edge]); }
+  addSnapshot(traceId: string, snapshot: ReplaySnapshot): void { this.snapshots.set(traceId, [...(this.snapshots.get(traceId) ?? []), snapshot]); }
   get(traceId: string): OperatorGraphReplayRecord | null {
     const spans = this.spans.filter((s) => s.traceId === traceId);
-    return spans.length ? { traceId, spans } : null;
+    return spans.length ? { traceId, spans, edges: this.edges.get(traceId) ?? [], snapshots: this.snapshots.get(traceId) ?? [] } : null;
   }
 }
 
