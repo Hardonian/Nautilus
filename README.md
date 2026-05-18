@@ -33,6 +33,25 @@ The fork prioritizes deterministic and auditable control over opaque autonomy. I
 - **Planned:** external orchestration adapter integrations after stable local contracts.
 - **Not implemented:** distributed execution, GPU balancing, Dynamo integration, autonomous orchestration/self-healing, automatic policy learning.
 
+
+## Nautilus M1 truth loop status (implemented now)
+
+Implemented in `src/lib/core/nautilus-truth-loop.ts` with tests in `src/lib/core/nautilus-truth-loop.test.ts`:
+- Event Fabric envelope emission for `execution.started`, `policy.evaluated`, and terminal execution events.
+- ThreatMesh fail-closed behavior when policy engine is unavailable.
+- OperatorGraph trace correlation via shared `correlationId`/`traceId` semantics (in-memory adapter wiring).
+- MeshRAG explicit retrieval states: `completed` or `unavailable` (degraded path, no simulated retrieval).
+- RecallForge memory writes with required source-event provenance on successful completion.
+- Operator report object (`TruthLoopReport`) that summarizes execution outcome and degraded states.
+
+Explicit degraded/unavailable states currently surfaced:
+- `policy_engine_unavailable` (fail-closed deny)
+- `retrieval_engine_unavailable`
+- `memory_store_unavailable`
+- `trace_store_unavailable`
+
+Scaffolded (not fully materialized): persistent trace store adapters, persistent memory backends, GPU telemetry integration, and local model runtime health adapters.
+
 ## Architecture and planning docs
 
 - Fork rationale: [docs/fork-rationale.md](docs/fork-rationale.md)
