@@ -5,28 +5,34 @@ import Ajv from 'ajv';
 
 export const SCHEMA_VERSION = '1.0.0' as const;
 
-export type ContractKind =
-  | 'execution'
-  | 'runtime'
-  | 'retrieval'
-  | 'policy'
-  | 'replay'
-  | 'proofpack'
-  | 'event'
-  | 'memory';
+export const contractKinds = [
+  'execution',
+  'runtime',
+  'retrieval',
+  'policy',
+  'replay',
+  'proofpack',
+  'event',
+  'memory',
+] as const;
 
-export type ExecutionState =
-  | 'queued'
-  | 'planning'
-  | 'policy_evaluation'
-  | 'retrieval'
-  | 'executing'
-  | 'fallback'
-  | 'degraded'
-  | 'completed'
-  | 'failed'
-  | 'cancelled'
-  | 'replaying';
+export type ContractKind = (typeof contractKinds)[number];
+
+const executionStates = [
+  'queued',
+  'planning',
+  'policy_evaluation',
+  'retrieval',
+  'executing',
+  'fallback',
+  'degraded',
+  'completed',
+  'failed',
+  'cancelled',
+  'replaying',
+] as const;
+
+export type ExecutionState = (typeof executionStates)[number];
 
 export const legalTransitions: Record<ExecutionState, ExecutionState[]> = {
   queued: ['planning', 'cancelled'],
@@ -52,6 +58,8 @@ export interface IdentityScope {
   memoryScope: string;
   proofpackScope: string;
 }
+
+const utcTimestampPattern = '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$';
 
 const identityScopeSchema = {
   type: 'object',
@@ -79,36 +87,65 @@ const identityScopeSchema = {
 } as const;
 
 export const contractSchemas = {
-  execution: { type: 'object', required: ['kind', 'schemaVersion', 'state', 'identityScope', 'idempotencyKey'], properties: { kind: { const: 'execution' }, schemaVersion: { const: SCHEMA_VERSION }, state: { enum: Object.keys(legalTransitions) }, identityScope: identityScopeSchema, idempotencyKey: { type: 'string', minLength: 8 } }, additionalProperties: false },
+  execution: {
+    type: 'object',
+    required: ['kind', 'schemaVersion', 'state', 'identityScope', 'idempotencyKey'],
+    properties: {
+      kind: { const: 'execution' },
+      schemaVersion: { const: SCHEMA_VERSION },
+      state: { enum: executionStates },
+      identityScope: identityScopeSchema,
+      idempotencyKey: { type: 'string', minLength: 8 },
+    },
+    additionalProperties: false,
+  },
   runtime: { type: 'object', required: ['kind', 'schemaVersion', 'runtimeStatus'], properties: { kind: { const: 'runtime' }, schemaVersion: { const: SCHEMA_VERSION }, runtimeStatus: { enum: ['available', 'unavailable', 'degraded'] } }, additionalProperties: false },
   retrieval: { type: 'object', required: ['kind', 'schemaVersion', 'mode'], properties: { kind: { const: 'retrieval' }, schemaVersion: { const: SCHEMA_VERSION }, mode: { enum: ['historical', 'refresh', 'degraded'] } }, additionalProperties: false },
   policy: { type: 'object', required: ['kind', 'schemaVersion', 'decision', 'policyScope'], properties: { kind: { const: 'policy' }, schemaVersion: { const: SCHEMA_VERSION }, decision: { enum: ['allow', 'deny'] }, policyScope: { type: 'string', minLength: 1 } }, additionalProperties: false },
   replay: { type: 'object', required: ['kind', 'schemaVersion', 'replayMode'], properties: { kind: { const: 'replay' }, schemaVersion: { const: SCHEMA_VERSION }, replayMode: { enum: ['read_only', 'mutation_safe'] } }, additionalProperties: false },
   proofpack: { type: 'object', required: ['kind', 'schemaVersion', 'proofpackScope'], properties: { kind: { const: 'proofpack' }, schemaVersion: { const: SCHEMA_VERSION }, proofpackScope: { type: 'string', minLength: 1 } }, additionalProperties: false },
-  event: { type: 'object', required: ['kind', 'schemaVersion', 'eventType', 'timestampUtc'], properties: { kind: { const: 'event' }, schemaVersion: { const: SCHEMA_VERSION }, eventType: { type: 'string', minLength: 1 }, timestampUtc: { type: 'string', minLength: 20 } }, additionalProperties: false },
+  event: { type: 'object', required: ['kind', 'schemaVersion', 'eventType', 'timestampUtc'], properties: { kind: { const: 'event' }, schemaVersion: { const: SCHEMA_VERSION }, eventType: { type: 'string', minLength: 1 }, timestampUtc: { type: 'string', pattern: utcTimestampPattern } }, additionalProperties: false },
   memory: { type: 'object', required: ['kind', 'schemaVersion', 'memoryScope', 'provenanceEventId'], properties: { kind: { const: 'memory' }, schemaVersion: { const: SCHEMA_VERSION }, memoryScope: { type: 'string', minLength: 1 }, provenanceEventId: { type: 'string', minLength: 1 } }, additionalProperties: false },
 } as const;
 
-const ajv = new Ajv();
-const validators = Object.fromEntries(
-  Object.entries(contractSchemas).map(([key, schema]) => [key, ajv.compile(schema)]),
-);
+const ajv = new Ajv({ allErrors: true, strict: false });
+const validators = Object.fromEntries(Object.entries(contractSchemas).map(([k, schema]) => [k, ajv.compile(schema)]));
 
-export function validateContract(kind: ContractKind, input: unknown): { ok: boolean; errors: string[] } {
+export interface ContractValidationResult {
+  ok: boolean;
+  errors: string[];
+}
+
+export function validateContract(kind: ContractKind, input: unknown): ContractValidationResult {
   const validator = validators[kind];
   const ok = validator(input) ?? false;
-  return {
-    ok,
-    errors: ok ? [] : (validator.errors ?? []).map((e) => `${e.instancePath || '/'} ${e.message}`),
-  };
+  if (ok) {
+    return { ok: true, errors: [] };
+  }
+  const errors = (validator.errors ?? []).map((e) => {
+    const path = e.instancePath || '/';
+    return `[${kind}] ${path} ${e.message ?? 'validation error'}`;
+  });
+  return { ok: false, errors };
+}
+
+export function isSchemaVersionCompatible(readerVersion: string, payloadVersion: string): boolean {
+  const parse = (version: string): number[] => version.split('.').map((part) => Number.parseInt(part, 10));
+  const [rMajor, rMinor] = parse(readerVersion);
+  const [pMajor, pMinor] = parse(payloadVersion);
+  if (Number.isNaN(rMajor) || Number.isNaN(rMinor) || Number.isNaN(pMajor) || Number.isNaN(pMinor)) {
+    return false;
+  }
+  return rMajor === pMajor && pMinor <= rMinor;
 }
 
 export const migrationNotes = {
-  from_0_9_to_1_0: 'Adds explicit identity/scope and replay mode requirements. Incompatible with unscoped execution records.',
+  from_0_9_to_1_0: 'Adds explicit identity/scope and replay mode requirements; execution records without scoped identity are rejected.',
+  from_1_0_to_future: 'Future 1.x migrations are additive-only for readers; writers must emit their exact schemaVersion to keep replay deterministic.',
 };
 
 export const compatibilityRules = {
-  backwardRead: '1.x readers must accept 1.0+ payloads with additive fields only',
-  forwardWrite: 'Writers must emit exact schemaVersion they implement',
-  replay: 'Replay can only consume immutable events with same major schema version',
+  backwardRead: '1.x readers accept 1.0+ payloads only when fields are additive and major version is unchanged.',
+  forwardWrite: 'Writers must emit exact schemaVersion implemented by their contract package.',
+  replay: 'Replay consumes immutable events and requires matching major version compatibility.',
 };

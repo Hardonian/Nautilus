@@ -217,3 +217,7 @@ All hooks managed by [prek](https://prek.j178.dev/) (installed via `npm install`
 - Update docs for any user-facing behavior changes
 - No secrets, API keys, or credentials committed
 - Limit open PRs to fewer than 10
+
+## Nautilus MVP foundation truth
+- Run `npm run nautilus:golden-path` for deterministic smoke output.
+- MVP docs are under `docs/nautilus/` and explicitly separate implemented/scaffolded/not-supported behavior.

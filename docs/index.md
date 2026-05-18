@@ -407,3 +407,6 @@ Report Vulnerabilities <https://github.com/NVIDIA/NemoClaw/blob/main/SECURITY.md
 resources/license
 Discord <https://discord.gg/XFpfPv9Uvx>
 ```
+
+## Nautilus MVP Foundation
+See `docs/nautilus/GOLDEN_PATH.md` and `docs/nautilus/MVP_FOUNDATION_READINESS.md` for implementation truth, degraded modes, and verification commands.

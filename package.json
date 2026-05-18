@@ -74,7 +74,8 @@
     "check-fixtures": "tsx scripts/check-fixtures.ts",
     "demo:local-proof": "node scripts/demo/run-local-governed-proof.mjs",
     "demo:local-proof:verify": "node scripts/demo/verify-local-governed-proof.mjs",
-    "demo:local-proof:clean": "node scripts/demo/clean-local-governed-proof.mjs"
+    "demo:local-proof:clean": "node scripts/demo/clean-local-governed-proof.mjs",
+    "nautilus:golden-path": "tsx scripts/nautilus/golden-path.ts"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
