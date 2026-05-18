@@ -61,6 +61,7 @@ Scaffolded (not fully materialized): persistent trace store adapters, persistent
 - Verification matrix: [docs/verification/verification-matrix.md](docs/verification/verification-matrix.md)
 - PR verification/reporting guide: [docs/contributing/pr-template-guide.md](docs/contributing/pr-template-guide.md)
 - Branch strategy: [docs/contributing/branch-strategy.md](docs/contributing/branch-strategy.md)
+- RC1 hardening report: [docs/release/nautilus-rc1-hardening.md](docs/release/nautilus-rc1-hardening.md)
 
 ## Security hardening doctrine
 
