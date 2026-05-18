@@ -123,3 +123,9 @@ The governed substrate closure pass is verification-focused: direct branch asser
 
 <!-- platform-matrix:begin -->
 <!-- platform-matrix:end -->
+
+## Nautilus MVP foundation (May 2026)
+- Added hardened Nautilus contracts, state machine transition events, failure semantics matrix, and a deterministic golden-path smoke (`npm run nautilus:golden-path`).
+- Verification commands: `npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build:cli`, `npm run nautilus:golden-path`.
+- Intentionally degraded paths: runtime unavailable, retrieval unavailable, telemetry unavailable/stale, trace store unavailable, and proofpack generation unavailable remain explicit degraded modes.
+- Not yet supported: distributed replay orchestration, durable evidence storage, and cross-cluster execution consensus.
