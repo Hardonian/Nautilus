@@ -3,19 +3,24 @@
 # operatorgraph
 
 ## Implemented now
-- Typed contracts and in-memory scaffolding in `src/lib/core`.
-- Unit tests covering contract validation and fail/degraded behavior.
+- Operator console truth-surface builder for topology, timelines, replay references, retrieval lineage, policy evaluation, degraded states, runtime health, execution outcomes, and memory provenance references.
+- Truthful state labeling across `ready`, `empty`, and `unavailable` states with deterministic explanation text.
+- Replay and policy references surfaced as explicit operator artifacts without synthetic telemetry.
 
-## Intentionally scaffolded
-- Service boundaries are interfaces; production persistence and distributed transport are not implemented in this change.
+## Partial
+- OperatorGraph projection includes policy decision references emitted by policy-pack evaluation artifacts.
+- Trace rendering in this milestone is programmatic (typed console surface object) and not yet a standalone UI route.
+
+## Scaffolded
+- Durable trace persistence and distributed replay query APIs are not implemented in this change.
 
 ## Planned later
-- Runtime integration into OpenShell lifecycle and plugin command surfaces.
-- Durable storage adapters and dashboard/replay presentation layers.
+- Full operator console route and CLI output integration.
+- Historical replay diffing across multiple executions.
 
 ## Known limitations
-- No claim of live telemetry, full observability dashboard, or autonomous learning.
-- Degraded/unavailable states are modeled by typed contracts and explicit denial/unknown fields.
+- No claim of live topology inference beyond provided runtime evidence.
+- Unavailable traces are explicitly labeled unavailable; no inferred substitute graph is generated.
 
 ## Verification commands
 - `npm test -- src/lib/core/nautilus-pillars.test.ts`
