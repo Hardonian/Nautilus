@@ -3,9 +3,10 @@
 
 import { buildNautilusEvent, type NautilusEventEmitter, type NautilusEventEnvelope } from "./nautilus-event-fabric";
 import type { OperatorGraphTraceWriter } from "./operatorgraph";
-import type { RecallForgeWriter } from "./recallforge";
-import type { ApprovalGate, PolicyDecision, RiskSignal } from "./threatmesh";
+import type { RecallForgeRecord, RecallForgeWriter } from "./recallforge";
+import type { ApprovalGate, RiskSignal } from "./threatmesh";
 import type { GraphAwareRetriever, RetrievalResult } from "./meshrag";
+import { buildProofpack, type Proofpack } from "./proofpacks";
 
 export type ExecutionId = string & { readonly __type: "execution_id" };
 
@@ -20,6 +21,7 @@ export interface TruthLoopDependencies {
   policyGate?: ApprovalGate;
   retriever?: GraphAwareRetriever;
   runtime: RuntimeExecutor;
+  proofpackSink?: (proofpack: Proofpack) => void;
 }
 
 export interface TruthLoopReport {
@@ -35,6 +37,7 @@ export interface TruthLoopReport {
   memoryRecorded: boolean;
   degraded: string[];
   status: "completed" | "failed" | "denied";
+  proofpackId?: string;
 }
 
 export function asExecutionId(value: string): ExecutionId {
@@ -48,6 +51,7 @@ export async function runTruthLoop(
 ): Promise<TruthLoopReport> {
   const executionId = asExecutionId(input.executionId);
   const degraded: string[] = [];
+  const memoryRecords: RecallForgeRecord[] = [];
 
   const startedEvent = buildNautilusEvent({
     type: "execution.started",
@@ -135,9 +139,9 @@ export async function runTruthLoop(
 
     let memoryRecorded = false;
     if (deps.memoryStore) {
-      deps.memoryStore.write({
+      const memoryRecord = {
         id: `${executionId}:completion`,
-        category: "execution_lineage",
+        category: "execution_lineage" as const,
         createdAt: completedEvent.timestamp,
         provenanceEvent: {
           type: completedEvent.type,
@@ -147,13 +151,24 @@ export async function runTruthLoop(
           correlationId: input.correlationId,
         },
         data: completedEvent.payload,
-      });
+      };
+      deps.memoryStore.write(memoryRecord);
+      memoryRecords.push(memoryRecord);
       memoryRecorded = true;
     } else {
       degraded.push("memory_store_unavailable");
     }
 
-    return { executionId, correlationId: input.correlationId, startedEvent, completedEvent, policyDecisionRef, retrievalRef, retrievalState, degraded, memoryRecorded, traceId: input.correlationId, status: "completed" };
+    const proofpack = buildProofpack({
+      executionId,
+      correlationId: input.correlationId,
+      events: [startedEvent, completedEvent],
+      memoryRecords,
+      degradedStates: degraded,
+    });
+    deps.proofpackSink?.(proofpack);
+
+    return { executionId, correlationId: input.correlationId, startedEvent, completedEvent, policyDecisionRef, retrievalRef, retrievalState, degraded, memoryRecorded, traceId: input.correlationId, status: "completed", proofpackId: proofpack.id };
   } catch (error) {
     const failedEvent = buildNautilusEvent({
       type: "execution.failed",
@@ -165,6 +180,14 @@ export async function runTruthLoop(
       payload: { reason: error instanceof Error ? error.message : String(error), policyDecisionRef, retrievalRef },
     });
     deps.eventBus.emit(failedEvent);
-    return { executionId, correlationId: input.correlationId, startedEvent, failedEvent, policyDecisionRef, retrievalRef, retrievalState, degraded, memoryRecorded: false, traceId: input.correlationId, status: "failed" };
+    const proofpack = buildProofpack({
+      executionId,
+      correlationId: input.correlationId,
+      events: [startedEvent, failedEvent],
+      degradedStates: degraded,
+    });
+    deps.proofpackSink?.(proofpack);
+
+    return { executionId, correlationId: input.correlationId, startedEvent, failedEvent, policyDecisionRef, retrievalRef, retrievalState, degraded, memoryRecorded: false, traceId: input.correlationId, status: "failed", proofpackId: proofpack.id };
   }
 }

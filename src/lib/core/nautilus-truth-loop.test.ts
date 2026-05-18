@@ -69,3 +69,31 @@ describe("Nautilus truth loop", () => {
     expect(events.list().at(-1)?.type).toBe("execution.failed");
   });
 });
+
+
+describe("proofpack continuity", () => {
+  it("builds a proofpack for completed executions", async () => {
+    const eventBus = new InMemoryNautilusEventBus();
+    const memoryStore = new InMemoryRecallForge();
+    const captured: string[] = [];
+
+    const result = await runTruthLoop(
+      {
+        eventBus,
+        memoryStore,
+        policyGate: { evaluate: () => ({ allowed: true, reasons: ["ok"], action: "safe_action", trustScore: 1, riskSignals: [] }) },
+        runtime: { run: async () => ({ ok: true }) },
+        proofpackSink: (pack) => captured.push(pack.id),
+      },
+      {
+        executionId: "exec-proofpack-1",
+        correlationId: "corr-proofpack-1",
+        action: "safe_action",
+      },
+    );
+
+    expect(result.status).toBe("completed");
+    expect(result.proofpackId).toBeDefined();
+    expect(captured).toContain(result.proofpackId as string);
+  });
+});

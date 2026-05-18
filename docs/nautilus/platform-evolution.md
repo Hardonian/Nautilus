@@ -85,3 +85,17 @@ Deprecated ambiguous language: dashboard, AI hub, command center, cockpit.
 
 ### Planned later
 - Durable storage adapters and production telemetry/runtime health integration beyond in-memory seam coverage.
+
+## M2 truth lineage + edge federation checkpoint (2026-05-18)
+
+### Implemented now
+- `src/lib/core/proofpacks.ts` generates replayable proofpacks from execution event lineage, policy lineage, retrieval lineage, trace lineage, and memory references.
+- `runTruthLoop` now emits proofpack artifacts for both completion and failure paths via an injectable `proofpackSink`.
+- `src/lib/core/edge-mesh.ts` introduces deterministic edge federation contracts for node registration, stale/offline detection, and fail-closed remote execution approval.
+
+### Explicit fail-closed/degraded behavior
+- Remote execution approvals deny by default for unavailable target nodes, untrusted boundaries, or missing operator approval.
+- Federation snapshots report `online`/`degraded`/`offline` states with explicit degraded reasons (`offline_nodes_detected`, `untrusted_boundary_present`).
+
+### Current scope limit
+- Edge mesh contracts are currently in-process control-plane logic and not yet backed by distributed transport.
