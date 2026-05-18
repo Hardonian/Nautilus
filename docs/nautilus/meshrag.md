@@ -2,21 +2,21 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # meshrag
 
-## Implemented now
-- Typed contracts and in-memory scaffolding in `src/lib/core`.
-- Unit tests covering contract validation and fail/degraded behavior.
+## Implemented (M8 minimal real path)
+- Deterministic ingestion, embedding, vector store, semantic cache, and retrieval contracts are implemented in `src/lib/control-plane/meshrag.ts`.
+- Retrieval responses include replayable lineage (`lineageId`, `replayHash`), explicit degraded reasons, evidence references, and trust-weighted ranking.
+- Graph-hop retrieval remains scaffolded only; responses mark `graphHop.status=scaffolded_unavailable`.
 
-## Intentionally scaffolded
-- Service boundaries are interfaces; production persistence and distributed transport are not implemented in this change.
+## Explicit degraded and unavailable states
+- Embedding adapter unavailable.
+- Embedding runtime unavailable with local fallback embedding.
+- Vector store degraded/unavailable.
+- Semantic cache unavailable.
+- Unsupported graph retrieval path.
 
-## Planned later
-- Runtime integration into OpenShell lifecycle and plugin command surfaces.
-- Durable storage adapters and dashboard/replay presentation layers.
+## Tests and verification
+- Retrieval lineage, trust scoring, degraded states, cache contracts, and replay determinism are covered in `src/lib/control-plane/meshrag.test.ts`.
 
-## Known limitations
-- No claim of live telemetry, full observability dashboard, or autonomous learning.
-- Degraded/unavailable states are modeled by typed contracts and explicit denial/unknown fields.
-
-## Verification commands
-- `npm test -- src/lib/core/nautilus-pillars.test.ts`
-- `npm run typecheck:cli`
+## Planned
+- Production embedding runtimes and persistent vector stores.
+- Distributed graph retrieval and replay inspector integration.
