@@ -35,4 +35,25 @@ export class InMemoryRecallForge implements RecallForgeWriter, RecallForgeReader
   }
   query(category: RecallForgeCategory): RecallForgeRecord[] { return this.records.filter((r) => r.category === category); }
   byExecution(executionId: string): RecallForgeRecord[] { return this.records.filter((r) => r.provenanceEvent.executionId === executionId); }
+
+  summarizeOperationalLearning(executionId: string): {
+    successCount: number;
+    failureCount: number;
+    fallbackUsedCount: number;
+    degradedFrequency: number;
+    remediationLinks: string[];
+  } {
+    const records = this.byExecution(executionId);
+    const successCount = records.filter((r) => r.category === "routing_outcome" && r.data.outcome === "success").length;
+    const failureCount = records.filter((r) => r.category === "routing_outcome" && r.data.outcome === "failure").length;
+    const fallbackUsedCount = records.filter((r) => r.category === "routing_outcome" && r.data.fallbackUsed === true).length;
+    const degraded = records.filter((r) => r.category === "routing_outcome" && r.data.degraded === true).length;
+    return {
+      successCount,
+      failureCount,
+      fallbackUsedCount,
+      degradedFrequency: records.length ? degraded / records.length : 0,
+      remediationLinks: records.flatMap((r) => (typeof r.data.remediationRef === "string" ? [r.data.remediationRef] : [])),
+    };
+  }
 }
