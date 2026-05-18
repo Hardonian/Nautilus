@@ -5,6 +5,8 @@
 
 ## Project Overview
 
+Nautilus is the platform identity for this repository. NemoClaw remains the runtime/orchestration engine inside Nautilus.
+
 NVIDIA NemoClaw is an open-source reference stack for running [OpenClaw](https://openclaw.ai) always-on assistants inside [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell) sandboxes more safely. It provides CLI tooling, a blueprint for sandbox orchestration, and security hardening.
 
 **Status:** Alpha (March 2026+). Interfaces may change without notice.
@@ -12,6 +14,20 @@ NVIDIA NemoClaw is an open-source reference stack for running [OpenClaw](https:/
 ## Agent Skills
 
 This repo ships agent skills under `.agents/skills/`, organized into three audience buckets: `nemoclaw-user-*` (end users), `nemoclaw-maintainer-*` (project maintainers), and `nemoclaw-contributor-*` (codebase contributors). Load the `nemoclaw-skills-guide` skill for a full catalog and quick decision guide mapping tasks to skills.
+
+
+## Nautilus pillar boundaries
+
+The repository is being consolidated under these canonical platform pillars:
+
+- `core/runtime` (NemoClaw Runtime boundary)
+- `core/recallforge`
+- `core/operatorgraph`
+- `core/threatmesh`
+- `core/meshrag`
+- `core/event-fabric` (canonical event contract)
+
+When adding features, prefer extending existing implementation paths and introducing contracts under these boundaries before moving code.
 
 ## Architecture
 
