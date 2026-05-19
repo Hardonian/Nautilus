@@ -314,8 +314,8 @@ function resolveUpstreamDigest(
   // air-gapped with pre-staged images, and is sub-second when warm).
   let upstreamDigest = inspectImageDigest(
     opts.upstreamImage,
-    opts.runCaptureImpl,
-    opts.inspectTimeoutMs,
+    runCaptureImpl,
+    inspectTimeoutMs,
   );
 
   if (!upstreamDigest) {
@@ -337,22 +337,22 @@ function resolveUpstreamDigest(
       );
     }
 
-    opts.log(`  Pulling upstream cluster image: ${opts.upstreamImage}`);
-    const pullResult = opts.runImpl(["docker", "pull", opts.upstreamImage], {
+    log(`  Pulling upstream cluster image: ${opts.upstreamImage}`);
+    const pullResult = runImpl(["docker", "pull", opts.upstreamImage], {
       ignoreError: true,
-      timeoutMs: opts.pullTimeoutMs,
+      timeoutMs: pullTimeoutMs,
     });
     if (pullResult.status !== 0) {
       throw new ClusterImagePatchError(
-        `failed to pull upstream cluster image ${opts.upstreamImage} ` +
-          `(docker pull exit ${pullResult.status}; timeout ${opts.pullTimeoutMs} ms)`,
+          `failed to pull upstream cluster image ${opts.upstreamImage} ` +
+          `(docker pull exit ${pullResult.status}; timeout ${pullTimeoutMs} ms)`,
       );
     }
 
     upstreamDigest = inspectImageDigest(
       opts.upstreamImage,
-      opts.runCaptureImpl,
-      opts.inspectTimeoutMs,
+      runCaptureImpl,
+      inspectTimeoutMs,
     );
     if (!upstreamDigest) {
       throw new ClusterImagePatchError(
@@ -388,30 +388,30 @@ function buildPatchedImage(
   );
   try {
     const dockerfilePath = path.join(tmpDir, "Dockerfile");
-    opts.fsApi.writeFileSync(dockerfilePath, opts.dockerfile, "utf-8");
+    fsApi.writeFileSync(dockerfilePath, dockerfile, "utf-8");
 
-    const buildResult = opts.runImpl(
+    const buildResult = runImpl(
       [
         "docker",
         "build",
         "--build-arg",
         `UPSTREAM=${opts.upstreamImage}`,
         "-t",
-        opts.tag,
+        tag,
         tmpDir,
       ],
-      { ignoreError: true, timeoutMs: opts.buildTimeoutMs },
+      { ignoreError: true, timeoutMs: buildTimeoutMs },
     );
 
     if (buildResult.status !== 0) {
       throw new ClusterImagePatchError(
-        `failed to build patched cluster image ` +
-          `(docker build exit ${buildResult.status}; timeout ${opts.buildTimeoutMs} ms)`,
+          `failed to build patched cluster image ` +
+          `(docker build exit ${buildResult.status}; timeout ${buildTimeoutMs} ms)`,
       );
     }
   } finally {
     try {
-      opts.fsApi.rmSync(tmpDir, { recursive: true, force: true });
+      fsApi.rmSync(tmpDir, { recursive: true, force: true });
     } catch {
       // Best-effort cleanup; don't mask the build outcome with a tmp-cleanup error.
     }

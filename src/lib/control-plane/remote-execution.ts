@@ -38,15 +38,19 @@ interface SshCredentials {
 }
 
 interface RemoteWorkerProofConfig {
+  transportType: "ssh" | "https-signed";
   credentials: SshCredentials | Record<string, unknown>;
+  expectedOutputHash?: string;
   timeoutMs?: number;
 }
 
 interface RemoteWorkerProofResult {
-  ok: boolean;
-  stdout: string;
-  stderr: string;
-  exitCode: number;
+  success: boolean;
+  output: string;
+  outputHash: string;
+  hashMatches: boolean;
+  durationMs: number;
+  error?: string;
 }
 
 export type RemoteExecutionStatus = "disabled" | "policy_denied" | "approval_required" | "authorization_denied" | "unavailable" | "degraded" | "failed" | "succeeded" | "not_supported";
@@ -142,13 +146,14 @@ export async function executeSignedHttps(endpoint: string, command: string, time
 
 export async function executeRemoteWorkerProof(config: RemoteWorkerProofConfig, command: string): Promise<RemoteWorkerProofResult> {
   const start = Date.now();
+  const timeoutMs = config.timeoutMs ?? 30_000;
 
   if (config.transportType === "ssh") {
     const creds = config.credentials as SshCredentials;
     if (!creds.host || !creds.user) {
       return { success: false, output: "", outputHash: "", hashMatches: false, durationMs: Date.now() - start, error: "missing_ssh_credentials" };
     }
-    const result = await executeSshCommand(creds, command, config.timeoutMs);
+    const result = await executeSshCommand(creds, command, timeoutMs);
     const output = result.exitCode === 0 ? result.stdout : result.stderr;
     const outputHash = computeOutputHash(output);
     const hashMatches = config.expectedOutputHash ? outputHash === config.expectedOutputHash : true;
@@ -167,7 +172,7 @@ export async function executeRemoteWorkerProof(config: RemoteWorkerProofConfig, 
     if (!signedCreds.endpoint || !signedCreds.signingKey) {
       return { success: false, output: "", outputHash: "", hashMatches: false, durationMs: Date.now() - start, error: "missing_signed_https_credentials" };
     }
-    const response = await executeSignedHttps(signedCreds.endpoint, command, config.timeoutMs, signedCreds.signingKey);
+    const response = await executeSignedHttps(signedCreds.endpoint, command, timeoutMs, signedCreds.signingKey);
     const output = response.body;
     const outputHash = computeOutputHash(output);
     const hashMatches = config.expectedOutputHash ? outputHash === config.expectedOutputHash : true;

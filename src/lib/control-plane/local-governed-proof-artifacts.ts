@@ -48,7 +48,7 @@ export function cleanLocalGovernedProofArtifacts(rootDir: string): string {
 }
 
 function readJson(runDir: string, name: string): Record<string, unknown> {
-  return readJsonFileSync(path.join(runDir, name)) as Record<string, unknown>;
+  return readJsonSync(path.join(runDir, name)) as Record<string, unknown>;
 }
 
 function readNdjson(runDir: string, name: string): Record<string, unknown>[] {
