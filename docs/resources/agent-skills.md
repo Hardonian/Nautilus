@@ -93,6 +93,6 @@ The following table shows how each AI coding assistant can use the NemoClaw skil
 
 | Assistant | Skill discovery |
 |-----------|----------------|
-| Cursor | Reads `AGENTS.md` at the project root, which references `.agents/skills/`. |
+| Cursor | Reads project-level skill directories (for example `.agents/skills/` or `.cursor/skills/`). This repository uses `.agents/skills/` as the canonical source and includes a root `AGENTS.md` pointer for compatibility. |
 | Claude Code | Follows the `.claude/skills/` symlink, which points to `.agents/skills/`. |
-| Other assistants | Point the assistant to `.agents/skills/` if it supports project-level skill loading. |
+| Other assistants | Point project-level skill loading to `.agents/skills/` when the connector supports skill discovery. |
