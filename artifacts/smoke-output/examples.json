@@ -1,0 +1,21 @@
+
+> nemoclaw@0.1.0 nautilus:examples
+> tsx scripts/nautilus/examples-smoke.ts
+
+{
+  "kind": "nautilus.examples.smoke",
+  "ok": true,
+  "checked": [
+    "golden-path",
+    "runtime-unavailable",
+    "policy-denied",
+    "retrieval-degraded",
+    "proofpack-partial",
+    "replay-from-evidence",
+    "stale-telemetry",
+    "storage-pressure",
+    "queue-saturation",
+    "full-mvp-demo"
+  ],
+  "failures": []
+}

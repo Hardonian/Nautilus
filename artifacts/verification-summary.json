@@ -1,0 +1,6 @@
+{
+  "generatedAt": "2026-05-19T02:24:13.417Z",
+  "status": "degraded",
+  "checks": [],
+  "note": "Run npm run verification:summary to produce deterministic check results."
+}
