@@ -345,6 +345,7 @@ function resolveUpstreamDigest(
     if (pullResult.status !== 0) {
       throw new ClusterImagePatchError(
         `failed to pull upstream cluster image ${opts.upstreamImage} ` +
+          `failed to pull upstream cluster image ${opts.upstreamImage} ` +
           `(docker pull exit ${pullResult.status}; timeout ${pullTimeoutMs} ms)`,
       );
     }
@@ -405,7 +406,7 @@ function buildPatchedImage(
 
     if (buildResult.status !== 0) {
       throw new ClusterImagePatchError(
-        `failed to build patched cluster image ` +
+          `failed to build patched cluster image ` +
           `(docker build exit ${buildResult.status}; timeout ${buildTimeoutMs} ms)`,
       );
     }

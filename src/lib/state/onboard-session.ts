@@ -388,7 +388,7 @@ export function loadSession(): Session | null {
       return null;
     }
     const parsed = readJsonSync(SESSION_FILE);
-    return normalizeSession(normalizeJsonValue(parsed));
+    return normalizeSession(isObject(parsed) ? (parsed as SessionJsonValue) : undefined);
   } catch {
     return null;
   }

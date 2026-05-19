@@ -847,7 +847,7 @@ function backupStateDirectories(
   dir: string,
   stateDirs: string[],
   backupPath: string,
-): { backedUpDirs: string[]; failedDirs: string[]; error?: string; earlyReturn?: boolean } {
+): { success: boolean; backedUpDirs: string[]; failedDirs: string[]; error?: string; earlyReturn?: boolean } {
   const backedUpDirs: string[] = [];
   const failedDirs: string[] = [];
 
@@ -884,6 +884,7 @@ function backupStateDirectories(
       `FAILED: SSH dir check exited ${existResult.status} — cannot determine which dirs exist`,
     );
     return {
+      success: false,
       backedUpDirs,
       failedDirs: [...stateDirs],
       earlyReturn: true,
@@ -892,7 +893,7 @@ function backupStateDirectories(
 
   if (existingDirs.length === 0) {
     _log("No state dirs found in sandbox (all empty)");
-    return { backedUpDirs, failedDirs };
+    return { success: true, backedUpDirs, failedDirs };
   }
 
   // NC-2227-04: Pre-backup audit — reject symlinks, hardlinks, and special
@@ -916,6 +917,7 @@ function backupStateDirectories(
       stderr || auditResult.error?.message || `exit ${String(auditResult.status)}`;
     _log(`FAILED: Pre-backup audit command failed — ${detail}`);
     return {
+      success: false,
       backedUpDirs,
       failedDirs: [...existingDirs],
       error: `Pre-backup audit failed: ${detail}`,
@@ -930,6 +932,7 @@ function backupStateDirectories(
       `SECURITY: Pre-backup audit found ${violations.length} unsafe entries: ${violations.slice(0, 5).join("; ")}`,
     );
     return {
+      success: false,
       backedUpDirs,
       failedDirs: [...existingDirs],
       error: `Pre-backup audit rejected: symlinks, hard links, or special files found in state dirs: ${violations.slice(0, 3).join("; ")}`,
@@ -1012,7 +1015,7 @@ function backupStateDirectories(
     failedDirs.push(...existingDirs);
   }
 
-  return { backedUpDirs, failedDirs };
+  return { success: failedDirs.length === 0, backedUpDirs, failedDirs };
 }
 
 export function backupSandboxState(sandboxName: string, options: BackupOptions = {}): BackupResult {
