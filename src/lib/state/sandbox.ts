@@ -1115,7 +1115,7 @@ export function backupSandboxState(sandboxName: string, options: BackupOptions =
       backedUpDirs.push(...dirsResult.backedUpDirs);
       failedDirs.push(...dirsResult.failedDirs);
 
-      if (!dirsResult.success && dirsResult.error) {
+      if (dirsResult.error) {
          return {
             success: false,
             manifest,

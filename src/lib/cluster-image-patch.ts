@@ -332,7 +332,7 @@ function resolveUpstreamDigest(
     if (probeResult.status !== 0) {
       throw new ClusterImagePatchError(
         `cannot reach upstream registry for ${opts.upstreamImage} ` +
-          `(docker manifest inspect exit ${probeResult.status} within ${opts.inspectTimeoutMs} ms). ` +
+          `(docker manifest inspect exit ${probeResult.status} within ${inspectTimeoutMs} ms). ` +
           "See docs/reference/troubleshooting.md for the manual daemon.json workaround.",
       );
     }
@@ -344,6 +344,7 @@ function resolveUpstreamDigest(
     });
     if (pullResult.status !== 0) {
       throw new ClusterImagePatchError(
+        `failed to pull upstream cluster image ${opts.upstreamImage} ` +
           `failed to pull upstream cluster image ${opts.upstreamImage} ` +
           `(docker pull exit ${pullResult.status}; timeout ${pullTimeoutMs} ms)`,
       );

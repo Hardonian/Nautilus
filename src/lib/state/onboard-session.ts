@@ -429,6 +429,27 @@ function parseLockFile(contents: string): LockInfo | null {
 
 const MALFORMED_STALE_SECONDS = 30;
 
+function normalizeJsonValue(value: unknown): SessionJsonValue | undefined {
+  if (value === null || value === undefined || typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
+  if (Array.isArray(value)) {
+    const normalized: SessionJsonValue[] = [];
+    for (const entry of value) {
+      const parsed = normalizeJsonValue(entry);
+      if (parsed !== undefined) normalized.push(parsed);
+    }
+    return normalized;
+  }
+  if (isObject(value)) {
+    const normalized: JsonObject = {};
+    for (const [key, entry] of Object.entries(value)) {
+      const parsed = normalizeJsonValue(entry);
+      if (parsed !== undefined) normalized[key] = parsed;
+    }
+    return normalized;
+  }
+  return undefined;
+}
+
 function isProcessAlive(pid: number): boolean {
   if (!Number.isInteger(pid) || pid <= 0) return false;
   try {
