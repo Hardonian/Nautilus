@@ -176,7 +176,6 @@ export interface ControlDecision {
 
 export type ExecutionPhase = "received" | "policy" | "scheduling" | "execution" | "completed" | "failed";
 export interface ExecutionReceipt {
-  executionLineage?: ExecutionReceiptLineage;
   version: string;
   receiptId: string;
   requestId: string;
@@ -205,4 +204,3 @@ export interface ExecutionReceiptLineage {
   authorizationLineageId?: string;
   replayReferenceId?: string;
 }
-

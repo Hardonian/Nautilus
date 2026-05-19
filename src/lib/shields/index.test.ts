@@ -121,8 +121,8 @@ describe("shields — unit logic", () => {
         JSON.stringify(betaState, null, 2),
       );
 
-      const alpha = readJsonFileSync(path.join(stateDir, "shields-alpha.json"));
-      const beta = readJsonFileSync(path.join(stateDir, "shields-beta.json"));
+      const alpha = readJsonSync(path.join(stateDir, "shields-alpha.json"));
+      const beta = readJsonSync(path.join(stateDir, "shields-beta.json"));
       expect(alpha.shieldsDown).toBe(true);
       expect(beta.shieldsDown).toBe(false);
     });
