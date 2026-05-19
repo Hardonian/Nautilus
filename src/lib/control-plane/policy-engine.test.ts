@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect, test, describe } from "vitest";
-import { evaluatePolicyEngine, mutatePolicyPack, computePolicyPackDigest, PolicyPack, PolicyInheritance, PolicyOverride } from "./policy-engine";
+import { evaluatePolicy, mutatePolicyPack, computePolicyPackDigest, PolicyPack, PolicyInheritance, PolicyOverride } from "./policy-engine";
 import type { PolicyRule, PolicyEvaluationContext } from "./governance";
 
 describe("Policy Engine", () => {
@@ -47,7 +47,7 @@ describe("Policy Engine", () => {
     };
     const inheritance: PolicyInheritance = { activeScopes: ["global", "environment"], packs: [globalPack, envPack] };
 
-    const trace = evaluatePolicyEngine(inheritance, dummyContext);
+    const trace = evaluatePolicy(inheritance, dummyContext);
     expect(trace.finalEffect).toBe("allow"); // environment wins over global
     expect(trace.winningScope).toBe("environment");
   });
@@ -64,7 +64,7 @@ describe("Policy Engine", () => {
     };
     const inheritance: PolicyInheritance = { activeScopes: ["global"], packs: [pack] };
 
-    const trace = evaluatePolicyEngine(inheritance, dummyContext);
+    const trace = evaluatePolicy(inheritance, dummyContext);
     expect(trace.finalEffect).toBe("deny");
     expect(trace.winningRuleId).toBe("deny-all");
   });
@@ -84,7 +84,7 @@ describe("Policy Engine", () => {
     const pack2: PolicyPack = { packId: "p2", version: "v1", scope: "execution", rules: [], overrides: [override] };
 
     const inheritance: PolicyInheritance = { activeScopes: ["global", "execution"], packs: [pack1, pack2] };
-    const trace = evaluatePolicyEngine(inheritance, dummyContext);
+    const trace = evaluatePolicy(inheritance, dummyContext);
 
     expect(trace.finalEffect).toBe("allow");
     expect(trace.winningScope).toBe("execution"); // the override's scope
@@ -105,7 +105,7 @@ describe("Policy Engine", () => {
     const pack2: PolicyPack = { packId: "p2", version: "v1", scope: "emergency", rules: [], overrides: [override] };
 
     const inheritance: PolicyInheritance = { activeScopes: ["global", "emergency"], packs: [pack1, pack2] };
-    const trace = evaluatePolicyEngine(inheritance, dummyContext);
+    const trace = evaluatePolicy(inheritance, dummyContext);
 
     expect(trace.finalEffect).toBe("deny");
     expect(trace.winningScope).toBe("emergency");
@@ -133,17 +133,17 @@ describe("Policy Engine", () => {
     const pack1: PolicyPack = { packId: "p1", version: "v1", scope: "global", rules: [r1, r2], overrides: [] };
     const pack2: PolicyPack = { packId: "p1", version: "v1", scope: "global", rules: [r2, r1], overrides: [] };
 
-    const trace1 = evaluatePolicyEngine({ activeScopes: ["global"], packs: [pack1] }, dummyContext);
-    const trace2 = evaluatePolicyEngine({ activeScopes: ["global"], packs: [pack2] }, dummyContext);
+    const trace1 = evaluatePolicy({ activeScopes: ["global"], packs: [pack1] }, dummyContext);
+    const trace2 = evaluatePolicy({ activeScopes: ["global"], packs: [pack2] }, dummyContext);
 
     // Sort order should ensure deterministic graph edges and nodes
-    expect(trace1.decisions.nodes.map(n => n.ruleId).sort()).toEqual(trace2.decisions.nodes.map(n => n.ruleId).sort());
+    expect(trace1.decisions.nodes.map((n: any) => n.ruleId).sort()).toEqual(trace2.decisions.nodes.map((n: any) => n.ruleId).sort());
   });
 
   test("replay trace validation", () => {
     const pack: PolicyPack = { packId: "p1", version: "v1", scope: "global", rules: [allowRule], overrides: [] };
-    const trace1 = evaluatePolicyEngine({ activeScopes: ["global"], packs: [pack] }, dummyContext);
-    const trace2 = evaluatePolicyEngine({ activeScopes: ["global"], packs: [pack] }, dummyContext);
+    const trace1 = evaluatePolicy({ activeScopes: ["global"], packs: [pack] }, dummyContext);
+    const trace2 = evaluatePolicy({ activeScopes: ["global"], packs: [pack] }, dummyContext);
 
     // Exclude traceId and timestamp for equivalence check
     const { traceId: t1, evaluatedAt: e1, ...rest1 } = trace1;

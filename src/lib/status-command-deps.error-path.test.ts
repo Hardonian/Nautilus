@@ -20,7 +20,7 @@ vi.mock("./messaging-conflict", () => ({
   backfillMessagingChannels: vi.fn(() => {
     throw new Error("simulated registry write failure");
   }),
-  findAllOverlaps: vi.fn(() => [{ provider: "a", channels: ["telegram"] }]),
+  findAllOverlaps: vi.fn(() => [{ channel: "telegram", sandboxes: ["a", "b"], reason: "matching-token" }]),
 }));
 
 // Stub openshell resolution so the module can be imported without a real binary.
@@ -77,7 +77,7 @@ describe("backfillAndFindOverlaps – catch block", () => {
 
     // The catch block must absorb the throw and return an empty array so that
     // the status command remains usable even when the gateway is unreachable.
-    expect(deps.backfillAndFindOverlaps()).toEqual([]);
+    expect(deps.backfillAndFindOverlaps!()).toEqual([]);
 
     // Confirm backfillMessagingChannels was actually called (so the throw
     // came from inside the try block, not from a guard before it).
@@ -97,20 +97,20 @@ describe("backfillAndFindOverlaps – catch block", () => {
 
     const deps = buildStatusCommandDeps("/tmp/fake-root");
 
-    expect(deps.backfillAndFindOverlaps()).toEqual([]);
+    expect(deps.backfillAndFindOverlaps!()).toEqual([]);
     expect(backfillMessagingChannels).toHaveBeenCalledOnce();
     expect(findAllOverlaps).toHaveBeenCalledOnce();
   });
 
   it("returns the real overlap list when neither call throws", () => {
-    const overlaps = [{ provider: "some-provider", channels: ["telegram"] }];
+    const overlaps = [{ channel: "telegram", sandboxes: ["sb1", "sb2"], reason: "matching-token" }];
     vi.mocked(backfillMessagingChannels).mockImplementation(() => undefined);
-    vi.mocked(findAllOverlaps).mockReturnValue(overlaps as ReturnType<typeof findAllOverlaps>);
+    vi.mocked(findAllOverlaps).mockReturnValue(overlaps as unknown as ReturnType<typeof findAllOverlaps>);
 
     const deps = buildStatusCommandDeps("/tmp/fake-root");
 
     // Sanity-check the happy path: the catch block must not interfere when
     // nothing throws.
-    expect(deps.backfillAndFindOverlaps()).toBe(overlaps);
+    expect(deps.backfillAndFindOverlaps!()).toBe(overlaps);
   });
 });

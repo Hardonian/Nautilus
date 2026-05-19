@@ -363,7 +363,7 @@ describe("onboard session", () => {
     // parseTelegramConfig() path.
     const seed = session.createSession();
     session.saveSession(seed);
-    const onDisk = readJsonSync(session.SESSION_FILE);
+    const onDisk = readJsonSync(session.SESSION_FILE) as any;
     onDisk.telegramConfig = { requireMention: "yes" };
     fs.writeFileSync(session.SESSION_FILE, JSON.stringify(onDisk));
 
@@ -452,7 +452,7 @@ describe("onboard session", () => {
     const acquired = session.acquireOnboardLock("nemoclaw onboard --resume");
     expect(acquired.acquired).toBe(true);
 
-    const written = readJsonSync(session.LOCK_FILE);
+    const written = readJsonSync(session.LOCK_FILE) as any;
     expect(written.pid).toBe(process.pid);
   });
 
@@ -491,7 +491,7 @@ describe("onboard session", () => {
       const acquired = session.acquireOnboardLock("nemoclaw onboard --resume");
       expect(acquired.acquired).toBe(true);
 
-      const written = readJsonSync(session.LOCK_FILE);
+      const written = readJsonSync(session.LOCK_FILE) as any;
       expect(written.pid).toBe(process.pid);
     } finally {
       readSpy.mockRestore();
@@ -562,7 +562,7 @@ describe("onboard session", () => {
       // The fresh lock that the simulated concurrent process wrote
       // should still be on disk after acquireOnboardLock returns.
       expect(fs.existsSync(session.LOCK_FILE)).toBe(true);
-      const onDisk = readJsonSync(session.LOCK_FILE);
+      const onDisk = readJsonSync(session.LOCK_FILE) as any;
       // The lock content should be the fresh claim, NOT the stale one
       // and NOT a new one written by acquireOnboardLock after a wrong
       // unlink.
@@ -601,7 +601,7 @@ describe("onboard session", () => {
     const acquired = session.acquireOnboardLock("nemoclaw onboard --resume");
     expect(acquired.acquired).toBe(true);
     expect(fs.existsSync(session.LOCK_FILE)).toBe(true);
-    const written = readJsonSync(session.LOCK_FILE);
+    const written = readJsonSync(session.LOCK_FILE) as any;
     expect(written.pid).toBe(process.pid);
     session.releaseOnboardLock();
   });
@@ -638,7 +638,7 @@ describe("onboard session", () => {
       const acquired = session.acquireOnboardLock("nemoclaw onboard --resume");
       expect(acquired.acquired).toBe(false);
       expect(acquired.holderPid).toBe(process.pid);
-      const onDisk = readJsonSync(session.LOCK_FILE);
+      const onDisk = readJsonSync(session.LOCK_FILE) as any;
       expect(onDisk.command).toContain("fresh malformed-cleanup race claimant");
     } finally {
       statSpy.mockRestore();

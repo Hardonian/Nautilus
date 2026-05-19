@@ -121,8 +121,8 @@ describe("shields — unit logic", () => {
         JSON.stringify(betaState, null, 2),
       );
 
-      const alpha = readJsonSync(path.join(stateDir, "shields-alpha.json"));
-      const beta = readJsonSync(path.join(stateDir, "shields-beta.json"));
+      const alpha = readJsonSync(path.join(stateDir, "shields-alpha.json")) as any;
+      const beta = readJsonSync(path.join(stateDir, "shields-beta.json")) as any;
       expect(alpha.shieldsDown).toBe(true);
       expect(beta.shieldsDown).toBe(false);
     });
@@ -216,7 +216,7 @@ describe("shields — unit logic", () => {
       const markerPath = path.join(stateDir, "shields-timer-openclaw.json");
       fs.writeFileSync(markerPath, JSON.stringify(marker), { mode: 0o600 });
 
-      const loaded = readJsonSync(markerPath);
+      const loaded = readJsonSync(markerPath) as any;
       expect(loaded.pid).toBe(12345);
       expect(loaded.sandboxName).toBe("openclaw");
       expect(loaded.restoreAt).toBeDefined();

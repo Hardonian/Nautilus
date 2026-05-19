@@ -42,7 +42,6 @@ interface RemoteWorkerProofConfig {
   credentials: SshCredentials | Record<string, unknown>;
   expectedOutputHash?: string;
   timeoutMs?: number;
-  expectedOutputHash?: string;
 }
 
 interface RemoteWorkerProofResult {

@@ -338,7 +338,7 @@ export function buildScenarioOutput(scenario: ScenarioDefinition) {
     ...validateFixture("proofpack", {
       kind: "proofpack",
       schemaVersion: SCHEMA_VERSION,
-      proofpackScope: String(proofpack.proofpackScope),
+      proofpackScope: String((proofpack as any).proofpackScope),
     }),
   ];
   const events = stateTransitions(scenario);

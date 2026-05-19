@@ -69,7 +69,7 @@ describe("runtime intelligence m2", () => {
 
   it("records operational learning provenance", () => {
     const forge = new InMemoryRecallForge();
-    forge.write({ id: "1", category: "routing_outcome", createdAt: "2026-05-18", provenanceEvent: { type: "route", timestamp: "2026-05-18", source: "runtime", executionId: "e1", correlationId: "c1" }, data: { outcome: "success", fallbackUsed: true, degraded: true, remediationRef: "kb:1" } });
+    forge.write({ id: "1", category: "routing_outcome", createdAt: "2026-05-18", provenanceEvent: { type: "execution.completed", timestamp: "2026-05-18", source: "runtime", executionId: "e1", correlationId: "c1" }, data: { outcome: "success", fallbackUsed: true, degraded: true, remediationRef: "kb:1" } });
     const summary = forge.summarizeOperationalLearning("e1");
     expect(summary.fallbackUsedCount).toBe(1);
     expect(summary.remediationLinks).toContain("kb:1");

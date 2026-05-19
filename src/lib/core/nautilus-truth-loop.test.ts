@@ -81,7 +81,7 @@ describe("proofpack continuity", () => {
       {
         eventBus,
         memoryStore,
-        policyGate: { evaluate: () => ({ allowed: true, reasons: ["ok"], action: "safe_action", trustScore: 1, riskSignals: [] }) },
+        policyGate: { evaluate: () => ({ allowed: true, reasons: ["ok"], action: "safe_action", trustScore: { value: 1, source: "test" }, riskSignals: [] }) },
         runtime: { run: async () => ({ ok: true }) },
         proofpackSink: (pack) => captured.push(pack.id),
       },

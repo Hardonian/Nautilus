@@ -26,7 +26,7 @@ describe("local runtime adapters", () => {
 
   it("normalizes capability snapshot and model listing", async () => {
     vi.stubEnv("NEMOCLAW_OPENAI_COMPAT_URL", "http://localhost:1234");
-    vi.spyOn(globalThis, "fetch").mockImplementation(async (input: RequestInfo | URL) => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input: any) => {
       const url = String(input);
       if (url.endsWith("/health")) return new Response(JSON.stringify({ ok: true }), { status: 200 });
       if (url.endsWith("/v1/models")) return new Response(JSON.stringify({ data: [{ id: "mistral" }] }), { status: 200 });
