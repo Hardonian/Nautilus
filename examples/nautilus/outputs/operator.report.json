@@ -1,0 +1,31 @@
+{
+  "kind": "nautilus.operator.report.sample",
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
+  "notice": "deterministic fixture/sample; not live telemetry or production runtime output",
+  "generatedAt": "2026-03-01T00:00:00.000Z",
+  "packageReady": true,
+  "commands": [
+    "npm run nautilus:golden-path",
+    "npm run nautilus:runtime-health-smoke",
+    "npm run nautilus:examples -- policy-denied",
+    "npm run nautilus:examples -- retrieval-degraded",
+    "npm run nautilus:proofpack-smoke",
+    "npm run nautilus:replay-smoke",
+    "npm run nautilus:examples -- stale-telemetry",
+    "npm run nautilus:examples -- storage-pressure",
+    "npm run nautilus:examples -- queue-saturation",
+    "npm run nautilus:examples -- full-mvp-demo"
+  ],
+  "degradedStatesDocumented": [
+    "runtime-unavailable",
+    "policy-denied",
+    "retrieval-degraded",
+    "proofpack-partial",
+    "stale-telemetry",
+    "storage-pressure",
+    "queue-saturation"
+  ],
+  "unsupportedFeaturesDocumented": true
+}

@@ -14,10 +14,11 @@ import { isErrnoException } from "../core/errno";
 import type { JsonObject, JsonValue } from "../core/json-types";
 import type { WebSearchConfig } from "../inference/web-search";
 import {
-  sanitizeMessagingChannelConfig,
   type MessagingChannelConfig,
+  sanitizeMessagingChannelConfig,
 } from "../messaging-channel-config";
 import { redactSensitiveText, redactUrl } from "../security/redact";
+import { readJsonSync } from "../core/json-file";
 
 export const SESSION_VERSION = 1;
 export const SESSION_DIR = path.join(process.env.HOME || "/tmp", ".nemoclaw");
@@ -386,7 +387,7 @@ export function loadSession(): Session | null {
     if (!fs.existsSync(SESSION_FILE)) {
       return null;
     }
-    const parsed = JSON.parse(fs.readFileSync(SESSION_FILE, "utf-8"));
+    const parsed = readJsonSync(SESSION_FILE);
     return normalizeSession(parsed);
   } catch {
     return null;

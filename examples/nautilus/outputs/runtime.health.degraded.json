@@ -1,0 +1,23 @@
+{
+  "kind": "nautilus.runtime.health.sample",
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
+  "notice": "deterministic fixture/sample; not live telemetry or production runtime output",
+  "generatedAt": "2026-03-01T00:00:00.000Z",
+  "runtimeStatus": "unavailable",
+  "degraded": true,
+  "checks": [
+    {
+      "name": "local-runtime",
+      "status": "unavailable",
+      "reason": "fixture does not require a running sandbox"
+    },
+    {
+      "name": "contracts",
+      "status": "available",
+      "reason": "contract validators loaded"
+    }
+  ],
+  "recovery": "fallback to local or queue retry"
+}

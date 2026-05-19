@@ -1,0 +1,12 @@
+{
+  "kind": "retrieval",
+  "schemaVersion": "1.0.0",
+  "mode": "historical",
+  "records": [
+    {
+      "id": "retrieval-fixture-001",
+      "source": "deterministic-fixture",
+      "redacted": true
+    }
+  ]
+}

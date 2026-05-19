@@ -30,6 +30,25 @@ import {
 const execAsync = promisify(exec);
 const execFileAsync = promisify(execFile);
 
+interface SshCredentials {
+  host: string;
+  port: number;
+  user: string;
+  privateKeyPath?: string;
+}
+
+interface RemoteWorkerProofConfig {
+  credentials: SshCredentials | Record<string, unknown>;
+  timeoutMs?: number;
+}
+
+interface RemoteWorkerProofResult {
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}
+
 export type RemoteExecutionStatus = "disabled" | "policy_denied" | "approval_required" | "authorization_denied" | "unavailable" | "degraded" | "failed" | "succeeded" | "not_supported";
 export interface RemoteExecutionRequest { requestId: string; nowIso: string; action: string; command: string; commandDescriptor?: CommandDescriptor; nodeId?: string; targetEndpoint?: string; auth?: { headerName?: string; token?: string }; approved?: boolean; timeoutMs?: number; executionPlanRequired?: boolean; commandPolicy?: CommandExecutionPolicy; }
 export interface RemoteExecutionResult { status: RemoteExecutionStatus; output?: string; degradedReason?: string; errorCode?: string; receipt: ExecutionReceipt; events: OperationalEvent[]; replayRef: ExecutionReceipt["provenance"]; }

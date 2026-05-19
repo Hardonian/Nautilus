@@ -1,11 +1,22 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# NemoClaw Fork: Local Operator-Grade Execution and Governance
+# Nautilus: Deterministic Operational AI Infrastructure Platform
 
-This fork of NemoClaw is being shaped into a governed heterogeneous execution substrate for local operator-grade AI execution with explicit release-truth boundaries.
+Nautilus is the platform identity for deterministic operational AI infrastructure. NemoClaw remains the runtime/orchestration engine inside the platform.
 
-## Why this fork exists
+## Why Nautilus exists
+## Nautilus platform structure
+
+- **NemoClaw Runtime** (`src/`, `nemoclaw/src/`, `bin/`)
+- **RecallForge** (`core/recallforge/`)
+- **OperatorGraph** (`core/operatorgraph/`, `operator-console/`)
+- **ThreatMesh** (`core/threatmesh/`, security and policy modules)
+- **MeshRAG** (`core/meshrag/`)
+- **Canonical Event Fabric** (`core/event-fabric/contracts.ts`)
+
+See the architecture truth + migration plan: [docs/nautilus/platform-evolution.md](docs/nautilus/platform-evolution.md).
+
 
 The fork prioritizes deterministic and auditable control over opaque autonomy. It focuses on:
 - execution plane and control plane separation,
@@ -22,6 +33,25 @@ The fork prioritizes deterministic and auditable control over opaque autonomy. I
 - **Planned:** external orchestration adapter integrations after stable local contracts.
 - **Not implemented:** distributed execution, GPU balancing, Dynamo integration, autonomous orchestration/self-healing, automatic policy learning.
 
+
+## Nautilus M1 truth loop status (implemented now)
+
+Implemented in `src/lib/core/nautilus-truth-loop.ts` with tests in `src/lib/core/nautilus-truth-loop.test.ts`:
+- Event Fabric envelope emission for `execution.started`, `policy.evaluated`, and terminal execution events.
+- ThreatMesh fail-closed behavior when policy engine is unavailable.
+- OperatorGraph trace correlation via shared `correlationId`/`traceId` semantics (in-memory adapter wiring).
+- MeshRAG explicit retrieval states: `completed` or `unavailable` (degraded path, no simulated retrieval).
+- RecallForge memory writes with required source-event provenance on successful completion.
+- Operator report object (`TruthLoopReport`) that summarizes execution outcome and degraded states.
+
+Explicit degraded/unavailable states currently surfaced:
+- `policy_engine_unavailable` (fail-closed deny)
+- `retrieval_engine_unavailable`
+- `memory_store_unavailable`
+- `trace_store_unavailable`
+
+Scaffolded (not fully materialized): persistent trace store adapters, persistent memory backends, GPU telemetry integration, and local model runtime health adapters.
+
 ## Architecture and planning docs
 
 - Fork rationale: [docs/fork-rationale.md](docs/fork-rationale.md)
@@ -31,6 +61,7 @@ The fork prioritizes deterministic and auditable control over opaque autonomy. I
 - Verification matrix: [docs/verification/verification-matrix.md](docs/verification/verification-matrix.md)
 - PR verification/reporting guide: [docs/contributing/pr-template-guide.md](docs/contributing/pr-template-guide.md)
 - Branch strategy: [docs/contributing/branch-strategy.md](docs/contributing/branch-strategy.md)
+- RC1 hardening report: [docs/release/nautilus-rc1-hardening.md](docs/release/nautilus-rc1-hardening.md)
 
 ## Security hardening doctrine
 
@@ -92,3 +123,9 @@ The governed substrate closure pass is verification-focused: direct branch asser
 
 <!-- platform-matrix:begin -->
 <!-- platform-matrix:end -->
+
+## Nautilus MVP foundation (May 2026)
+- Added hardened Nautilus contracts, state machine transition events, failure semantics matrix, and a deterministic golden-path smoke (`npm run nautilus:golden-path`).
+- Verification commands: `npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build:cli`, `npm run nautilus:golden-path`.
+- Intentionally degraded paths: runtime unavailable, retrieval unavailable, telemetry unavailable/stale, trace store unavailable, and proofpack generation unavailable remain explicit degraded modes.
+- Not yet supported: distributed replay orchestration, durable evidence storage, and cross-cluster execution consensus.

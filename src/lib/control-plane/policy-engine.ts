@@ -164,6 +164,16 @@ function evaluateAllRules(
   return matchedRules;
 }
 
+export function evaluatePolicy(
+  inheritance: PolicyInheritance,
+  context: PolicyEvaluationContext
+): PolicyEvaluationTrace {
+  const nodes: PolicyDecisionGraphNode[] = [];
+  const edges: PolicyDecisionGraphEdge[] = [];
+
+  const allRules = flattenRulesAndOverrides(inheritance, edges);
+  const matchedRules = evaluateAllRules(allRules, context, nodes);
+
   // 3. Determine winner
   // Precedence:
   // 1. Highest Scope
@@ -213,6 +223,7 @@ function evaluateAllRules(
 
   return trace;
 }
+
 
 // ── Mutation Audit ─────────────────────────────────────────────────────────
 

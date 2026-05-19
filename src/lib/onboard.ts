@@ -12,6 +12,7 @@ const os = require("os");
 const path = require("path");
 const { spawn, spawnSync } = require("child_process");
 const pRetry = require("p-retry");
+const { readJsonSync } = require("./core/json-file");
 
 /** Parse a numeric env var, returning `fallback` when unset or non-finite. */
 function envInt(name: string, fallback: number): number {
@@ -313,6 +314,7 @@ import type { AgentDefinition } from "./agent/defs";
 import type { CurlProbeResult } from "./http-probe";
 import type { GatewayInference, ProviderSelectionConfig } from "./inference/config";
 import type { GpuInfo, ValidationResult } from "./inference/local";
+import type { WebSearchConfig } from "./inference/web-search";
 import {
   hydrateMessagingChannelConfig,
   type MessagingChannelConfig,
@@ -321,22 +323,21 @@ import {
   readMessagingChannelConfigFromEnv,
   sanitizeMessagingChannelConfig,
 } from "./messaging-channel-config";
-import type { ContainerRuntime } from "./platform";
-import type { Session, SessionUpdates } from "./state/onboard-session";
 import type {
   ModelCatalogFetchResult,
   ModelValidationResult,
   ProbeResult,
   ValidationFailureLike,
 } from "./onboard/types";
+import type { ContainerRuntime } from "./platform";
 import { listChannels } from "./sandbox-channels";
 import type { StreamSandboxCreateResult } from "./sandbox-create-stream";
+import type { Session, SessionUpdates } from "./state/onboard-session";
 import type { SandboxEntry } from "./state/registry";
 import type { BackupResult } from "./state/sandbox";
 import type { TierDefinition, TierPreset } from "./tiers";
 import type { SandboxCreateFailure, ValidationClassification } from "./validation";
 import type { ProbeRecovery } from "./validation-recovery";
-import type { WebSearchConfig } from "./inference/web-search";
 
 /**
  * Create a temp file inside a directory with a cryptographically random name.
@@ -1729,7 +1730,7 @@ function upsertProvider(
         // A later upsert under the same env-key wrote a different value
         // (e.g. a retry-loop after validation failure replaced the legacy
         // key with a freshly entered one, or a placeholder like "dummy"
-        // for vllm-local). The gateway no longer holds the staged legacy
+        // used by vllm-local). The gateway no longer holds the staged legacy
         // value under this env-key, so withdraw the migration mark — the
         // cleanup gate must keep the legacy file intact.
         migratedLegacyKeys.delete(credentialEnv);
@@ -2242,7 +2243,7 @@ function readSandboxSelectionConfig(sandboxName: string): ProviderSelectionConfi
     const configPath = findSelectionConfigPath(tmpDir);
     if (!configPath) return null;
     try {
-      const parsed = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+      const parsed = readJsonSync(configPath);
       return parsed && typeof parsed === "object" ? parsed : null;
     } catch {
       return null;
@@ -4064,7 +4065,7 @@ async function preflight(
       }
       // Auto-cleanup orphaned SSH port-forward from a previous NemoClaw session
       // (e.g. dashboard forward left behind after destroy). Only kill the process
-      // if its command line contains "openshell" to avoid killing unrelated SSH
+      // when its command line contains "openshell" to avoid killing unrelated SSH
       // tunnels the user may have set up on the same port. (#1950)
       if (port === DASHBOARD_PORT && portCheck.process === "ssh" && portCheck.pid) {
         // Use `ps` to get the command line — works on Linux, macOS, and WSL.
@@ -9100,7 +9101,7 @@ function fetchGatewayAuthTokenFromSandbox(sandboxName: string): string | null {
     if (result.status !== 0) return null;
     const jsonPath = findOpenclawJsonPath(tmpDir);
     if (!jsonPath) return null;
-    const cfg = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+    const cfg = readJsonSync(jsonPath);
     const token = cfg && cfg.gateway && cfg.gateway.auth && cfg.gateway.auth.token;
     return typeof token === "string" && token.length > 0 ? token : null;
   } catch {
@@ -9324,7 +9325,6 @@ function printDashboard(
 
   console.log("");
   console.log(`  ${"─".repeat(50)}`);
-  // console.log(`  Dashboard    http://localhost:${DASHBOARD_PORT}/`);
   console.log(`  Sandbox      ${sandboxName} (Landlock + seccomp + netns)`);
   console.log(`  Model        ${model} (${providerLabel})`);
   if (showNim) {
@@ -9503,7 +9503,7 @@ async function onboard(opts: OnboardOptions = {}): Promise<void> {
     (isNonInteractive() ? process.env.NEMOCLAW_FROM_DOCKERFILE || null : null);
   // Resolve the explicit sandbox name early so both validation and the
   // --from guard work off the same source. --name always counts; the env
-  // var is used as the interactive prompt default via getSandboxPromptDefault,
+  // variable is used as the interactive prompt default via getSandboxPromptDefault,
   // and also as the resolved name when we cannot prompt (non-interactive or
   // missing-TTY runs such as CI scripts and piped stdin).
   const stdinIsTty = Boolean(process.stdin && process.stdin.isTTY);
@@ -10028,7 +10028,7 @@ async function onboard(opts: OnboardOptions = {}): Promise<void> {
       // Prompt for the sandbox name and show the review gate BEFORE
       // setupInference runs upsertProvider / `inference set` on the gateway.
       // On retry (inferenceResult.retry === "selection") the user is re-prompted
-      // for provider/model above and sees this gate again with the new config.
+      // regarding provider/model above and sees this gate again with the new config.
       // See #2221 (CodeRabbit).
       if (!sandboxName) {
         sandboxName = await promptValidatedSandboxName(agent);

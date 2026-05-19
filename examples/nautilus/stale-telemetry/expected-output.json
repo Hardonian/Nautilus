@@ -1,0 +1,149 @@
+{
+  "kind": "nautilus.mvp.scenario",
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
+  "notice": "deterministic fixture/sample; not live telemetry or production runtime output",
+  "generatedAt": "2026-03-01T00:00:00.000Z",
+  "scenario": "stale-telemetry",
+  "title": "Stale telemetry",
+  "ok": true,
+  "degraded": true,
+  "finalState": "completed",
+  "command": "npm run nautilus:examples -- stale-telemetry",
+  "explanation": "Telemetry is marked stale and excluded from healthy-runtime claims.",
+  "unsupportedClaims": [
+    "Does not infer current GPU health from stale samples."
+  ],
+  "failure": {
+    "key": "gpu_telemetry_stale",
+    "visibleState": "degraded",
+    "failBehavior": "open",
+    "event": "telemetry.gpu.stale",
+    "recovery": "invalidate stale metrics and refresh sample"
+  },
+  "evidence": {
+    "executionId": "exec-nautilus-mvp-0001",
+    "idempotencyKey": "nautilus-fixture-golden",
+    "policy": {
+      "kind": "policy",
+      "schemaVersion": "1.0.0",
+      "decision": "allow",
+      "policyScope": "local-default"
+    },
+    "retrieval": {
+      "kind": "retrieval",
+      "schemaVersion": "1.0.0",
+      "mode": "historical",
+      "records": [
+        {
+          "id": "retrieval-fixture-001",
+          "source": "deterministic-fixture",
+          "redacted": true
+        }
+      ]
+    },
+    "runtimeHealth": {
+      "kind": "runtime",
+      "schemaVersion": "1.0.0",
+      "runtimeStatus": "degraded",
+      "fixture": true,
+      "checks": [
+        {
+          "name": "local-runtime",
+          "status": "degraded",
+          "reason": "fixture does not require a running sandbox"
+        },
+        {
+          "name": "contracts",
+          "status": "available",
+          "reason": "contract validators loaded"
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "queued",
+        "to": "planning",
+        "reason": "execution accepted",
+        "correlationId": "corr-stale-telemetry",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "planning",
+        "to": "policy_evaluation",
+        "reason": "plan ready",
+        "correlationId": "corr-stale-telemetry",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "policy_evaluation",
+        "to": "retrieval",
+        "reason": "policy allow",
+        "correlationId": "corr-stale-telemetry",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "retrieval",
+        "to": "executing",
+        "reason": "retrieval resolved",
+        "correlationId": "corr-stale-telemetry",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "executing",
+        "to": "completed",
+        "reason": "runtime completed",
+        "correlationId": "corr-stale-telemetry",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      }
+    ],
+    "trace": {
+      "kind": "trace",
+      "schemaVersion": "1.0.0",
+      "fixture": true,
+      "traceId": "trace-nautilus-fixture-golden",
+      "spanCount": 5,
+      "redacted": true
+    },
+    "memory": {
+      "kind": "memory",
+      "schemaVersion": "1.0.0",
+      "memoryScope": "local-default",
+      "provenanceEventId": "evt-nautilus-fixture-001",
+      "lineageGap": false
+    },
+    "proofpack": {
+      "kind": "proofpack",
+      "schemaVersion": "1.0.0",
+      "proofpackScope": "local-default",
+      "fixture": true,
+      "deterministicSample": true,
+      "status": "partial"
+    }
+  },
+  "validation": {
+    "ok": true,
+    "errors": []
+  }
+}
