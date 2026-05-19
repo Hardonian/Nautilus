@@ -1,0 +1,149 @@
+{
+  "kind": "nautilus.mvp.scenario",
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
+  "notice": "deterministic fixture/sample; not live telemetry or production runtime output",
+  "generatedAt": "2026-03-01T00:00:00.000Z",
+  "scenario": "runtime-unavailable",
+  "title": "Runtime unavailable",
+  "ok": false,
+  "degraded": true,
+  "finalState": "failed",
+  "command": "npm run nautilus:runtime-health-smoke",
+  "explanation": "The runtime check is explicit about an unavailable sandbox and emits degraded fixture output instead of pretending runtime health is green.",
+  "unsupportedClaims": [
+    "Does not repair or launch the sandbox automatically."
+  ],
+  "failure": {
+    "key": "runtime_unavailable",
+    "visibleState": "degraded",
+    "failBehavior": "open",
+    "event": "runtime.unavailable",
+    "recovery": "fallback to local or queue retry"
+  },
+  "evidence": {
+    "executionId": "exec-nautilus-mvp-0001",
+    "idempotencyKey": "nautilus-fixture-golden",
+    "policy": {
+      "kind": "policy",
+      "schemaVersion": "1.0.0",
+      "decision": "allow",
+      "policyScope": "local-default"
+    },
+    "retrieval": {
+      "kind": "retrieval",
+      "schemaVersion": "1.0.0",
+      "mode": "historical",
+      "records": [
+        {
+          "id": "retrieval-fixture-001",
+          "source": "deterministic-fixture",
+          "redacted": true
+        }
+      ]
+    },
+    "runtimeHealth": {
+      "kind": "runtime",
+      "schemaVersion": "1.0.0",
+      "runtimeStatus": "unavailable",
+      "fixture": true,
+      "checks": [
+        {
+          "name": "local-runtime",
+          "status": "unavailable",
+          "reason": "fixture does not require a running sandbox"
+        },
+        {
+          "name": "contracts",
+          "status": "available",
+          "reason": "contract validators loaded"
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "queued",
+        "to": "planning",
+        "reason": "execution accepted",
+        "correlationId": "corr-runtime-unavailable",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "planning",
+        "to": "policy_evaluation",
+        "reason": "plan ready",
+        "correlationId": "corr-runtime-unavailable",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "policy_evaluation",
+        "to": "retrieval",
+        "reason": "policy allow",
+        "correlationId": "corr-runtime-unavailable",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "retrieval",
+        "to": "fallback",
+        "reason": "runtime.unavailable",
+        "correlationId": "corr-runtime-unavailable",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "fallback",
+        "to": "failed",
+        "reason": "runtime unavailable with no fallback runtime",
+        "correlationId": "corr-runtime-unavailable",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      }
+    ],
+    "trace": {
+      "kind": "trace",
+      "schemaVersion": "1.0.0",
+      "fixture": true,
+      "traceId": "trace-nautilus-fixture-golden",
+      "spanCount": 5,
+      "redacted": true
+    },
+    "memory": {
+      "kind": "memory",
+      "schemaVersion": "1.0.0",
+      "memoryScope": "local-default",
+      "provenanceEventId": "evt-nautilus-fixture-001",
+      "lineageGap": false
+    },
+    "proofpack": {
+      "kind": "proofpack",
+      "schemaVersion": "1.0.0",
+      "proofpackScope": "local-default",
+      "fixture": true,
+      "deterministicSample": true,
+      "status": "partial"
+    }
+  },
+  "validation": {
+    "ok": true,
+    "errors": []
+  }
+}

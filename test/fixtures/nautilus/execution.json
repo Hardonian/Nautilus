@@ -1,0 +1,16 @@
+{
+  "kind": "execution",
+  "schemaVersion": "1.0.0",
+  "state": "queued",
+  "idempotencyKey": "nautilus-fixture-golden",
+  "identityScope": {
+    "actorIdentity": "local-operator",
+    "runtimeIdentity": "runtime/local",
+    "nodeIdentity": "node/local",
+    "executionOwner": "local-operator",
+    "namespace": "nautilus/mvp",
+    "policyScope": "local-default",
+    "memoryScope": "local-default",
+    "proofpackScope": "local-default"
+  }
+}

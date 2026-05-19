@@ -1,16 +1,16 @@
-import { readJsonFileSync } from "../../core/json-file";
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
 
 import fs from "node:fs";
-import { readJsonFileSync } from "../../core/json-file";
 import os from "node:os";
 import path from "node:path";
 import { captureOpenshell } from "../../adapters/openshell/runtime";
 import { CLI_NAME } from "../../cli/branding";
 import { D, G, R, YW } from "../../cli/terminal-style";
 import { readJsonSync } from "../../core/json-file";
+import * as skillInstall from "../../skill-install";
+import { ensureLiveSandboxOrExit } from "./gateway-state";
 
 
 const agentRuntime = require("../../../../bin/lib/agent-runtime");
@@ -40,17 +40,16 @@ export function looksLikeOpenClawPlugin(candidatePath: string): boolean {
   const packageJsonPath = path.join(dir, "package.json");
   if (!fs.existsSync(packageJsonPath)) return false;
   try {
-    const packageJson = readJsonSync(packageJsonPath);
-    const openclawBlock = packageJson?.openclaw;
+    const packageJson = readJsonSync<Record<string, unknown>>(packageJsonPath);
+    const openclawBlock = packageJson.openclaw;
+    if (packageJson["openclaw.plugin"] === true || openclawBlock === true) return true;
+    if (typeof openclawBlock !== "object" || openclawBlock === null) return false;
+    const openclawConfig = openclawBlock as Record<string, unknown>;
     return Boolean(
-      packageJson?.["openclaw.plugin"] === true ||
-        openclawBlock === true ||
-        (typeof openclawBlock === "object" &&
-          openclawBlock !== null &&
-          (openclawBlock.plugin === true ||
-            typeof openclawBlock.entry === "string" ||
-            typeof openclawBlock.main === "string" ||
-            (Array.isArray(openclawBlock.extensions) && openclawBlock.extensions.length > 0))),
+      openclawConfig.plugin === true ||
+        typeof openclawConfig.entry === "string" ||
+        typeof openclawConfig.main === "string" ||
+        (Array.isArray(openclawConfig.extensions) && openclawConfig.extensions.length > 0),
     );
   } catch {
     return false;

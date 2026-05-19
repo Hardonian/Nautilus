@@ -1,0 +1,18 @@
+{
+  "kind": "runtime",
+  "schemaVersion": "1.0.0",
+  "runtimeStatus": "degraded",
+  "fixture": true,
+  "checks": [
+    {
+      "name": "local-runtime",
+      "status": "unavailable",
+      "reason": "fixture does not require a running sandbox"
+    },
+    {
+      "name": "contracts",
+      "status": "available",
+      "reason": "contract validators loaded"
+    }
+  ]
+}

@@ -46,3 +46,9 @@ secrets.json
 secrets.yaml
 service-account*.json
 token.json
+
+# TypeScript build outputs emitted next to Nautilus contract sources
+contracts/**/*.js
+contracts/**/*.js.map
+contracts/**/*.d.ts
+contracts/**/*.d.ts.map

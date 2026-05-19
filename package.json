@@ -75,7 +75,12 @@
     "demo:local-proof": "node scripts/demo/run-local-governed-proof.mjs",
     "demo:local-proof:verify": "node scripts/demo/verify-local-governed-proof.mjs",
     "demo:local-proof:clean": "node scripts/demo/clean-local-governed-proof.mjs",
-    "nautilus:golden-path": "tsx scripts/nautilus/golden-path.ts"
+    "nautilus:golden-path": "tsx scripts/nautilus/golden-path.ts",
+    "nautilus:replay-smoke": "tsx scripts/nautilus/replay-smoke.ts",
+    "nautilus:proofpack-smoke": "tsx scripts/nautilus/proofpack-smoke.ts",
+    "nautilus:runtime-health-smoke": "tsx scripts/nautilus/runtime-health-smoke.ts",
+    "nautilus:examples": "tsx scripts/nautilus/examples-smoke.ts",
+    "nautilus:verify": "tsx scripts/nautilus/verify.ts && npm run nautilus:golden-path && npm run nautilus:replay-smoke && npm run nautilus:proofpack-smoke && npm run nautilus:runtime-health-smoke && npm run nautilus:examples"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
