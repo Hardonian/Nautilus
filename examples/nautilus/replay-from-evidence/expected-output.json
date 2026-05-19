@@ -1,0 +1,143 @@
+{
+  "kind": "nautilus.mvp.scenario",
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
+  "notice": "deterministic fixture/sample; not live telemetry or production runtime output",
+  "generatedAt": "2026-03-01T00:00:00.000Z",
+  "scenario": "replay-from-evidence",
+  "title": "Replay from evidence",
+  "ok": true,
+  "degraded": false,
+  "finalState": "completed",
+  "command": "npm run nautilus:replay-smoke",
+  "explanation": "Replay reads deterministic evidence and reports reproducible state without live mutation.",
+  "unsupportedClaims": [
+    "Does not replay external side effects."
+  ],
+  "failure": null,
+  "evidence": {
+    "executionId": "exec-nautilus-mvp-0001",
+    "idempotencyKey": "nautilus-fixture-golden",
+    "policy": {
+      "kind": "policy",
+      "schemaVersion": "1.0.0",
+      "decision": "allow",
+      "policyScope": "local-default"
+    },
+    "retrieval": {
+      "kind": "retrieval",
+      "schemaVersion": "1.0.0",
+      "mode": "historical",
+      "records": [
+        {
+          "id": "retrieval-fixture-001",
+          "source": "deterministic-fixture",
+          "redacted": true
+        }
+      ]
+    },
+    "runtimeHealth": {
+      "kind": "runtime",
+      "schemaVersion": "1.0.0",
+      "runtimeStatus": "available",
+      "fixture": true,
+      "checks": [
+        {
+          "name": "local-runtime",
+          "status": "available",
+          "reason": "fixture runtime path available"
+        },
+        {
+          "name": "contracts",
+          "status": "available",
+          "reason": "contract validators loaded"
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "queued",
+        "to": "planning",
+        "reason": "execution accepted",
+        "correlationId": "corr-replay-from-evidence",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "planning",
+        "to": "policy_evaluation",
+        "reason": "plan ready",
+        "correlationId": "corr-replay-from-evidence",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "policy_evaluation",
+        "to": "retrieval",
+        "reason": "policy allow",
+        "correlationId": "corr-replay-from-evidence",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "retrieval",
+        "to": "executing",
+        "reason": "retrieval resolved",
+        "correlationId": "corr-replay-from-evidence",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "type": "execution.state_transition",
+        "executionId": "exec-nautilus-mvp-0001",
+        "from": "executing",
+        "to": "completed",
+        "reason": "runtime completed",
+        "correlationId": "corr-replay-from-evidence",
+        "schemaVersion": "1.0.0",
+        "replayCompatible": true,
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      }
+    ],
+    "trace": {
+      "kind": "trace",
+      "schemaVersion": "1.0.0",
+      "fixture": true,
+      "traceId": "trace-nautilus-fixture-golden",
+      "spanCount": 5,
+      "redacted": true
+    },
+    "memory": {
+      "kind": "memory",
+      "schemaVersion": "1.0.0",
+      "memoryScope": "local-default",
+      "provenanceEventId": "evt-nautilus-fixture-001",
+      "lineageGap": false
+    },
+    "proofpack": {
+      "kind": "proofpack",
+      "schemaVersion": "1.0.0",
+      "proofpackScope": "local-default",
+      "fixture": true,
+      "deterministicSample": true,
+      "status": "complete"
+    }
+  },
+  "validation": {
+    "ok": true,
+    "errors": []
+  }
+}

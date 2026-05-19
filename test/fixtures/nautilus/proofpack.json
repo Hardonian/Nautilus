@@ -1,0 +1,7 @@
+{
+  "kind": "proofpack",
+  "schemaVersion": "1.0.0",
+  "proofpackScope": "local-default",
+  "fixture": true,
+  "deterministicSample": true
+}
