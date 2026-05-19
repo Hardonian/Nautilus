@@ -538,15 +538,17 @@ describe("Regression: sandbox-state.ts uses validated tar extraction", () => {
     );
   }
 
-  it("backupSandboxState calls safeTarExtract (not raw tar -xf)", () => {
+  it("backupStateDirectories enforces pre-backup audit before tar operations", () => {
     const src = getSourceCode();
-    // Find the backupSandboxState function body
-    const fnStart = src.indexOf("function backupSandboxState");
+    // Find the backupStateDirectories helper body
+    const fnStart = src.indexOf("function backupStateDirectories");
     expect(fnStart).not.toBe(-1);
     const fnBody = src.slice(fnStart);
 
-    // Must call safeTarExtract
-    expect(fnBody).toContain("safeTarExtract");
+    expect(fnBody).toContain("Pre-backup audit");
+    expect(fnBody).toContain("auditResult.status !== 0");
+    expect(fnBody).toContain("-type l");
+    expect(fnBody).toContain("-links +1");
   });
 
   it("no raw tar -xf extraction without validation exists", () => {

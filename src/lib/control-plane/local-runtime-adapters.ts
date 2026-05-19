@@ -66,7 +66,7 @@ class DegradedAdapter implements RuntimeAdapter {
   detect() { return { state: "degraded" as const, detail: "no supported local runtime detected" }; }
   async health() { return { state: "degraded" as const, detail: "no runtime available" }; }
   async listModels() { return []; }
-  async capabilities() { return { runtime: this.kind, state: "degraded", streaming: false, tools: false, jsonMode: false, embeddings: false, vision: false, modelCount: 0, degradedReason: "unsupported_environment" }; }
+  async capabilities(): Promise<RuntimeCapabilitySnapshot> { return { runtime: this.kind, state: "degraded" as const, streaming: false, tools: false, jsonMode: false, embeddings: false, vision: false, modelCount: 0, degradedReason: "unsupported_environment" }; }
   async execute(): Promise<LocalRuntimeExecutionResult> {
     return { ok: false, runtime: this.kind, state: "degraded", attempts: 1, durationMs: 0, degradedReason: "unsupported_environment", error: "No local runtime adapter available" };
   }
