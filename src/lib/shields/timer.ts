@@ -1,4 +1,3 @@
-import { readJsonFileSync } from "../core/json-file";
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -10,7 +9,6 @@ import { readJsonFileSync } from "../core/json-file";
 //   node shields-timer.js <sandbox-name> <snapshot-path> <restore-at-iso> <config-path> <config-dir>
 
 import fs from "node:fs";
-import { readJsonFileSync } from "../core/json-file";
 import path from "node:path";
 
 import { buildPolicySetCommand } from "../policies";
@@ -18,7 +16,6 @@ import { run } from "../runner";
 import { DEFAULT_AGENT_CONFIG, resolveAgentConfig } from "../sandbox-config";
 import { lockAgentConfig } from "./index";
 import { readJsonSync } from "../core/json-file";
-
 
 type UnknownRecord = { [key: string]: unknown };
 

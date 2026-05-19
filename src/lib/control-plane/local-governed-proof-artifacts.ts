@@ -1,13 +1,10 @@
-import { readJsonFileSync } from "../core/json-file";
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
 import { createHash } from "node:crypto";
-import { readJsonFileSync } from "../core/json-file";
 import fs from "node:fs";
 import path from "node:path";
 import { readJsonSync } from "../core/json-file";
-
 
 export interface LocalProofReadResult {
   runDir: string;
