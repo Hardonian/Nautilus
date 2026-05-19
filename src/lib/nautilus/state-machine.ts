@@ -1,7 +1,20 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { SCHEMA_VERSION, type ExecutionState } from '../../../contracts/nautilus/index';
+const SCHEMA_VERSION = '1.0.0' as const;
+
+type ExecutionState =
+  | 'queued'
+  | 'planning'
+  | 'policy_evaluation'
+  | 'retrieval'
+  | 'executing'
+  | 'fallback'
+  | 'degraded'
+  | 'replaying'
+  | 'completed'
+  | 'failed'
+  | 'cancelled';
 
 const legalTransitions: Record<ExecutionState, ExecutionState[]> = {
   queued: ['planning', 'cancelled'],

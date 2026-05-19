@@ -1,4 +1,3 @@
-import { readJsonFileSync } from "../core/json-file";
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -9,7 +8,6 @@ import { readJsonFileSync } from "../core/json-file";
  */
 
 import fs from "node:fs";
-import { readJsonFileSync } from "../core/json-file";
 import path from "node:path";
 
 import { isErrnoException } from "../core/errno";
@@ -21,7 +19,6 @@ import {
 } from "../messaging-channel-config";
 import { redactSensitiveText, redactUrl } from "../security/redact";
 import { readJsonSync } from "../core/json-file";
-
 
 export const SESSION_VERSION = 1;
 export const SESSION_DIR = path.join(process.env.HOME || "/tmp", ".nemoclaw");
