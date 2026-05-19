@@ -69,3 +69,11 @@ export function buildReplay(events: ReplayEvent[], expectedFinalSequence?: numbe
     gaps.length > 0 || !hasTerminal ? 'partial' : duplicates.length > 0 ? 'degraded' : 'complete';
   return { status, events: ordered, gaps, duplicates, integrityHash: replayIntegrityHash(ordered), notes };
 }
+
+export class ReplayHardenGuard {
+  public static verifyReplay(result: ReplayResult): void {
+    if (result.status === 'degraded' || result.status === 'partial') {
+      throw new Error(`Replay failed integrity verification. Status: ${result.status}. Fails-closed for security.`);
+    }
+  }
+}

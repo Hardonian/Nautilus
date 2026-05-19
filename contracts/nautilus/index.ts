@@ -14,6 +14,8 @@ export const contractKinds = [
   'proofpack',
   'event',
   'memory',
+  'request',
+  'receipt',
 ] as const;
 
 export type ContractKind = (typeof contractKinds)[number];
@@ -106,6 +108,8 @@ export const contractSchemas = {
   proofpack: { type: 'object', required: ['kind', 'schemaVersion', 'proofpackScope'], properties: { kind: { const: 'proofpack' }, schemaVersion: { const: SCHEMA_VERSION }, proofpackScope: { type: 'string', minLength: 1 } }, additionalProperties: false },
   event: { type: 'object', required: ['kind', 'schemaVersion', 'eventType', 'timestampUtc'], properties: { kind: { const: 'event' }, schemaVersion: { const: SCHEMA_VERSION }, eventType: { type: 'string', minLength: 1 }, timestampUtc: { type: 'string', pattern: utcTimestampPattern } }, additionalProperties: false },
   memory: { type: 'object', required: ['kind', 'schemaVersion', 'memoryScope', 'provenanceEventId'], properties: { kind: { const: 'memory' }, schemaVersion: { const: SCHEMA_VERSION }, memoryScope: { type: 'string', minLength: 1 }, provenanceEventId: { type: 'string', minLength: 1 } }, additionalProperties: false },
+  request: { type: 'object', required: ['kind', 'schemaVersion', 'intent', 'constraints'], properties: { kind: { const: 'request' }, schemaVersion: { const: SCHEMA_VERSION }, intent: { type: 'string', minLength: 1 }, constraints: { type: 'object' } }, additionalProperties: false },
+  receipt: { type: 'object', required: ['kind', 'schemaVersion', 'decision', 'evidence'], properties: { kind: { const: 'receipt' }, schemaVersion: { const: SCHEMA_VERSION }, decision: { enum: ['granted', 'denied', 'degraded'] }, evidence: { type: 'string', minLength: 1 } }, additionalProperties: false },
 } as const;
 
 const ajv = new Ajv({ allErrors: true, strict: false });

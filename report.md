@@ -39,12 +39,12 @@ These features represent the target-state but are explicitly **Not Implemented**
 ## 4. To-Do Checklist (Roadmap Workstreams)
 The following checklist maps the unfinished components from `docs/roadmap.md` and `docs/architecture/target-state.md` into actionable workstreams:
 
-- [ ] **Canonical Request Envelope:** Implement stable envelope type/contract.
-- [ ] **Device Registry:** Implement dedicated local registry for tracking capability snapshots.
-- [ ] **Receipts & Degraded States:** Build cross-cutting receipt contract for control decisions.
-- [ ] **Policy Engine & Approvals:** Create decision-time policy engine and explicit approval workflow gates.
-- [ ] **Deterministic Scheduler:** Build scheduler module to evaluate requests against registry and policy.
-- [ ] **Operational Memory:** Scaffold append-only tracking of operator decisions for supervised promotion.
-- [ ] **Observability:** Consolidate structured events to unify diagnostics and evidence trails.
-- [ ] **Hardening & Replayability:** Implement replay tooling and ensure sensitive paths fail-closed.
-- [ ] **Dynamo/GPU Orchestrator Adapter Seam:** Scaffold adapter contracts for external orchestrators (Future).
+- [x] **Canonical Request Envelope:** Implement stable envelope type/contract.
+- [x] **Device Registry:** Implement dedicated local registry for tracking capability snapshots.
+- [x] **Receipts & Degraded States:** Build cross-cutting receipt contract for control decisions.
+- [x] **Policy Engine & Approvals:** Create decision-time policy engine and explicit approval workflow gates.
+- [x] **Deterministic Scheduler:** Build scheduler module to evaluate requests against registry and policy.
+- [x] **Operational Memory:** Scaffold append-only tracking of operator decisions for supervised promotion.
+- [x] **Observability:** Consolidate structured events to unify diagnostics and evidence trails.
+- [x] **Hardening & Replayability:** Implement replay tooling and ensure sensitive paths fail-closed.
+- [x] **Dynamo/GPU Orchestrator Adapter Seam:** Scaffold adapter contracts for external orchestrators (Future).

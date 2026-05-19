@@ -53,9 +53,6 @@ export function classifyValidationFailure({
   if (httpStatus === 404 || httpStatus === 405) {
     return { kind: "endpoint", retry: "selection" };
   }
-  if (/unauthorized|forbidden|invalid api key|invalid_auth|permission/i.test(normalized)) {
-    return { kind: "credential", retry: "credential" };
-  }
   if (/ssl|tls|certificate|handshake/i.test(normalized)) {
     return { kind: "transport", retry: "retry" };
   }

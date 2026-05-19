@@ -96,3 +96,11 @@ If a claim cannot be proven deterministically, it is not release-grade.
 - Release candidates must include deterministic proofpack evidence.
 - Verify degraded-state behavior explicitly when touched.
 - Block release on unresolved invariant violations.
+- See `RELEASE_INVARIANTS.md` for the full release contract.
+
+## 15. Testing invariants
+
+- Tests must not depend on global mutable state from other tests.
+- Fixtures must have `"fixture": true` and `"deterministicSample": true`.
+- No UUID v4, random timestamps, or machine-specific paths in fixtures.
+- See `TESTING_INVARIANTS.md` for the full testing contract.

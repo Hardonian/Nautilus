@@ -91,6 +91,8 @@ Read and follow:
 - `docs/architecture/REPO_INVARIANTS.md`
 - `docs/architecture/NAUTILUS_TRUTHS.md`
 - `docs/architecture/CONTROL_PLANE_BOUNDARIES.md`
+- `docs/architecture/TESTING_INVARIANTS.md`
+- `docs/architecture/RELEASE_INVARIANTS.md`
 
 These documents are normative for agent implementation behavior.
 

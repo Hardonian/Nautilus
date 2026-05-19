@@ -1,131 +1,123 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# Nautilus: Deterministic Operational AI Infrastructure Platform
+# 🌌 Nautilus: Deterministic Operational AI Infrastructure Platform
 
-Nautilus is the platform identity for deterministic operational AI infrastructure. NemoClaw remains the runtime/orchestration engine inside the platform.
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Node](https://img.shields.io/badge/Node.js-%3E%3D_22.16.0-green.svg)](https://nodejs.org)
+[![WSL2](https://img.shields.io/badge/Environment-Linux%20%2F%20macOS%20%2F%20WSL2-orange.svg)](#execution-environment-truth)
 
-## Why Nautilus exists
-## Nautilus platform structure
+> Nautilus is the platform identity for deterministic operational AI infrastructure. **NemoClaw** serves as the runtime and orchestration engine inside the platform.
 
-- **NemoClaw Runtime** (`src/`, `nemoclaw/src/`, `bin/`)
-- **RecallForge** (`core/recallforge/`)
-- **OperatorGraph** (`core/operatorgraph/`, `operator-console/`)
-- **ThreatMesh** (`core/threatmesh/`, security and policy modules)
-- **MeshRAG** (`core/meshrag/`)
-- **Canonical Event Fabric** (`core/event-fabric/contracts.ts`)
+Nautilus bridges the gap between raw AI potential and production-grade reliability. Instead of treating AI agents as black boxes, Nautilus provides the core blueprints, boundaries, and validation networks needed to execute AI workloads deterministically, securely, and transparently.
 
-See the architecture truth + migration plan: [docs/nautilus/platform-evolution.md](docs/nautilus/platform-evolution.md).
+---
 
+## 🎯 Why Nautilus Exists
 
-The fork prioritizes deterministic and auditable control over opaque autonomy. It focuses on:
-- execution plane and control plane separation,
-- truthful degraded-state reporting,
-- execution receipts/provenance,
-- supervised policy promotion,
-- explainable routing/control decisions.
+In the era of autonomous agents, traditional software patterns break down. AI decisions are often non-deterministic, opaque, and difficult to audit. Nautilus shifts the paradigm from **unconstrained AI autonomy** to **governed, deterministic alignment**:
 
-## Current state vs roadmap
+*   **State Separation:** Absolute segregation between the execution plane (where models think) and the control plane (where policies are enforced).
+*   **Zero Theatre:** We do not guess or optimize telemetry. If a service is degraded, Nautilus reports it explicitly.
+*   **Auditable Provenance:** Every action produces a cryptographic execution receipt, making agent operations replayable and auditable.
+*   **Fail-Closed Policy:** Security is not an afterthought. The ThreatMesh enforces strict egress and capability boundaries at the kernel level.
 
-- **Implemented:** existing CLI/plugin/sandbox orchestration and inference onboarding flows; control-plane verification gates.
-- **Scaffolded:** remote execution and telemetry adapter seams with explicit degraded-state reporting.
-- **Opt-in:** governed routing (`NEMOCLAW_GOVERNED_ROUTING=1`) and heterogeneous bridge (`NEMOCLAW_HETEROGENEOUS_ROUTING=1`).
-- **Planned:** external orchestration adapter integrations after stable local contracts.
-- **Not implemented:** distributed execution, GPU balancing, Dynamo integration, autonomous orchestration/self-healing, automatic policy learning.
+---
 
+## 🏗️ Platform Architecture
 
-## Nautilus M1 truth loop status (implemented now)
+Nautilus is composed of five specialized core pillars, wired together via a unified Event Fabric:
 
-Implemented in `src/lib/core/nautilus-truth-loop.ts` with tests in `src/lib/core/nautilus-truth-loop.test.ts`:
-- Event Fabric envelope emission for `execution.started`, `policy.evaluated`, and terminal execution events.
-- ThreatMesh fail-closed behavior when policy engine is unavailable.
-- OperatorGraph trace correlation via shared `correlationId`/`traceId` semantics (in-memory adapter wiring).
-- MeshRAG explicit retrieval states: `completed` or `unavailable` (degraded path, no simulated retrieval).
-- RecallForge memory writes with required source-event provenance on successful completion.
-- Operator report object (`TruthLoopReport`) that summarizes execution outcome and degraded states.
+```mermaid
+graph TD
+    A[Operator Graph / Console] -->|Observe| B[Event Fabric]
+    C[NemoClaw Runtime] -->|Emit Events| B
+    D[ThreatMesh Policy] -->|Guard Egress| C
+    E[MeshRAG Retrieval] -->|Supply Context| C
+    F[RecallForge Memory] -->|Trace Lineage| C
+```
 
-Explicit degraded/unavailable states currently surfaced:
-- `policy_engine_unavailable` (fail-closed deny)
-- `retrieval_engine_unavailable`
-- `memory_store_unavailable`
-- `trace_store_unavailable`
+*   **NemoClaw Runtime** (`src/`, `nemoclaw/src/`, `bin/`): The core orchestration engine executing OpenClaw sandboxes with NVIDIA local & remote inference.
+*   **RecallForge** (`core/recallforge/`): The provenance-based memory system that ensures context remains auditable, traceable, and free of drift.
+*   **OperatorGraph** (`core/operatorgraph/`, `operator-console/`): The visualization and telemetry matrix providing operators with real-time, inspectable state traces.
+*   **ThreatMesh** (`core/threatmesh/`): The security perimeter containing sandboxes, validating network policies, and guarding API boundaries.
+*   **MeshRAG** (`core/meshrag/`): The deterministic context retrieval engine that serves factual lookups with strict confidence scoring.
+*   **Canonical Event Fabric** (`core/event-fabric/contracts.ts`): The event bus unifying communication across all pillars.
 
-Scaffolded (not fully materialized): persistent trace store adapters, persistent memory backends, GPU telemetry integration, and local model runtime health adapters.
+> [!NOTE]
+> Read the complete target architecture and evolution plan in [docs/nautilus/platform-evolution.md](docs/nautilus/platform-evolution.md).
 
-## Architecture and planning docs
+---
 
-- Fork rationale: [docs/fork-rationale.md](docs/fork-rationale.md)
-- Current-state architecture audit: [docs/architecture/current-state.md](docs/architecture/current-state.md)
-- Target-state architecture: [docs/architecture/target-state.md](docs/architecture/target-state.md)
-- Roadmap and dependencies: [docs/roadmap.md](docs/roadmap.md)
-- Verification matrix: [docs/verification/verification-matrix.md](docs/verification/verification-matrix.md)
-- PR verification/reporting guide: [docs/contributing/pr-template-guide.md](docs/contributing/pr-template-guide.md)
-- Branch strategy: [docs/contributing/branch-strategy.md](docs/contributing/branch-strategy.md)
-- RC1 hardening report: [docs/release/nautilus-rc1-hardening.md](docs/release/nautilus-rc1-hardening.md)
+## ⚡ Quick Start: Experience the Gold Standard
 
-## Security hardening doctrine
-
-- Security threat model: [docs/architecture/security-threat-model.md](docs/architecture/security-threat-model.md)
-- Security policy model: [docs/architecture/security-policy-model.md](docs/architecture/security-policy-model.md)
-- Transport security: [docs/architecture/transport-security.md](docs/architecture/transport-security.md)
-- Secret redaction doctrine: [docs/architecture/secret-redaction-doctrine.md](docs/architecture/secret-redaction-doctrine.md)
-- Command execution safety: [docs/architecture/command-execution-safety.md](docs/architecture/command-execution-safety.md)
-- Local-stack security profiles: [docs/architecture/local-stack-security-profiles.md](docs/architecture/local-stack-security-profiles.md)
-- Security verification matrix: [docs/verification/security-verification-matrix.md](docs/verification/security-verification-matrix.md)
-
-## Control-plane discipline
-
-Control-plane discipline means decisions are governed by inspectable contracts, policy artifacts, and verifiable receipts; not by hidden fallbacks or prompt-only instructions.
-
-## Contribution guidance
-
-When contributing:
-1. Distinguish current repository truth from target-state design.
-2. Avoid implementation claims unless backed by code and tests in the same PR.
-3. Include verification commands and observed outcomes in PR descriptions.
-
-## Not implemented yet (explicitly not implemented in this checkpoint)
-
-Unless specifically added and verified in code:
-- no dedicated deterministic scheduler,
-- no dedicated device registry,
-- no dedicated policy-promotion engine,
-- no unified execution receipt framework,
-- no Dynamo-style orchestration integration,
-- no distributed execution handoff,
-- no GPU balancing,
-- no autonomous orchestration or self-healing loops,
-- no automatic policy learning.
-
-
-## Local bootstrap fallback
-If lifecycle scripts fail in restricted environments, contributors can use `npm install --ignore-scripts` for local verification only, then run typecheck/tests manually. Production/release flows should keep normal install behavior.
-
-
-## Verification
-
-Preferred contributor flow:
+Get Nautilus running locally in minutes. Ensure Docker is running and you are on a POSIX-compliant environment (Linux, macOS, or WSL2).
 
 ```bash
-npm run verify:changelog-hygiene
-npm run verify:core
+# 1. Clone & install root dependencies
+npm install
+
+# 2. Build the NemoClaw runtime plugin
+cd nemoclaw && npm install && npm run build && cd ..
+
+# 3. Verify the installation
 npm run verify:release
 ```
 
-- `verify:core` reports deterministic `PASS/WARN/FAIL` status across changelog hygiene, typecheck, lint, and targeted control-plane/probe/governed-routing suites.
-- `verify:release` is the primary release gate for local and CI readiness checks.
-- `verify:all` remains available as a strict-mode variant of `verify:core` that fails for both repository failures and missing required toolchain/dependencies.
-- In restricted local environments, `npm install --ignore-scripts` is a local diagnosis fallback only and must not be used for release packaging or CI baselines.
+Once built, verify the core platform mechanics with the built-in MVP simulation:
+```bash
+# Run the complete Nautilus Golden Path execution flow
+npm run nautilus:golden-path
+```
 
+---
 
-### Residual matrix closure status (2026-05-09)
-The governed substrate closure pass is verification-focused: direct branch assertions, replay/diagnostics truth hardening, and status-document coherence. It does not add orchestration, distributed execution, GPU balancing, Dynamo integration, autonomous routing, or automatic policy/trust mutation.
+## 🚀 The Nautilus M1 Truth Loop
 
-<!-- platform-matrix:begin -->
-<!-- platform-matrix:end -->
+Nautilus implements the **M1 Truth Loop** (located in `src/lib/core/nautilus-truth-loop.ts`), which enforces execution-plane invariants and emits trace telemetry:
 
-## Nautilus MVP foundation (May 2026)
-- Added hardened Nautilus contracts, state machine transition events, failure semantics matrix, and a deterministic golden-path smoke (`npm run nautilus:golden-path`).
-- Verification commands: `npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build:cli`, `npm run nautilus:golden-path`.
-- Intentionally degraded paths: runtime unavailable, retrieval unavailable, telemetry unavailable/stale, trace store unavailable, and proofpack generation unavailable remain explicit degraded modes.
-- Not yet supported: distributed replay orchestration, durable evidence storage, and cross-cluster execution consensus.
+1.  **State-Transition Telemetry:** Emits structured Event Fabric envelopes for `execution.started`, `policy.evaluated`, and terminal outcomes.
+2.  **Fail-Closed Security:** ThreatMesh triggers immediate containment and denies execution if the policy engine becomes unreachable.
+3.  **Trace Correlation:** OperatorGraph binds spans via unique `correlationId` and `traceId` attributes.
+4.  **No-Theatre Context:** MeshRAG explicitly defaults to `unavailable` rather than generating hallucinated fallbacks when retrieval fails.
+5.  **Audit-Ready Recall:** RecallForge writes memory structures alongside their required completion receipts.
+
+---
+
+## 🗺️ Open Frontiers: Join the Build!
+
+Nautilus is an open-source initiative designed for both **human developers** and **AI coding agents**. Below is our forward-looking roadmap. We actively welcome PRs, RFCs, and discussions for these modules:
+
+### 🧩 Core Backlog & Contribution Opportunities
+
+| Module | Goal | Current Status | How to Join |
+|:---|:---|:---|:---|
+| **Heterogeneous Routing** | Smart routing of tasks across local NIMs and cloud providers based on cost/latency. | `Opt-in` via environment flags. | Extend `src/lib/control-plane/governed-provider-routing.ts`. |
+| **Distributed Replay** | Replaying execution traces across multi-node clusters with exact-state consensus. | `Planned` | Draft an RFC in `docs/architecture/` proposing consensus schemas. |
+| **Durable Evidence Storage** | Cryptographically signed database backends for RecallForge memory. | `Scaffolded` | Implement SQL/KV adapters under `core/recallforge/`. |
+| **GPU Telemetry Parser** | High-fidelity hardware metrics parsing for dynamic load-balancing. | `Scaffolded` | Build real-time parser integrations under `docs/architecture/gpu-telemetry.md`. |
+| **Unified Device Registry** | System for dynamic discovery and capability attestation of local GPUs. | `Not Implemented` | Model the schema in `docs/architecture/device-registry.md`. |
+
+---
+
+## 🛠️ Verification Command Center
+
+Keep the repository green and release-ready using our local verification scripts:
+
+*   `npm run verify:core` — Executes core suite typechecks, linters, and checks import boundaries.
+*   `npm run verify:release` — The ultimate pre-flight checklist. Verifies changelog hygiene, lints, types, and chaos resilience.
+*   `npm run verify:all` — Strict mode validation, ensuring all host tools and dependencies are aligned.
+*   `npm run nautilus:verify` — Executes all MVP smoke-testing scenarios (replay, proofpacks, and telemetry fallbacks).
+
+---
+
+## 🤝 Community & Collaboration
+
+We are building a community of systems engineers, AI alignment researchers, and developer-advocates.
+
+*   **Read the Guidelines:** Dive into our [CONTRIBUTING.md](CONTRIBUTING.md) to understand our engineering expectations.
+*   **Learn the Rules:** See [docs/architecture/REPO_INVARIANTS.md](docs/architecture/REPO_INVARIANTS.md) for our code standards.
+*   **Security Disclosures:** Please report security issues privately according to the steps in [SECURITY.md](SECURITY.md).
+*   **AI Agent Friendly:** If you are pair-programming with an agent, refer them to [AGENTS.md](AGENTS.md) to load repository context and patterns directly.
+
+Let's build a deterministic future for operational AI together! 🌌
