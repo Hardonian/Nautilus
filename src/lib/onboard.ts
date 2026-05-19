@@ -873,9 +873,9 @@ function loadBlueprintProfile(
   }
 }
 
-const ROUTER_HEALTH_RETRIES = 15;
-const ROUTER_HEALTH_INTERVAL_MS = 2000;
-const ROUTER_HEALTH_TIMEOUT_MS = 3000;
+const ROUTER_HEALTH_RETRIES = envInt("NEMOCLAW_ROUTER_HEALTH_RETRIES", 15);
+const ROUTER_HEALTH_INTERVAL_MS = envInt("NEMOCLAW_ROUTER_HEALTH_INTERVAL_MS", 2000);
+const ROUTER_HEALTH_TIMEOUT_MS = envInt("NEMOCLAW_ROUTER_HEALTH_TIMEOUT_MS", 3000);
 const MODEL_ROUTER_RELATIVE_DIR = path.join("nemoclaw-blueprint", "router", "llm-router");
 const MODEL_ROUTER_VENV_DIR = path.join(os.homedir(), ".nemoclaw", "model-router-venv");
 const MODEL_ROUTER_FINGERPRINT_FILE = ".nemoclaw-source-fingerprint";
