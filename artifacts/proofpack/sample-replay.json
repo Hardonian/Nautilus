@@ -1,0 +1,19 @@
+
+> nemoclaw@0.1.0 nautilus:replay-smoke
+> tsx scripts/nautilus/replay-smoke.ts
+
+{
+  "kind": "nautilus.replay.report.sample",
+  "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
+  "notice": "deterministic fixture/sample; not live telemetry or production runtime output",
+  "generatedAt": "2026-03-01T00:00:00.000Z",
+  "replayId": "replay-nautilus-mvp-0001",
+  "replayMode": "read_only",
+  "sourceExecutionId": "exec-nautilus-mvp-0001",
+  "reproducedFinalState": "completed",
+  "mutationSafe": true,
+  "evidenceDigest": "sha256:fixture-nautilus-replay-0001",
+  "eventsReplayed": 5
+}

@@ -50,3 +50,22 @@ jobs:
         run: npm run nautilus:examples
       - name: Nautilus verify
         run: npm run nautilus:verify
+      - name: Repo doctor
+        run: npm run doctor
+      - name: Verification summary
+        run: npm run verification:summary
+      - name: Build release artifacts
+        run: npm run release:artifacts
+      - name: Assemble release package
+        run: npm run release:assemble
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nautilus-release-artifacts
+          path: |
+            artifacts/release-manifest.json
+            artifacts/verification-summary.json
+            artifacts/proofpack/**
+            artifacts/smoke-output/**
+            artifacts/release-bundle/**
+            artifacts/*.zip
