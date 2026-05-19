@@ -12,9 +12,16 @@ export default defineConfig({
   test: {
     // CI logs are easiest to scan when test chatter stays quiet and failures
     // surface as GitHub annotations at the relevant file and line.
-    reporters: isGithubActions ? ["github-actions"] : ["default"],
+    reporters: isGithubActions
+      ? ["github-actions", "hanging-process"]
+      : ["default", "hanging-process"],
     silent: isCi,
     hideSkippedTests: isCi,
+    setupFiles: ["./test/vitest.setup.ts"],
+    slowTestThreshold: isCi ? 8_000 : 5_000,
+    testTimeout: testTimeout(),
+    hookTimeout: Math.max(30_000, testTimeout()),
+    teardownTimeout: Math.max(30_000, testTimeout()),
     projects: [
       {
         test: {
@@ -44,6 +51,13 @@ export default defineConfig({
             process.env.CI === "true" ||
             process.env.CI === "1" ||
             process.env.NEMOCLAW_RUN_INSTALLER_TESTS === "1",
+        },
+      },
+      {
+        test: {
+          name: "nautilus",
+          include: ["test/nautilus/**/*.test.ts"],
+          exclude: ["**/node_modules/**", "**/.claude/**"],
         },
       },
       {

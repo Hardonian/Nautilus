@@ -81,9 +81,9 @@
     "nautilus:runtime-health-smoke": "tsx scripts/nautilus/runtime-health-smoke.ts",
     "nautilus:examples": "tsx scripts/nautilus/examples-smoke.ts",
     "nautilus:verify": "tsx scripts/nautilus/verify.ts && npm run nautilus:golden-path && npm run nautilus:replay-smoke && npm run nautilus:proofpack-smoke && npm run nautilus:runtime-health-smoke && npm run nautilus:examples",
-    "nautilus:demo": "tsx scripts/nautilus/demo.ts",
-    "nautilus:show-proofpack": "tsx scripts/nautilus/show-proofpack.ts",
-    "nautilus:show-replay": "tsx scripts/nautilus/show-replay.ts"
+    "test:unit": "vitest run --project plugin --project nautilus",
+    "test:integration": "vitest run --project cli --project installer-integration",
+    "test:nautilus": "vitest run --project nautilus"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
