@@ -4943,7 +4943,7 @@ runner.runCapture = (command) => {
   if (_n(command).includes("sandbox list")) return "my-assistant Ready";
   if (_n(command).includes("provider get")) return "Provider: discord-bridge";
   if (_n(command).includes("forward list")) return "my-assistant 127.0.0.1 18789 12345 running";
-  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "ok";
+  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "200";
   return "";
 };
 registry.registerSandbox = () => true;
@@ -5184,7 +5184,7 @@ runner.runCapture = (command) => {
   if (_n(command).includes("sandbox get my-assistant")) return "";
   if (_n(command).includes("sandbox list")) return "my-assistant Ready";
   if (_n(command).includes("forward list")) return "my-assistant 127.0.0.1 18789 12345 running";
-  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "ok";
+  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "200";
   return "";
 };
 registry.registerSandbox = (entry) => {
@@ -5766,7 +5766,7 @@ runner.runCapture = (command) => {
   if (_n(command).includes("sandbox get my-assistant")) return "my-assistant";
   if (_n(command).includes("sandbox list")) return "my-assistant Ready";
   if (_n(command).includes("forward list")) return "";
-  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "ok";
+  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "200";
   return "";
 };
 registry.getSandbox = () => ({ name: "my-assistant", gpuEnabled: false });
@@ -5873,7 +5873,7 @@ runner.runCapture = (command) => {
   if (_n(command).includes("sandbox get my-assistant")) return "my-assistant";
   if (_n(command).includes("sandbox list")) return "my-assistant Ready";
   if (_n(command).includes("forward list")) return "";
-  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "ok";
+  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "200";
   return "";
 };
 
@@ -6138,7 +6138,7 @@ runner.runCapture = (command) => {
   if (_n(command).includes("sandbox get my-assistant")) return "my-assistant";
   if (_n(command).includes("sandbox list")) return "my-assistant Ready";
   if (_n(command).includes("forward list")) return "";
-  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "ok";
+  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "200";
   return "";
 };
 registry.getSandbox = () => ({ name: "my-assistant", gpuEnabled: false });
@@ -6263,7 +6263,7 @@ runner.runCapture = (command) => {
     return sandboxDeleted ? "my-assistant Ready" : "my-assistant NotReady";
   }
   if (_n(command).includes("forward list")) return "";
-  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "ok";
+  if (_n(command).includes("sandbox exec") && _n(command).includes("curl")) return "200";
   return "";
 };
 registry.getSandbox = () => ({ name: "my-assistant", gpuEnabled: false });

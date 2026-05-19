@@ -15,6 +15,8 @@ beforeEach(() => {
   process.env.NEMOCLAW_GATEWAY_START_POLL_COUNT ??= "2";
   process.env.NEMOCLAW_GATEWAY_START_POLL_INTERVAL ??= "1";
   process.env.NEMOCLAW_SANDBOX_READY_TIMEOUT ??= "5";
+  process.env.NEMOCLAW_SANDBOX_READY_POLL_COUNT ??= "2";
+  process.env.NEMOCLAW_SANDBOX_READY_POLL_INTERVAL ??= "1";
 });
 
 

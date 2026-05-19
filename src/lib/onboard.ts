@@ -3540,7 +3540,14 @@ async function ensureNamedCredential(
   return replaceNamedCredential(envName, label, helpUrl);
 }
 
-async function waitForSandboxReady(sandboxName: string, attempts = 10, delaySeconds = 2): Promise<boolean> {
+const SANDBOX_READY_POLL_COUNT = envInt("NEMOCLAW_SANDBOX_READY_POLL_COUNT", 10);
+const SANDBOX_READY_POLL_INTERVAL_SECS = envInt("NEMOCLAW_SANDBOX_READY_POLL_INTERVAL", 2);
+
+async function waitForSandboxReady(
+  sandboxName: string,
+  attempts = SANDBOX_READY_POLL_COUNT,
+  delaySeconds = SANDBOX_READY_POLL_INTERVAL_SECS,
+): Promise<boolean> {
   for (let i = 0; i < attempts; i += 1) {
     const podPhase = runCaptureOpenshell(
       [
@@ -3561,6 +3568,9 @@ async function waitForSandboxReady(sandboxName: string, attempts = 10, delaySeco
     if (podPhase === "Running") return true;
     await new Promise((r) => setTimeout(r, delaySeconds * 1000));
   }
+  note(
+    `  [diagnostic] Sandbox '${sandboxName}' did not report Running after ${attempts} readiness probes (${delaySeconds}s interval).`,
+  );
   return false;
 }
 
