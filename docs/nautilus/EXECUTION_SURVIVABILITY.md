@@ -1,17 +1,51 @@
 <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 
-# EXECUTION_SURVIVABILITY
+# Nautilus execution survivability
 
 ## Implemented
-- Deterministic scaffold with explicit degraded-state behavior and replay-visible outcomes.
-- Contracted behavior is covered with Vitest tests in `test/core`.
+
+- `core/runtime/execution-engine.ts` provides a bounded in-process execution engine with retry events, cancellation events, timeout events, cleanup callbacks, and queue overflow protection.
+- `core/runtime/survivability.ts` provides startup reconciliation for durable execution snapshots.
+- Reconciliation preserves terminal executions, marks old non-terminal executions without terminal evidence as orphaned, and marks recent non-terminal executions without terminal evidence as partial.
+- Recovery results include replay continuity and notes so degraded states remain explicit.
+
+## Scaffolded
+
+- Execution survivability primitives are deterministic and local. They do not persist snapshots, own process supervisors, or resume containerized work.
+- Shutdown handling is represented by cancellation and cleanup callbacks in the execution engine; durable shutdown journals are not implemented.
 
 ## Planned
-- Durable multi-node persistence and cross-process recovery remain planned.
 
-## Degraded behavior
-- Unavailable components return explicit unavailable/degraded states, never synthetic healthy values.
+- Durable execution journals.
+- Startup reconciliation wired to real sandbox process state.
+- Operator commands for orphan review, partial replay review, and proofpack repair.
+- Signal-aware shutdown drains with bounded timeouts.
+
+## Crash and partial-state recovery behavior
+
+- Terminal states are preserved and not replayed as active work.
+- Old non-terminal snapshots without terminal evidence become `orphaned` with partial replay continuity.
+- Recent non-terminal snapshots without terminal evidence become `partial`; callers can decide whether to wait, resume, or escalate.
+- Non-terminal snapshots with replay evidence are degraded resumable candidates, not guaranteed recovered work.
+
+## Interrupted pipeline behavior
+
+- Event replay gaps remain visible through the replay engine.
+- Interrupted proofpacks are partial or incomplete.
+- Interrupted memory recording must keep provenance event IDs visible; this change provides the classification contract but does not implement durable memory writes.
 
 ## Replay implications
-- Replay never mutates source evidence; missing segments are explicit.
+
+- Replay continuity is prioritized over hiding partial state.
+- Orphaned executions should be replayed as partial evidence until an operator or reconciler attaches terminal evidence.
+
+## Proofpack implications
+
+- Proofpacks assembled during interrupted execution must include partial status and missing evidence notes.
+- A partial execution cannot produce a complete proofpack unless all required evidence and replay references are present and the interruption did not affect proofpack assembly.
+
+## Known limitations
+
+- No fake recovery claims are made: durable recovery, cross-process resume, and production process supervision remain planned.
+- The current primitives improve truth classification and test coverage; they are not a complete production survivability subsystem.
