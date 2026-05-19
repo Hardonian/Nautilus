@@ -93,3 +93,17 @@ Read and follow:
 - `docs/architecture/CONTROL_PLANE_BOUNDARIES.md`
 
 These documents are normative for agent implementation behavior.
+
+## Optional skill catalog pointers for coding assistants
+
+For environments that support skill discovery through repository pointers, the project skill catalog lives at:
+
+- `.agents/skills/` (canonical shared skill source)
+
+Connector-specific optional pointers:
+
+- Cursor: also supports project-level `.cursor/skills/`; this repository keeps the canonical skills in `.agents/skills/`.
+- Claude Code: `.claude/skills/` is a symlink to `.agents/skills/` for Claude-native discovery.
+- Other agentic IDEs/connectors: point project-level skill loading to `.agents/skills/` when supported.
+
+This section is a discovery pointer only and does not change the operational invariants above.
