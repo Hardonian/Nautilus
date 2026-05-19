@@ -1,7 +1,7 @@
 {
   "name": "nemoclaw",
   "version": "0.1.0",
-  "description": "NemoClaw — run OpenClaw inside OpenShell with NVIDIA inference",
+  "description": "NemoClaw \u2014 run OpenClaw inside OpenShell with NVIDIA inference",
   "license": "Apache-2.0",
   "bin": {
     "nemoclaw": "./bin/nemoclaw.js",
@@ -80,7 +80,10 @@
     "nautilus:proofpack-smoke": "tsx scripts/nautilus/proofpack-smoke.ts",
     "nautilus:runtime-health-smoke": "tsx scripts/nautilus/runtime-health-smoke.ts",
     "nautilus:examples": "tsx scripts/nautilus/examples-smoke.ts",
-    "nautilus:verify": "tsx scripts/nautilus/verify.ts && npm run nautilus:golden-path && npm run nautilus:replay-smoke && npm run nautilus:proofpack-smoke && npm run nautilus:runtime-health-smoke && npm run nautilus:examples"
+    "nautilus:verify": "tsx scripts/nautilus/verify.ts && npm run nautilus:golden-path && npm run nautilus:replay-smoke && npm run nautilus:proofpack-smoke && npm run nautilus:runtime-health-smoke && npm run nautilus:examples",
+    "nautilus:demo": "tsx scripts/nautilus/demo.ts",
+    "nautilus:show-proofpack": "tsx scripts/nautilus/show-proofpack.ts",
+    "nautilus:show-replay": "tsx scripts/nautilus/show-replay.ts"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
