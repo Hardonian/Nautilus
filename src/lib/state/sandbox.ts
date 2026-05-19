@@ -19,6 +19,7 @@ import {
   readFileSync,
   readlinkSync,
   rmSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import os from "node:os";
@@ -26,8 +27,7 @@ import path from "node:path";
 import { spawnSync } from "child_process";
 import { captureOpenshellCommand } from "../adapters/openshell/client.js";
 import { resolveOpenshell } from "../adapters/openshell/resolve.js";
-import type { AgentStateFile } from "../agent/defs.js";
-import { loadAgent } from "../agent/defs.js";
+import { type AgentStateFile, loadAgent } from "../agent/defs.js";
 import { shellQuote } from "../runner.js";
 import { isSensitiveFile, sanitizeConfigFile } from "../security/credential-filter.js";
 import * as registry from "./registry.js";
@@ -514,7 +514,7 @@ function sanitizeBackupDirectory(dirPath: string): void {
       } else if (entry.isFile()) {
         if (isSensitiveFile(entry.name)) {
           try {
-            require("node:fs").unlinkSync(fullPath);
+            unlinkSync(fullPath);
           } catch {
             /* best effort */
           }
@@ -583,9 +583,7 @@ function normalizeStateFilePath(filePath: string): string | null {
 }
 
 function isSafeStateDirPath(dirPath: string): boolean {
-  if (!dirPath || dirPath.includes("\0") || path.isAbsolute(dirPath)) return false;
-  const normalized = path.posix.normalize(dirPath.replace(/\\/g, "/"));
-  return normalized === dirPath && normalized !== "." && normalized !== ".." && !normalized.startsWith("../");
+  return normalizeStateFilePath(dirPath) !== null;
 }
 
 function isStateDirArray(value: unknown): value is string[] {
@@ -1138,7 +1136,7 @@ export function backupSandboxState(sandboxName: string, options: BackupOptions =
     }
   } finally {
     try {
-      require("node:fs").unlinkSync(configFile);
+      unlinkSync(configFile);
     } catch {
       /* ignore */
     }
@@ -1374,7 +1372,7 @@ export function restoreSandboxState(sandboxName: string, backupPath: string): Re
     }
   } finally {
     try {
-      require("node:fs").unlinkSync(configFile);
+      unlinkSync(configFile);
     } catch {
       /* ignore */
     }

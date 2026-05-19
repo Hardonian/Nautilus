@@ -1,4 +1,3 @@
-import { readJsonSync } from "../core/json-file";
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -11,8 +10,9 @@ import { readJsonSync } from "../core/json-file";
 // The sandbox cannot lower or raise its own shields — all mutations are
 // host-initiated (security invariant).
 
+import { readJsonSync } from "../core/json-file";
+
 const fs = require("fs");
-const { readJsonFileSync } = require("../core/json-file");
 const path = require("path");
 const { fork } = require("child_process");
 const { run, runCapture, validateName, shellQuote } = require("../runner");

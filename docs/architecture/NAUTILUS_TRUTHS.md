@@ -42,3 +42,7 @@ Evidence and state transitions should be replayable from committed artifacts and
 ## Unsupported features truth
 
 “Not supported” is a valid product answer. Do not imply support by returning simulated values or silently dropping fields.
+
+## Execution Environment Truth
+
+Nautilus tests and execution assume POSIX execution environments natively. Windows native testing is explicitly unsupported. WSL2, Linux, or macOS must be used to preserve deterministic POSIX semantics without polluting the codebase with cross-platform environment mocking.

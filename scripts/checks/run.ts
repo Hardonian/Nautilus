@@ -14,22 +14,22 @@ type CheckCommand = {
 };
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const TSX = process.platform === "win32" ? "tsx.cmd" : "tsx";
+const TSX = process.platform === "win32" ? "npx.cmd" : "npx";
 const CHECKS: readonly CheckCommand[] = [
   {
     name: "direct-credential-env",
     command: TSX,
-    args: ["scripts/checks/direct-credential-env.ts", "src/lib/onboard.ts"],
+    args: ["tsx", "scripts/checks/direct-credential-env.ts", "src/lib/onboard.ts"],
   },
   {
     name: "no-coverage-ignore",
     command: TSX,
-    args: ["scripts/checks/no-coverage-ignore.ts"],
+    args: ["tsx", "scripts/checks/no-coverage-ignore.ts"],
   },
   {
     name: "layer-import-boundaries",
     command: TSX,
-    args: ["scripts/checks/layer-import-boundaries.ts"],
+    args: ["tsx", "scripts/checks/layer-import-boundaries.ts"],
   },
 ];
 
@@ -39,6 +39,7 @@ function main(): void {
       cwd: REPO_ROOT,
       encoding: "utf-8",
       stdio: "inherit",
+      shell: process.platform === "win32",
     });
     if (result.status !== 0) {
       console.error(`Check failed: ${check.name}`);

@@ -2,6 +2,7 @@
   "kind": "trace",
   "schemaVersion": "1.0.0",
   "fixture": true,
+  "deterministicSample": true,
   "traceId": "trace-nautilus-fixture-golden",
   "spanCount": 5,
   "redacted": true

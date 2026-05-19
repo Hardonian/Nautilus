@@ -313,7 +313,5 @@ export function checkExisting(ctx: SshContext, paths: SkillPaths): boolean {
  * Verify the SKILL.md file exists on the sandbox at the expected path.
  */
 export function verifyInstall(ctx: SshContext, paths: SkillPaths): boolean {
-  const target = shellQuote(`${paths.uploadDir}/SKILL.md`);
-  const result = sshExec(ctx, `test -f ${target} && echo EXISTS`);
-  return result !== null && result.stdout === "EXISTS";
+  return checkExisting(ctx, paths);
 }

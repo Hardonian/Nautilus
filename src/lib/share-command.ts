@@ -201,7 +201,6 @@ export function runShareUnmount(
       console.error("  Could not find fusermount3 or fusermount on this host.");
       console.error("  Install with: sudo apt-get install fuse3  (or: sudo dnf install fuse3)");
       process.exit(1);
-      return;
     }
     unmountCmd = resolved;
     unmountArgs = ["-u", localMount];

@@ -1,6 +1,8 @@
 {
   "kind": "memory",
   "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
   "memoryScope": "local-default",
   "provenanceEventId": "evt-nautilus-fixture-001"
 }

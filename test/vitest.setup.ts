@@ -1,9 +1,24 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+import fs from "node:fs";
 import { afterEach, beforeEach, vi } from "vitest";
 
 const BASE_ENV = { ...process.env };
+if (process.platform === "win32") {
+  const gitBashPath = "C:\\Program Files\\Git\\bin";
+  const gitUsrBinPath = "C:\\Program Files\\Git\\usr\\bin";
+  const pathsToAdd = [gitBashPath, gitUsrBinPath].filter(p => fs.existsSync(p));
+  let currentPath = BASE_ENV.PATH || process.env.Path || "";
+  for (const p of pathsToAdd) {
+    if (!currentPath.includes(p)) {
+      currentPath = `${p};${currentPath}`;
+    }
+  }
+  BASE_ENV.PATH = currentPath;
+  process.env.PATH = currentPath;
+  if (process.env.Path) process.env.Path = currentPath;
+}
 
 beforeEach(() => {
   process.env.TZ = "UTC";

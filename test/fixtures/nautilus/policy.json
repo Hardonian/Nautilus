@@ -1,6 +1,8 @@
 {
   "kind": "policy",
   "schemaVersion": "1.0.0",
+  "fixture": true,
+  "deterministicSample": true,
   "decision": "allow",
   "policyScope": "local-default"
 }
