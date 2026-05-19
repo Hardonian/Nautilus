@@ -3,221 +3,93 @@
 
 # Agent Instructions
 
-## Project Overview
+## Purpose
 
-Nautilus is the platform identity for this repository. NemoClaw remains the runtime/orchestration engine inside Nautilus.
+This file is operational memory for Codex/agent contributors. It is not a marketing page. Preserve real invariants, prove behavior with executable evidence, and refuse “looks-good” changes that weaken safety or truthfulness.
 
-NVIDIA NemoClaw is an open-source reference stack for running [OpenClaw](https://openclaw.ai) always-on assistants inside [NVIDIA OpenShell](https://github.com/NVIDIA/OpenShell) sandboxes more safely. It provides CLI tooling, a blueprint for sandbox orchestration, and security hardening.
+## No-theatre doctrine
 
-**Status:** Alpha (March 2026+). Interfaces may change without notice.
+- Do not claim behavior that is not implemented and verified.
+- Do not fabricate health, confidence, completeness, telemetry, or incident status.
+- Do not merge “placeholder architecture” that creates parallel truth paths.
+- Prefer explicit degraded states over silent fallback.
 
-## Agent Skills
+## Canonical contracts and boundaries
 
-This repo ships agent skills under `.agents/skills/`, organized into three audience buckets: `nemoclaw-user-*` (end users), `nemoclaw-maintainer-*` (project maintainers), and `nemoclaw-contributor-*` (codebase contributors). Load the `nemoclaw-skills-guide` skill for a full catalog and quick decision guide mapping tasks to skills.
+Nautilus platform pillars are the canonical architecture boundaries:
 
-
-## Nautilus pillar boundaries
-
-The repository is being consolidated under these canonical platform pillars:
-
-- `core/runtime` (NemoClaw Runtime boundary)
+- `core/runtime` (NemoClaw runtime boundary)
 - `core/recallforge`
 - `core/operatorgraph`
 - `core/threatmesh`
 - `core/meshrag`
 - `core/event-fabric` (canonical event contract)
 
-When adding features, prefer extending existing implementation paths and introducing contracts under these boundaries before moving code.
+When adding features, extend existing boundary-owned contracts before introducing net-new abstractions.
 
-## Architecture
+## Deterministic proofpack rules
 
-| Path | Language | Purpose |
-|------|----------|---------|
-| `bin/` | JavaScript (CJS) | CLI launcher (`nemoclaw.js`) and small compatibility helpers |
-| `src/lib/` | TypeScript | Core CLI logic: onboard, credentials, inference, policies, preflight, runner |
-| `nemoclaw/` | TypeScript | Plugin project (Commander CLI extension for OpenClaw) |
-| `nemoclaw/src/blueprint/` | TypeScript | Runner, snapshot, SSRF validation, state management |
-| `nemoclaw/src/commands/` | TypeScript | Slash commands, migration state |
-| `nemoclaw/src/onboard/` | TypeScript | Onboarding config |
-| `nemoclaw-blueprint/` | YAML | Blueprint definition and network policies |
-| `nemoclaw-blueprint/model-specific-setup/` | JSON | Agent-scoped model/provider compatibility registry |
-| `scripts/` | Bash/JS/TS | Install helpers, setup, automation, E2E tooling |
-| `test/` | JavaScript (ESM) | Root-level integration tests (Vitest) |
-| `test/e2e/` | Bash/JS | End-to-end tests (Brev cloud instances) |
-| `docs/` | Markdown (MyST) | User-facing docs (Sphinx) |
+Every meaningful change must have deterministic proof artifacts (proofpack):
 
-## Quick Reference
+1. exact commands run,
+2. pass/fail outcomes,
+3. generated evidence tied to changed behavior,
+4. degraded behavior evidence when applicable.
 
-| Task | Command |
-|------|---------|
-| Install all deps | `npm install && npm link && cd nemoclaw && npm install && npm run build && cd .. && cd nemoclaw-blueprint && uv sync && cd ..` |
-| Build plugin | `cd nemoclaw && npm run build` |
-| Watch mode | `cd nemoclaw && npm run dev` |
-| Run all tests | `npm test` |
-| Run plugin tests | `cd nemoclaw && npm test` |
-| Run all linters | `make check` |
-| Run all hooks manually | `npx prek run --all-files` |
-| Type-check CLI | `npm run typecheck:cli` |
-| Auto-format | `make format` |
-| Build docs | `make docs` |
-| Serve docs locally | `make docs-live` |
+“Trust me” is not acceptable evidence.
 
-## Key Architecture Decisions
+## Degraded-state semantics
 
-### Dual-Language Stack
+- Degraded state must be explicit, inspectable, and user-visible where relevant.
+- Degraded must never be emitted as healthy/success.
+- Recovery transitions must be auditable.
 
-- **CLI and plugin**: TypeScript (`src/`, `nemoclaw/src/`) with a small CommonJS launcher in `bin/`; ESM in `test/`
-- **Blueprint**: YAML configuration (`nemoclaw-blueprint/`)
-- **Docs**: Sphinx/MyST Markdown
-- **Tooling scripts**: Bash and Python
+## TypeScript and CI invariants
 
-The `bin/` directory uses CommonJS intentionally for the launcher and a few compatibility helpers so the CLI still has a stable executable entry point. The main CLI implementation lives in `src/` and compiles to `dist/`. The `nemoclaw/` plugin uses TypeScript and requires compilation.
+- Keep runtime truth in TypeScript sources under `src/` and `nemoclaw/src/`; CJS in `bin/` remains launcher/compat only.
+- Preserve strict compile/type boundaries (`tsconfig.cli.json`, `nemoclaw/tsconfig.json`).
+- CI must remain deterministic and fail-closed for type errors, lint failures, and test regressions.
+- Do not lower coverage thresholds or bypass hooks to land a change.
 
-### Testing Strategy
+## Fixture philosophy and replay guarantees
 
-Tests are organized into three Vitest projects defined in `vitest.config.ts`:
+- Fixtures are executable evidence, not decorative snapshots.
+- Favor minimal fixtures that encode one invariant each.
+- Replays should reproduce contract-level outcomes deterministically from committed inputs.
 
-1. **`cli`** — `test/**/*.test.{js,ts}` — integration tests for CLI behavior
-2. **`plugin`** — `nemoclaw/src/**/*.test.ts` — unit tests co-located with source
-3. **`e2e-branch-validation`** — `test/e2e/brev-e2e.test.ts` — validates a branch from source on ephemeral Brev instance (requires `BREV_API_TOKEN`)
+## Unsupported-feature policy
 
-When writing tests:
+- If behavior is not supported, say so directly in docs and operator-facing output.
+- Do not disguise unsupported features with partial emulation that appears complete.
 
-- Root-level tests (`test/`) use ESM imports
-- Plugin tests use TypeScript and are co-located with their source files
-- Mock external dependencies; don't call real NVIDIA APIs in unit tests
-- E2E tests run on ephemeral Brev cloud instances
+## Safe extension points
 
-### Security Model
+Preferred extension points:
 
-NemoClaw isolates agents inside OpenShell sandboxes with:
+- CLI behavior: `src/lib/` (+ integration tests in `test/`)
+- Plugin behavior: `nemoclaw/src/` (+ co-located tests)
+- Blueprint/policy: `nemoclaw-blueprint/`
+- User-facing docs: `docs/`
 
-- Network policies (`nemoclaw-blueprint/policies/`) controlling egress
-- Credential sanitization to prevent leaks
-- SSRF validation (`nemoclaw/src/blueprint/ssrf.ts`)
-- Docker capability drops and process limits
+## Anti-patterns to reject
 
-Security-sensitive code paths require extra test coverage.
+- Fake telemetry, fake confidence, synthetic “healthy” state.
+- Silent fallback that changes security posture.
+- Copy-paste contracts that diverge from canonical event/control contracts.
+- Broad refactors that move boundaries without proving invariant preservation.
 
-## Code Style and Conventions
+## Known fragile areas
 
-### Commit Messages
+- Security-sensitive runtime pathways in `nemoclaw/src/blueprint/` (state, SSRF, sandbox behavior).
+- Policy/egress interactions under `nemoclaw-blueprint/policies/`.
+- Cross-project TypeScript/CJS seams between root CLI, `nemoclaw/`, and `bin/` launcher.
 
-Conventional Commits required. Enforced by commitlint via prek `commit-msg` hook.
+## Required architecture memory
 
-```text
-<type>(<scope>): <description>
-```
+Read and follow:
 
-Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`, `perf`, `merge`
+- `docs/architecture/REPO_INVARIANTS.md`
+- `docs/architecture/NAUTILUS_TRUTHS.md`
+- `docs/architecture/CONTROL_PLANE_BOUNDARIES.md`
 
-### SPDX Headers
-
-Every source file must include an SPDX license header. The pre-commit hook auto-inserts them:
-
-```javascript
-// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
-```
-
-For shell scripts use `#` comments. For Markdown use HTML comments.
-
-### JavaScript
-
-- `bin/` launcher and remaining `scripts/*.js`: **CommonJS** (`require`/`module.exports`), Node.js 22.16+
-- `test/`: **ESM** (`import`/`export`)
-- Biome config in `biome.json`
-- Keep function complexity low; existing complexity hotspots are tracked separately
-- Unused vars pattern: prefix with `_`
-
-### TypeScript
-
-- Plugin code in `nemoclaw/src/` is linted and formatted by the root Biome config
-- CLI type-checking via `tsconfig.cli.json`
-- Plugin type-checking via `nemoclaw/tsconfig.json`
-
-### Shell Scripts
-
-- ShellCheck enforced (`.shellcheckrc` at root)
-- `shfmt` for formatting
-- All scripts must have shebangs and be executable
-
-### No External Project Links
-
-Do not add links to third-party code repositories, community collections, or unofficial resources. Links to official tool documentation (Node.js, Python, uv) are acceptable.
-
-## Git Hooks (prek)
-
-All hooks managed by [prek](https://prek.j178.dev/) (installed via `npm install`):
-
-| Hook | What runs |
-|------|-----------|
-| **pre-commit** | File fixers, formatters, linters, Vitest (plugin) |
-| **commit-msg** | commitlint (Conventional Commits) |
-| **pre-push** | TypeScript type check (tsc --noEmit for plugin, JS, CLI) |
-
-## Working with This Repo
-
-### Before Making Changes
-
-1. Read `CONTRIBUTING.md` for the full contributor guide
-2. Run `make check` to verify your environment is set up correctly
-3. Check that `npm test` passes before starting
-
-### Common Patterns
-
-**Adding a CLI command:**
-
-- Entry point: `bin/nemoclaw.js` (launches the compiled CLI in `dist/`)
-- Main CLI implementation lives in `src/lib/` and compiles to `dist/lib/`
-- Add tests in `test/`
-
-**Adding a plugin feature:**
-
-- Source: `nemoclaw/src/`
-- Co-locate tests as `*.test.ts`
-- Build with `cd nemoclaw && npm run build`
-
-**Adding a network policy preset:**
-
-- Add YAML to `nemoclaw-blueprint/policies/presets/`
-- Follow existing preset structure (see `slack.yaml`, `discord.yaml`)
-
-**Adding model-specific sandbox compatibility:**
-
-- Add a declarative manifest under `nemoclaw-blueprint/model-specific-setup/<agent>/`
-- Use one exact `agent` per manifest (`openclaw`, `hermes`, etc.); do not make shared multi-agent manifests
-- Put OpenClaw executable wrappers under `nemoclaw-blueprint/openclaw-plugins/`
-- Put Hermes executable wrappers under `agents/hermes/`
-- Keep `agents/hermes/generate-config.ts` as a thin build-time entrypoint; add Hermes env parsing, config construction, registry handling, and serialization under `agents/hermes/config/`
-- Do not add Hermes behavior for an OpenClaw issue without a Hermes-specific repro or acceptance test
-
-### Gotchas
-
-- `npm install` at root triggers `prek install` which sets up git hooks. If hooks fail, check that `core.hooksPath` is unset: `git config --unset core.hooksPath`
-- The `nemoclaw/` subdirectory has its own `package.json` and `node_modules`, while sharing the root Biome config — it's a separate npm project
-- SPDX headers are auto-inserted by pre-commit hooks; don't worry about adding them manually
-- Coverage thresholds are ratcheted in `ci/coverage-threshold-*.json` — new code should not decrease CLI or plugin coverage
-- The `.claude/skills` symlink points to `.agents/skills` — both paths resolve to the same content
-
-## Documentation
-
-- Source of truth: `docs/` directory
-- `.agents/skills/nemoclaw-user-*/*.md` is **autogenerated** — never edit directly
-- User skills are generated agent-skill packages, prefixed with `nemoclaw-user-*`, that help AI agents guide end users through NemoClaw workflows.
-- For normal docs changes, include only the source pages under `docs/`; the docs-to-skills hook runs in dry-run mode to validate generated output.
-- Follow style guide in `docs/CONTRIBUTING.md`
-- **Release prep only:** During release prep, run `nemoclaw-contributor-update-docs`, make doc version bumps, regenerate user skills, then open the docs refresh PR with both docs and generated user skills.
-
-## PR Requirements
-
-- Create feature branch from `main`
-- Run `make check` and `npm test` before submitting
-- Follow PR template (`.github/PULL_REQUEST_TEMPLATE.md`)
-- Update docs for any user-facing behavior changes
-- No secrets, API keys, or credentials committed
-- Limit open PRs to fewer than 10
-
-## Nautilus MVP foundation truth
-- Run `npm run nautilus:golden-path` for deterministic smoke output.
-- MVP docs are under `docs/nautilus/` and explicitly separate implemented/scaffolded/not-supported behavior.
+These documents are normative for agent implementation behavior.
