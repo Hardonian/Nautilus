@@ -83,7 +83,11 @@
     "nautilus:verify": "tsx scripts/nautilus/verify.ts && npm run nautilus:golden-path && npm run nautilus:replay-smoke && npm run nautilus:proofpack-smoke && npm run nautilus:runtime-health-smoke && npm run nautilus:examples",
     "test:unit": "vitest run --project plugin --project nautilus",
     "test:integration": "vitest run --project cli --project installer-integration",
-    "test:nautilus": "vitest run --project nautilus"
+    "test:nautilus": "vitest run --project nautilus",
+    "doctor": "tsx scripts/release/doctor.ts",
+    "verification:summary": "tsx scripts/release/verification-summary.ts",
+    "release:artifacts": "tsx scripts/release/generate-artifacts.ts",
+    "release:assemble": "bash scripts/release/assemble-release.sh"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
