@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-19T02:24:13.417Z",
+  "files": [
+    {
+      "path": "proofpack/sample-proofpack.json",
+      "sha256": "1bc2e28f8515e8da7ee0fb28a87f8ecc8c1ba1ee5c263673d4fd253aa3de3261"
+    },
+    {
+      "path": "proofpack/sample-replay.json",
+      "sha256": "d0168cfb3d7647fcdbd9fcd9b4f4fe71b8b9857d4bc170215581b9e462cb9957"
+    },
+    {
+      "path": "smoke-output/examples.json",
+      "sha256": "44368a0a605131dfc88f065d032a2bbb823e642069d66f8ce128a8ad02985c24"
+    },
+    {
+      "path": "smoke-output/golden-path.json",
+      "sha256": "18807cf46cafed8cb258c5f118123333346e9da2e21b669212c368e5eacd7399"
+    },
+    {
+      "path": "smoke-output/proofpack-smoke.json",
+      "sha256": "1bc2e28f8515e8da7ee0fb28a87f8ecc8c1ba1ee5c263673d4fd253aa3de3261"
+    },
+    {
+      "path": "smoke-output/replay-smoke.json",
+      "sha256": "d0168cfb3d7647fcdbd9fcd9b4f4fe71b8b9857d4bc170215581b9e462cb9957"
+    },
+    {
+      "path": "smoke-output/runtime-health-smoke.json",
+      "sha256": "70a0ca113ec5c5b44d63a7006f6841c6f89b791f579fa2fc49bdca61f42fbd7b"
+    },
+    {
+      "path": "verification-summary.json",
+      "sha256": "75e39a417d17186baf1ae847166a96759a061a33c1daa3de2285680799299517"
+    }
+  ]
+}

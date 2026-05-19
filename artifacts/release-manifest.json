@@ -1,0 +1,19 @@
+{
+  "commit": "7c29a29a572100c4c75d442d64fe7e051d249055",
+  "branch": "work",
+  "buildTimestamp": "2026-05-19T02:24:13.417Z",
+  "nodeVersion": "v24.15.0",
+  "npmVersion": "11.4.2",
+  "packageHashes": [
+    {
+      "file": "package.json",
+      "sha256": "cc0fd2c0f4ae946d0517832997e7dc34b4ff7a57fecfbaab1cda312c0abe3828"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256": "e5896ecd143e79a3b812c5689a7ae9938d174814363d63a5c6becde2814207a6"
+    }
+  ],
+  "verificationSummary": "artifacts/verification-summary.json",
+  "releaseBundleIndex": "artifacts/release-bundle/index.json"
+}
