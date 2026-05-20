@@ -10,7 +10,8 @@
 - `npm run verify:remote-probes`
 - `npm run verify:governed-routing`
 - `npm run verify:core`
-- `npm run verify:release`
+- `npm run verify:release-readiness`
+- `npm run verify:release` (legacy compatibility gate)
 - `npm run verify:all` (strict `verify:core` variant)
 - `npx vitest run src/lib/security/security-policy.test.ts src/lib/control-plane/remote-runtime-probes.test.ts src/lib/control-plane/remote-execution.test.ts src/lib/control-plane/local-runtime-probes.test.ts src/lib/control-plane/policy-engine.test.ts`
 

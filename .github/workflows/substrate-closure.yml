@@ -42,7 +42,7 @@ jobs:
         run: npm run verify:core
 
       - name: Verify release
-        run: npm run verify:release
+        run: npm run verify:release-readiness
 
       - name: Demo local proof clean
         run: npm run demo:local-proof:clean

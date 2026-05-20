@@ -25,6 +25,7 @@ This checklist gates the governed heterogeneous execution substrate integration 
 
 ## Verification gate
 
+- [x] `npm run verify:release-readiness` passes.
 - [x] `npm run verify:release` passes.
 - [x] `npm run verify:changelog-hygiene` passes.
 - [x] `npm run verify:core` passes.
@@ -34,6 +35,7 @@ This checklist gates the governed heterogeneous execution substrate integration 
 
 ## CI gate
 
+- [x] CI workflow invokes `npm run verify:release-readiness` (or stricter superset).
 - [x] CI workflow invokes `npm run verify:release`.
 
 ## Packaging gate

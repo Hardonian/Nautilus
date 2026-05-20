@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Release verification
-        run: npm run verify:release
+        run: npm run verify:release-readiness
 
       - name: Typecheck CLI
         run: npm run typecheck:cli
