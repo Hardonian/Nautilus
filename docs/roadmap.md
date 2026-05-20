@@ -250,3 +250,129 @@ Closure pass completed for direct branch assertions and docs/status coherence. N
 - Operational event payloads, diagnostics, receipts, telemetry metadata, and proofpack/export-shaped payloads share redaction helpers.
 - Command safety remains descriptor-only and does not introduce arbitrary command execution.
 - Explicitly out of scope: orchestration, queues, daemons, retries, GPU balancing, Dynamo integration, autonomous behavior, and default remote execution.
+
+## Forward milestone roadmap (next 5-10 releases, proposed on 2026-05-20)
+
+This roadmap is grounded in current repository truth (opt-in governed/heterogeneous routing, explicit degraded-state semantics, deterministic verification expectations) and prioritizes contract safety over feature theatre.
+
+### Release M1 — Canonical event-fabric contract lock + drift gate
+- Goal: eliminate schema drift between runtime receipts, telemetry events, diagnostics exports, and docs references.
+- Scope:
+  - Introduce single-source event schema package under canonical ownership boundary (`core/event-fabric` mapping in repo layout).
+  - Add CI drift check to fail when emitted runtime payload fields diverge from contract.
+  - Add migration notes for existing event consumers.
+- Why now: current roadmap/history shows many event additions; lock-in prevents silent divergence.
+- Proofpack expectations:
+  - deterministic schema compatibility test;
+  - fixture replay proving stable event IDs and required degraded markers.
+
+### Release M2 — Policy explainability and operator approval UX hardening
+- Goal: make every deny/degraded decision human-auditable without exposing secrets.
+- Scope:
+  - Structured policy-decision reason tree (rule id, input class, redacted evidence source, remediation hint).
+  - CLI/operator output upgrades for approval-required paths with clear next actions.
+  - Explicit unsupported-path messaging for missing approvals or unsupported transports.
+- Why now: fail-closed behavior is implemented, but operator ergonomics can still block safe adoption.
+- Proofpack expectations:
+  - golden tests for reason-code determinism;
+  - integration tests for approval-required, denied, and recovered transitions.
+
+### Release M3 — Replayability v2 (contract-level deterministic incident reconstruction)
+- Goal: enable one-command deterministic reconstruction of control-plane decisions for support and audit.
+- Scope:
+  - Replay bundle index format (commands, environment toggles, fixture pointers, expected outcomes).
+  - Validation command that compares replayed outputs vs committed baseline.
+  - Degraded-path replay scenarios as first-class acceptance criteria.
+- Why now: architecture docs require replay truth; formal tooling converts this into day-2 operational leverage.
+- Proofpack expectations:
+  - replay pass/fail snapshots;
+  - deterministic hash/signature of replay artifacts.
+
+### Release M4 — Runtime/policy boundary hardening for remote execution seam
+- Goal: close fragile security seam where runtime dispatch, egress policy, and trust state intersect.
+- Scope:
+  - Mandatory preflight boundary checks consolidated into one typed guard.
+  - Reject-on-ambiguity for conflicting trust signals (expired/revoked/conflicting probe results).
+  - Add deny telemetry with explicit cause class, never mapped to healthy.
+- Why now: AGENTS + architecture docs identify this as fragile/high-risk.
+- Proofpack expectations:
+  - adversarial tests for SSRF-like endpoint abuse attempts;
+  - trust-conflict chaos fixtures proving fail-closed outcomes.
+
+### Release M5 — Worker identity trust phase 1 (cryptographic attestation scaffold)
+- Goal: move from evidence-only worker claims to verifiable trust anchors.
+- Scope:
+  - Pluggable attestation verifier interface (no silent fallback to self-asserted trust).
+  - Signed worker identity metadata ingestion and expiry handling.
+  - Policy hooks to require attestation for selected classes of remote execution.
+- Why now: current docs explicitly state attestation is not implemented; this is the highest trust multiplier.
+- Proofpack expectations:
+  - attestation success/failure fixtures;
+  - policy-gated routing tests demonstrating blocked execution without valid attestation.
+
+### Release M6 — Device/telemetry confidence model + staleness SLOs
+- Goal: convert probe telemetry from descriptive metadata into reliable scheduling inputs with explicit confidence semantics.
+- Scope:
+  - Confidence scoring contract (observed freshness, source type, parse quality, conflict state).
+  - Staleness thresholds with deterministic degraded-state transitions.
+  - Operator-visible telemetry quality diagnostics and remediation guidance.
+- Why now: enables safe evolution toward smarter routing without fake confidence.
+- Proofpack expectations:
+  - property tests for confidence monotonicity and staleness transitions;
+  - fixtures for conflicting telemetry sources.
+
+### Release M7 — Deterministic scheduler GA (opt-in to default-ready)
+- Goal: graduate scheduler from scaffolded/opt-in behavior to release-grade deterministic selection engine.
+- Scope:
+  - Stable tie-breaker hierarchy with explicit reject reasons.
+  - Dry-run vs live-run parity checks.
+  - Contract tests across local-only, heterogeneous, and policy-constrained candidate sets.
+- Why now: depends on M2/M4/M6 trust and explainability work to avoid unsafe automation.
+- Proofpack expectations:
+  - reproducibility test matrix across seeded candidate pools;
+  - regression corpus for prior routing incidents.
+
+### Release M8 — OperatorGraph UX: truthful status matrix + degraded recovery workflows
+- Goal: improve operator UX without compromising truthfulness.
+- Scope:
+  - Unified status panel for healthy/degraded/unknown with provenance badges.
+  - Guided recovery actions tied to concrete reason codes.
+  - Accessibility pass for keyboard navigation and small-screen readability in operator surfaces.
+- Why now: converts deep backend work into dependable day-to-day operator flow.
+- Proofpack expectations:
+  - integration snapshots for each status class;
+  - accessibility checks and keyboard-path tests.
+
+### Release M9 — RecallForge operational memory phase 1 (support-safe evidence recall)
+- Goal: make historical decisions queryable for support and continuous improvement without policy auto-mutation.
+- Scope:
+  - Append-only evidence index keyed by receipt IDs and decision contexts.
+  - Query/filter tooling for “why was this blocked/degraded?” investigations.
+  - Export-safe redaction guarantees for memory-backed support bundles.
+- Why now: increases MTTR reduction and enables trust-preserving product analytics.
+- Proofpack expectations:
+  - append-only integrity tests;
+  - provenance chain verification across receipt → event → memory entry.
+
+### Release M10 — Release engineering and CI integrity ratchet
+- Goal: enforce deterministic, fail-closed release posture at scale.
+- Scope:
+  - Unified release-readiness gate command that runs type/lint/test/replay/proofpack checks.
+  - Contract-change checklist automation (docs delta required when behavior contracts change).
+  - Flake detection/reporting with deterministic quarantine workflow.
+- Why now: prevents roadmap progress from eroding integrity as system complexity rises.
+- Proofpack expectations:
+  - end-to-end release gate run artifact;
+  - evidence bundle proving fail-closed behavior on injected regressions.
+
+## Cross-cutting sequencing and dependency strategy
+
+1. **Trust and contract integrity first (M1–M4)** before enabling more automation.
+2. **Cryptographic and telemetry confidence substrate (M5–M6)** before scheduler GA.
+3. **Operator and memory compounding value (M8–M9)** once truth contracts are hardened.
+4. **CI/release ratchet (M10)** to sustain quality as new features ship.
+
+## Suggested milestone cadence
+- 2-3 week cycles per milestone with explicit go/no-go gates.
+- Each milestone must ship with a deterministic proofpack and at least one degraded-path verification artifact.
+- No milestone should claim “healthy” improvements without source-backed observability or explicit unknown/degraded semantics.
