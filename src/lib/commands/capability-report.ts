@@ -9,7 +9,12 @@ export default class CapabilityReportCommand extends NemoClawCommand {
   static id = "capability-report";
   static strict = true;
   static summary = "Generate local device and runtime capability report";
+  static description = "Generate and print a JSON capability report for local runtime endpoints.";
   static usage = ["capability-report [--endpoint <name=url>] [--stale-after-ms N] [--last-observed-at ISO]"];
+  static examples = [
+    "<%= config.bin %> <%= command.id %>",
+    "<%= config.bin %> <%= command.id %> --endpoint local=http://127.0.0.1:12434",
+  ];
   static flags = {
     endpoint: Flags.string({ multiple: true, description: "Runtime endpoint probe in form name=url" }),
     staleAfterMs: Flags.integer({ description: "Mark snapshot stale when last-observed age exceeds this value" }),

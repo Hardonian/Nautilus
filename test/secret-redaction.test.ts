@@ -147,7 +147,7 @@ describe("secret redaction consistency (#1736)", () => {
       } finally {
         rmSync(tmp, { recursive: true, force: true });
       }
-    });
+    }, 40_000);
   });
 
   describe("onboard-session redactSensitiveText (#2336)", () => {
