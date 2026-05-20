@@ -30,7 +30,7 @@ Unsupported-language audit completed across docs and code claims:
 ## Risk posture
 
 - Release messaging risk reduced by explicit status matrix and roadmap normalization.
-- Regression risk controlled by `verify:release` aggregate command and CI enforcement.
+- Regression risk controlled by `verify:release-readiness` aggregate command and CI enforcement (with fail-closed per-check status artifact at `artifacts/release-readiness-gate.json`).
 - Residual risk: future PRs could reintroduce unsupported claims without checklist enforcement discipline.
 
 ## Worker trust and attestation constraints (2026-05-09)

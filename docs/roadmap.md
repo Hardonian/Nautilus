@@ -364,6 +364,7 @@ This roadmap is grounded in current repository truth (opt-in governed/heterogene
 - Proofpack expectations:
   - end-to-end release gate run artifact;
   - evidence bundle proving fail-closed behavior on injected regressions.
+- 2026-05-20 implementation update: `npm run verify:release-readiness` now enforces a deterministic release gate spanning typecheck, lint, unit/integration tests, chaos, replay, proofpack, export, and benchmark verification.
 
 ## Cross-cutting sequencing and dependency strategy
 
