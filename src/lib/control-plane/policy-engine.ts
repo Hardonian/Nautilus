@@ -224,6 +224,9 @@ export function evaluatePolicy(
   return trace;
 }
 
+// Backward-compatible alias used by integration tests and legacy callers.
+export const evaluatePolicyEngine = evaluatePolicy;
+
 
 // ── Mutation Audit ─────────────────────────────────────────────────────────
 
