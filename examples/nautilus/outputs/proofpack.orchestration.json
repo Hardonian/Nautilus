@@ -1,0 +1,59 @@
+{
+  "kind": "nautilus.orchestration.proofpack",
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-05-21T10:23:49.202Z",
+  "capabilityRegistry": {
+    "backendName": "unavailable",
+    "supportsStructuredOutput": false,
+    "supportsSpeculativeDecoding": false,
+    "supportsPrefixCache": false,
+    "supportsChunkedPrefill": false,
+    "supportsContinuousBatching": false,
+    "supportsKvCacheQuantization": false,
+    "supportsTurboQuant": false,
+    "supportsKivi": false,
+    "supportedQuantFormats": [],
+    "maxContextTokens": 0,
+    "availableVramMb": 0,
+    "externalApi": false,
+    "healthStatus": "unavailable",
+    "degradedReason": "backend_unconfigured"
+  },
+  "routeDecision": {
+    "selectedBackend": "unavailable",
+    "selectedModel": "none",
+    "reason": "backend_unavailable",
+    "rejectedReasons": [
+      "long_context_rejected_retrieval_sufficient"
+    ],
+    "degradationReason": "backend_unconfigured"
+  },
+  "handoff": {
+    "originalBytes": 3041,
+    "compressedBytes": 1036,
+    "compressionRatio": 0.34067740874712266,
+    "droppedSections": [
+      "history_trimmed",
+      "working_state_summarized"
+    ]
+  },
+  "collaboration": {
+    "roundsExecuted": 2,
+    "terminationReason": "max_rounds_reached",
+    "telemetry": [
+      {
+        "round": 1,
+        "handoffBytes": 3041,
+        "compressed": false
+      },
+      {
+        "round": 2,
+        "handoffBytes": 3057,
+        "compressed": false
+      }
+    ]
+  },
+  "degraded": [
+    "backend_unconfigured"
+  ]
+}
