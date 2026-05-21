@@ -1,7 +1,7 @@
 {
   "name": "nemoclaw",
   "version": "0.1.0",
-  "description": "NemoClaw \u2014 run OpenClaw inside OpenShell with NVIDIA inference",
+  "description": "NemoClaw — run OpenClaw inside OpenShell with NVIDIA inference",
   "license": "Apache-2.0",
   "bin": {
     "nemoclaw": "./bin/nemoclaw.js",
@@ -84,7 +84,9 @@
     "test:unit": "vitest run --project plugin --project nautilus",
     "test:integration": "vitest run --project cli --project installer-integration",
     "test:nautilus": "vitest run --project nautilus",
-    "verify:release-readiness": "node scripts/verify-release-readiness.js"
+    "verify:release-readiness": "node scripts/verify-release-readiness.js",
+    "build": "npm run build:cli",
+    "proof:orchestration": "tsx scripts/proof-orchestration.ts"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
