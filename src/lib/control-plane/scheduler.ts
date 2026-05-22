@@ -94,13 +94,14 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
     }
     const score = Math.round(
       (node.role === "local" ? 100 : 50) +
-        (model.flags.streaming === input.classification.requiresStreaming ? 10 : 0) +
+        (model?.flags.streaming === input.classification.requiresStreaming ? 10 : 0) +
         (capabilityInputs.vramAvailableMb - capabilityInputs.vramRequiredMb) / 1024 -
         capabilityInputs.queuePressure * 15 -
         capabilityInputs.recentLatencyMs / 100 -
         capabilityInputs.estimatedCost * 2,
     );
-    candidates.push({ nodeId: node.nodeId, modelId: model.modelId, score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score}`, source: "scheduler" }] });
+    const selectedModelId = model?.modelId ?? input.request.requestedModel ?? "degraded-model-unavailable";
+    candidates.push({ nodeId: node.nodeId, modelId: selectedModelId, score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score}`, source: "scheduler" }] });
   }
 
   candidates.sort((a, b) => b.score - a.score || a.nodeId.localeCompare(b.nodeId) || a.modelId.localeCompare(b.modelId));
