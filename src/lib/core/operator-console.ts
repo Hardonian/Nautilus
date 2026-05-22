@@ -41,7 +41,7 @@ function renderState(hasData: boolean, unavailableReason?: string): "ready" | "e
 
 export function buildOperatorConsoleSurface(input: OperatorConsoleInput): OperatorConsoleSurface {
   const replayState = renderState(Boolean(input.replay), input.replay?.unavailableReason);
-  const retrievalState = renderState(input.retrieval?.lineage.length !== 0, input.retrieval?.state === "unavailable" ? "retrieval_unavailable" : undefined);
+  const retrievalState = renderState((input.retrieval?.lineage.length ?? 0) !== 0, input.retrieval?.state === "unavailable" ? "retrieval_unavailable" : undefined);
   const policyState = renderState(Boolean(input.policy?.decision), input.policy?.unavailableReason);
   const timelineState = renderState(input.timeline.events.length !== 0, input.timeline.unavailableReason);
   const topologyState = renderState(input.topology.nodes.length !== 0, input.topology.unavailableReason);
