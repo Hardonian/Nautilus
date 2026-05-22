@@ -1,0 +1,1 @@
+test: 🧪 [testing improvement] Add edge case tests for compactText
