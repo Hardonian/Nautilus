@@ -18,7 +18,8 @@
   },
   "scripts": {
     "preinstall": "node scripts/check-node-version.js",
-    "test": "vitest run",
+    "test": "npm run test:unit",
+    "test:full": "vitest run",
     "check": "npx prek run --all-files",
     "checks": "tsx scripts/checks/run.ts",
     "lint": "npx @biomejs/biome lint . && npm run checks",

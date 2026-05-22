@@ -14,3 +14,6 @@
 | Scheduler semantics | Good deterministic baseline | VRAM/context/latency-aware score and tie-break tests | `npm run verify:control-plane` | Suboptimal routing under load |
 | Proofpack/replay/export | Present in script surface | Integrated pipeline test for proofpack+replay+export together | `npm run verify:proofpack` / `npm run verify:replay` / `npm run verify:export` | Audit chain breaks |
 | Release readiness | Present | Explicit matrix that blocks on unresolved high severity gaps | `npm run verify:release-readiness` | Shipping with known high-risk gaps |
+
+| Default npm test path boundedness | Implemented: `npm test` now maps to bounded unit suite (`test:unit`) | Optional full-suite watchdog coverage for `test:full` in CI lanes | `npm test` and `npm run test:full` | Long suite moved behind explicit opt-in; residual risk is opt-in runtime variability |
+| Restricted install path clarity | Implemented documentation for restricted-proxy fallback (`npm ci --ignore-scripts`) | Upstream hook dependency fetch still externally constrained in proxy environments | `npm ci` and `npm ci --ignore-scripts` | Normal path still depends on external fetch allowance |
