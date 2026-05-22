@@ -1108,3 +1108,13 @@ Running `nemoclaw setup` now delegates directly to `nemoclaw onboard`.
 ```console
 $ nemoclaw setup
 ```
+
+### \`nemoclaw capability-report\`
+
+Generates a JSON report of the sandbox's capabilities, limits, and runtime configuration.
+
+**Usage:** \`nemoclaw capability-report [OPTIONS]\`
+
+**Options:**
+- \`--output <file>\`: Write the report to a file instead of stdout.
+- \`--format <format>\`: Output format (json, yaml). Default is json.
