@@ -894,6 +894,10 @@ $ nemoclaw setup-spark
 ### `nemoclaw debug`
 
 Collect diagnostics for bug reports.
+
+### `nemoclaw capability-report`
+
+Generate local device and runtime capability report.
 Gathers system info, Docker state, gateway logs, and sandbox status into a summary or tarball.
 Use `--sandbox <name>` to target a specific sandbox, `--quick` for a smaller snapshot, or `--output <path>` to save a tarball that you can attach to an issue.
 
