@@ -4855,9 +4855,10 @@ async function createSandbox(
   // skipped the token prompt for. Only channels with a real token will have a
   // provider attached, so the conflict check must filter out the skipped ones
   // (otherwise we warn about phantom channels that will never poll).
+  const channelsByName = new Map(MESSAGING_CHANNELS.map((c) => [c.name, c]));
   const conflictCheckChannels = Array.isArray(enabledChannels)
     ? enabledChannels.flatMap((name) => {
-        const def = MESSAGING_CHANNELS.find((c) => c.name === name);
+        const def = channelsByName.get(name);
         if (!def || !getMessagingToken(def.envKey)) return [];
         const tokenEnvKeys = def.appTokenEnvKey ? [def.envKey, def.appTokenEnvKey] : [def.envKey];
         const credentialHashes: Record<string, string> = {};
@@ -7743,9 +7744,10 @@ async function setupMessagingChannels(): Promise<string[]> {
     return [];
   }
 
+  const channelsByName = new Map(MESSAGING_CHANNELS.map((c) => [c.name, c]));
   // For each selected channel, prompt for token if not already set
   for (const name of selected) {
-    const ch = MESSAGING_CHANNELS.find((c) => c.name === name);
+    const ch = channelsByName.get(name);
     if (!ch) {
       console.log(`  Unknown channel: ${name}`);
       continue;
