@@ -74,3 +74,8 @@ See `docs/roadmap.md` for R0-R5 prioritized execution plan and ownership-ready t
   - `npm ci` may fail when postinstall fetch for `@j178/prek` is blocked (403/proxy).
   - `npm ci --ignore-scripts` is the supported restricted bootstrap path for local auditing.
   - CI remains fail-closed on normal path; restricted mode is a documented local fallback and does not mutate lockfile.
+
+## R1/R4/R5 implementation update (2026-05-22)
+- Implemented production primitives for R1 hardening (`boundedRetry`, `denyRemoteByDefault`, explicit unavailable degraded helper, cleanup registry).
+- Implemented R4 deterministic handoff/context/checkpoint primitives (handoff validator, evidence-preserving compaction, deterministic task fingerprinting, reuse guard, token overflow degraded outcome, checkpoint replay shape).
+- Implemented R5 queue governance and proofpack/release gate foundations (capacity admission, idempotent enqueue, retry exhaustion dead-letter, load-shed receipts, queue timeline, proofpack evidence composition, release-gap waiver gating, verification-matrix script-reference checks, benchmark unavailable/latency harness).
