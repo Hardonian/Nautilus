@@ -1108,3 +1108,18 @@ Running `nemoclaw setup` now delegates directly to `nemoclaw onboard`.
 ```console
 $ nemoclaw setup
 ```
+
+### \`nemoclaw capability-report\`
+
+Generates a capability orchestration report indicating the environment constraints.
+
+```bash
+nemoclaw capability-report
+```
+
+**Options:**
+- \`--json\`: Output in JSON format.
+
+**Exit Codes:**
+- \`0\`: Success
+- \`1\`: Runtime error
