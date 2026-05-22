@@ -1119,15 +1119,10 @@ $ nemoclaw setup
 
 ### \`nemoclaw capability-report\`
 
-Generates a capability orchestration report indicating the environment constraints.
+Generates a JSON report of the sandbox's capabilities, limits, and runtime configuration.
 
-```bash
-nemoclaw capability-report
-```
+**Usage:** \`nemoclaw capability-report [OPTIONS]\`
 
 **Options:**
-- \`--json\`: Output in JSON format.
-
-**Exit Codes:**
-- \`0\`: Success
-- \`1\`: Runtime error
+- \`--output <file>\`: Write the report to a file instead of stdout.
+- \`--format <format>\`: Output format (json, yaml). Default is json.
