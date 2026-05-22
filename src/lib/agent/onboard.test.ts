@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach, afterAll, vi } from "vites
 import fs from "node:fs";
 import path from "node:path";
 // Import from compiled dist/ so coverage is attributed correctly.
-import { printDashboardUi, verifyAgentBinaryAvailable } from "../../../dist/lib/agent/onboard";
+import { printDashboardUi, verifyAgentBinaryAvailable, isHealthProbeOk } from "../../../dist/lib/agent/onboard";
 import type { AgentDefinition } from "./defs";
 
 function makeAgent(overrides: Partial<AgentDefinition> = {}): AgentDefinition {
@@ -183,5 +183,35 @@ describe("handleAgentSetup guards", () => {
 
     expect(result).toEqual({ available: true });
     expect(script).toContain("NEMOCLAW_AGENT_BINARY_CHECK:ok");
+  });
+});
+
+describe("isHealthProbeOk", () => {
+  it("returns true for exact match of 'ok'", () => {
+    expect(isHealthProbeOk("ok")).toBe(true);
+  });
+
+  it("returns true for JSON with status 'ok'", () => {
+    expect(isHealthProbeOk(JSON.stringify({ status: "ok" }))).toBe(true);
+  });
+
+  it("returns false for invalid JSON", () => {
+    expect(isHealthProbeOk("invalid json")).toBe(false);
+  });
+
+  it("returns false for empty string", () => {
+    expect(isHealthProbeOk("")).toBe(false);
+  });
+
+  it("returns false for null", () => {
+    expect(isHealthProbeOk(null)).toBe(false);
+  });
+
+  it("returns false for undefined", () => {
+    expect(isHealthProbeOk(undefined)).toBe(false);
+  });
+
+  it("returns false for JSON with status other than 'ok'", () => {
+    expect(isHealthProbeOk(JSON.stringify({ status: "error" }))).toBe(false);
   });
 });
