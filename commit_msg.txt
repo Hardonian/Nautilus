@@ -1,0 +1,7 @@
+🧪 [test] add tests for classifyRuntimeAvailability
+
+🎯 What: Added missing tests for classifyRuntimeAvailability in core/runtime/health.ts.
+📊 Coverage: Added unit tests that cover scenarios of 0 probes, all reachable probes, all unreachable probes, mixed unreachable/reachable probes, and degraded probes. Tests all edge cases including combining degradation and unreachability reasons.
+✨ Result: Reliable and robust test coverage for runtime health evaluation.
+
+Signed-off-by: Jules <jules@example.com>
