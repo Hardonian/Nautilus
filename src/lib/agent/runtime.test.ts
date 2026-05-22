@@ -1,13 +1,16 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 // Import from compiled dist/ so coverage is attributed correctly.
 import {
   buildManualRecoveryCommand,
   buildOpenClawRecoveryScript,
   buildRecoveryScript,
+  getSessionAgent,
 } from "../../../dist/lib/agent/runtime";
+import * as registry from "../../../dist/lib/state/registry";
+import * as onboardSession from "../../../dist/lib/state/onboard-session";
 import type { AgentDefinition } from "./defs";
 
 function makeAgent(overrides: Partial<AgentDefinition> = {}): AgentDefinition {
@@ -70,6 +73,21 @@ function extractGatewayProcessPattern(script: string | null): string {
 function toJsRegex(pattern: string): RegExp {
   return new RegExp(pattern.replaceAll("[[:space:]]", "\\s"));
 }
+
+
+describe("getSessionAgent", () => {
+  it("returns null on missing sandbox and missing global agent", () => {
+    vi.spyOn(onboardSession, "loadSession").mockReturnValue(null);
+    expect(getSessionAgent()).toBeNull();
+  });
+
+  it("catches errors and returns null", () => {
+    vi.spyOn(registry, "getSandbox").mockImplementation(() => {
+      throw new Error("mock error");
+    });
+    expect(getSessionAgent("test")).toBeNull();
+  });
+});
 
 describe("buildRecoveryScript", () => {
   it("returns null for null agent (OpenClaw inline script handles it)", () => {
