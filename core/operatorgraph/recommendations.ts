@@ -10,5 +10,5 @@ export interface Recommendation {
 export function validateRecommendationEvidence(recommendation: Recommendation, availableEvidenceIds: string[]): { ok: boolean; missingEvidenceIds: string[] } {
   const available = new Set(availableEvidenceIds);
   const missingEvidenceIds = recommendation.evidenceIds.filter((id) => !available.has(id));
-  return { ok: recommendation.evidenceIds.length > 0 && missingEvidenceIds.length === 0, missingEvidenceIds };
+  return { ok: missingEvidenceIds.length === 0, missingEvidenceIds };
 }
