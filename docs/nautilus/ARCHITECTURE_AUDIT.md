@@ -2,7 +2,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Nautilus Omega Architecture & Implementation Truth Audit
 
-Date: 2026-05-18  
+Date: 2026-05-18
 Branch audited: `program/nautilus-omega`
 
 ## Executive outcome

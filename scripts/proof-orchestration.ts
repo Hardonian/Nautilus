@@ -3,7 +3,13 @@
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { capabilityFromEnv, compactHandoff, recursiveCollaborate, routeModel, type AgentHandoffState } from "../src/lib/control-plane/orchestration";
+import {
+  capabilityFromEnv,
+  compactHandoff,
+  recursiveCollaborate,
+  routeModel,
+  type AgentHandoffState,
+} from "../src/lib/control-plane/orchestration";
 
 const now = new Date().toISOString();
 const handoff: AgentHandoffState = {
@@ -45,8 +51,18 @@ const handoff: AgentHandoffState = {
 
 const capabilities = capabilityFromEnv(process.env);
 const compressed = compactHandoff(handoff, 900);
-const route = routeModel({ handoff, capabilities, estimatedInputTokens: 1024, retrievalSufficient: true });
-const collaboration = recursiveCollaborate({ initial: handoff, mode: "recursive_compact", maxRounds: 2, confidenceThreshold: 0.9 });
+const route = routeModel({
+  handoff,
+  capabilities,
+  estimatedInputTokens: 1024,
+  retrievalSufficient: true,
+});
+const collaboration = recursiveCollaborate({
+  initial: handoff,
+  mode: "recursive_compact",
+  maxRounds: 2,
+  confidenceThreshold: 0.9,
+});
 
 const proof = {
   kind: "nautilus.orchestration.proofpack",
