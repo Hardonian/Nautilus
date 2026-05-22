@@ -30,7 +30,7 @@ describe('validateRecommendationEvidence', () => {
     expect(result.missingEvidenceIds).toEqual(['e4']);
   });
 
-  it('should return ok=false when no evidence is required by the recommendation', () => {
+  it('should return ok=true when no evidence is required by the recommendation', () => {
     const recommendation: Recommendation = {
       id: 'r1',
       text: 'Rec 1',
@@ -40,7 +40,7 @@ describe('validateRecommendationEvidence', () => {
 
     const result = validateRecommendationEvidence(recommendation, available);
 
-    expect(result.ok).toBe(false);
+    expect(result.ok).toBe(true);
     expect(result.missingEvidenceIds).toEqual([]);
   });
 
