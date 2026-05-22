@@ -32,7 +32,7 @@ filesystem_policy:
     - /sandbox/.nemoclaw
 
 landlock:
-  compatibility: best_effort
+  compatibility: strict
 
 process:
   run_as_user: sandbox
