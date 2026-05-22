@@ -39,3 +39,7 @@
 - R0 must complete before deeper hardening/performance work to preserve deterministic release confidence.
 - R1 contract hardening should land before R2 optimization to avoid optimizing unstable boundaries.
 - R3 and R4 can progress in parallel once receipt/event schema stability is achieved in R1.
+
+## Status update (2026-05-22)
+- R0.2 (bounded default test path): implemented (`npm test` => `npm run test:unit`; `npm run test:full` opt-in).
+- R0.1 (restricted install resilience): partially addressed via explicit degraded local bootstrap contract (`npm ci --ignore-scripts`) while preserving fail-closed CI semantics.
