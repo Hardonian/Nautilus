@@ -909,6 +909,14 @@ $ nemoclaw debug [--quick|-q] [--sandbox NAME] [--output PATH|-o PATH]
 
 If `--output` is set and the tarball cannot be written (for example, the destination directory is missing or read-only), the command exits non-zero so scripts can detect the failure.
 
+### `nemoclaw capability-report`
+
+Generate a diagnostic capability report detailing host status, available sandboxes, and OpenShell properties.
+
+```console
+$ nemoclaw capability-report
+```
+
 ### `nemoclaw credentials list`
 
 List the provider credentials registered with the OpenShell gateway.

@@ -18,7 +18,8 @@
   },
   "scripts": {
     "preinstall": "node scripts/check-node-version.js",
-    "test": "vitest run",
+    "test": "npm run test:unit",
+    "test:full": "vitest run",
     "check": "npx prek run --all-files",
     "checks": "tsx scripts/checks/run.ts",
     "lint": "npx @biomejs/biome lint . && npm run checks",
@@ -91,6 +92,7 @@
   "dependencies": {
     "@oclif/core": "^4.10.5",
     "js-yaml": "^4.1.1",
+    "json5": "^2.2.3",
     "p-retry": "^4.6.2",
     "yaml": "^2.8.3"
   },

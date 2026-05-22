@@ -32,6 +32,7 @@ export interface ProviderRouteInput {
 }
 
 export function routeProviderWithGovernance(input: ProviderRouteInput): { provider: string; model: string; receipt?: ExecutionReceipt; events: OperationalEvent[] } {
+  const startedAt = Date.now();
   if (!input.config.enabled) return { provider: input.provider, model: input.model, events: [] };
 
   const request = {
@@ -43,7 +44,7 @@ export function routeProviderWithGovernance(input: ProviderRouteInput): { provid
     action: "provider:select",
     requestedModel: input.model,
     constraints: [],
-    metadata: { provider: input.provider, model: input.model },
+    metadata: { provider: input.provider, model: input.model, estimatedInputTokens: "2048", estimatedOutputTokens: "512", vramRequiredMb: "8192" },
   };
   const classification = classifyRequest(request);
   const policy = evaluatePolicy(input.policyBundle, { request, actionClass: "provider" });
@@ -56,7 +57,7 @@ export function routeProviderWithGovernance(input: ProviderRouteInput): { provid
   const selected = scheduling.decision.selected;
   const degradedStates: DegradedState[] = [];
   if (!selected) {
-    degradedStates.push({ category: "degraded", reason: "no governed candidate", affectedSubsystem: "provider-routing", severity: "warning", reasonCode: "constraint_unsatisfied", explanation: "No eligible governed routing candidate.", sourceComponent: "governed-provider-routing", timestamp: input.nowIso });
+    degradedStates.push({ category: "degraded", reason: "no governed candidate", affectedSubsystem: "provider-routing", severity: "warning", reasonCode: "constraint_unsatisfied", explanation: "No eligible governed routing candidate.", sourceComponent: "governed-provider-routing", timestamp: input.nowIso, recoverySuggestion: "check model/runtime availability and retry" });
     if (!input.config.allowFallback) throw new Error("Governed provider routing has no eligible candidate (fallback disabled)");
   }
 
@@ -82,7 +83,7 @@ export function routeProviderWithGovernance(input: ProviderRouteInput): { provid
     degradedEvents: degradedStates,
     fallbackAttempts: fallbackUsed ? [{ at: input.nowIso, reason: "no_eligible_candidate", target: `${input.provider}/${input.model}` }] : [],
     toolInvocations: [],
-    timing: { totalMs: 0 },
+    timing: { totalMs: Math.max(1, Date.now() - startedAt) },
     provenance: { source: "governed-provider-routing", lineage: [classification.taskKind], replayVersion: "1" },
     operatorOverrides: [],
   };
