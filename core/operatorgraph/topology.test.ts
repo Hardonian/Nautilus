@@ -41,7 +41,7 @@ describe("classifyTopology", () => {
   });
 
   it("handles a mix of node states correctly", () => {
-    const nodes: TopologyNode[] = [
+  it("classifies node as current when exactly at staleAfterMs boundary because comparison is strictly greater than", () => {
       { id: "node-unavailable", dependencies: [] },
       { id: "node-stale", lastSeenAt: "2026-05-09T00:00:00.000Z", dependencies: [] },
       { id: "node-current", lastSeenAt: "2026-05-09T00:00:08.000Z", dependencies: [] }
