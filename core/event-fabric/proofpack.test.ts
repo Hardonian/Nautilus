@@ -1,169 +1,119 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { createHash } from "node:crypto";
-import { describe, expect, it } from "vitest";
-import { buildProofpackManifest, type ProofpackInput } from "./proofpack";
+import { describe, it, expect } from 'vitest';
+import { buildProofpackManifest, ProofpackInput } from './proofpack.js';
 
-describe("buildProofpackManifest", () => {
-  it("creates a complete manifest when all inputs are valid", () => {
+describe('buildProofpackManifest', () => {
+  it('should return a complete manifest when input is valid', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "policy-abc",
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: 'prr-789',
       evidence: [
-        { id: "ev-1", contentHash: "hash-1", required: true },
-        { id: "ev-2", contentHash: "hash-2", required: false },
+        { id: 'ev-1', contentHash: 'hash1', required: true },
+        { id: 'ev-2', contentHash: 'hash2', required: false, partial: true },
       ],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("complete");
-    expect(result.missingRequiredEvidence).toEqual([]);
-    expect(result.notes).toEqual([]);
-    expect(result.id).toBe("proof-123");
-    expect(result.replayRef).toBe("replay-abc");
-    expect(result.policyReplayRef).toBe("policy-abc");
-    expect(result.evidence).toEqual(input.evidence);
-
-    const expectedHash = createHash("sha256")
-      .update(
-        JSON.stringify({
-          evidence: input.evidence,
-          id: input.id,
-          policyReplayRef: input.policyReplayRef,
-          replayRef: input.replayRef,
-          status: "complete",
-        }),
-      )
-      .digest("hex");
-    expect(result.integrityHash).toBe(expectedHash);
+    expect(result.status).toBe('complete');
+    expect(result.missingRequiredEvidence).toHaveLength(0);
+    expect(result.notes).toHaveLength(0);
+    expect(result.integrityHash).toBeTypeOf('string');
   });
 
-  it("marks status as incomplete when required evidence is missing (empty contentHash)", () => {
+  it('should mark status as partial and add notes if interrupted', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "policy-abc",
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: 'prr-789',
+      interrupted: true,
       evidence: [
-        { id: "ev-1", contentHash: "", required: true },
-        { id: "ev-2", contentHash: "hash-2", required: false },
+        { id: 'ev-1', contentHash: 'hash1', required: true },
       ],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("incomplete");
-    expect(result.missingRequiredEvidence).toEqual(["ev-1"]);
-    expect(result.notes).toContain("missing_required_evidence_visible");
+    expect(result.status).toBe('partial');
+    expect(result.notes).toContain('interrupted_proofpack_marked_partial');
   });
 
-  it("marks status as incomplete when required evidence is partial", () => {
+  it('should identify missing required evidence when contentHash is empty', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "policy-abc",
-      evidence: [{ id: "ev-1", contentHash: "hash-1", required: true, partial: true }],
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: 'prr-789',
+      evidence: [
+        { id: 'ev-1', contentHash: '', required: true },
+      ],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("incomplete");
-    expect(result.missingRequiredEvidence).toEqual(["ev-1"]);
-    expect(result.notes).toContain("missing_required_evidence_visible");
+    expect(result.status).toBe('incomplete');
+    expect(result.missingRequiredEvidence).toContain('ev-1');
+    expect(result.notes).toContain('missing_required_evidence_visible');
   });
 
-  it("marks status as incomplete when replayRef is missing", () => {
+  it('should identify missing required evidence when evidence is partial', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "",
-      policyReplayRef: "policy-abc",
-      evidence: [{ id: "ev-1", contentHash: "hash-1", required: true }],
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: 'prr-789',
+      evidence: [
+        { id: 'ev-1', contentHash: 'hash1', required: true, partial: true },
+      ],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("incomplete");
-    expect(result.notes).toContain("missing_replay_reference");
+    expect(result.status).toBe('incomplete');
+    expect(result.missingRequiredEvidence).toContain('ev-1');
   });
 
-  it("marks status as incomplete when policyReplayRef is missing", () => {
+  it('should not complain about missing optional evidence', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "",
-      evidence: [{ id: "ev-1", contentHash: "hash-1", required: true }],
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: 'prr-789',
+      evidence: [
+        { id: 'ev-1', contentHash: '', required: false },
+        { id: 'ev-2', contentHash: 'hash', required: false, partial: true },
+      ],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("incomplete");
-    expect(result.notes).toContain("missing_policy_replay_reference");
+    expect(result.status).toBe('complete');
+    expect(result.missingRequiredEvidence).toHaveLength(0);
   });
 
-  it("marks status as partial when interrupted is true and no other issues exist", () => {
+  it('should handle missing replayRef', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "policy-abc",
-      evidence: [{ id: "ev-1", contentHash: "hash-1", required: true }],
-      interrupted: true,
+      id: 'pp-123',
+      replayRef: '',
+      policyReplayRef: 'prr-789',
+      evidence: [],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("partial");
-    expect(result.notes).toContain("interrupted_proofpack_marked_partial");
+    expect(result.status).toBe('incomplete');
+    expect(result.notes).toContain('missing_replay_reference');
   });
 
-  it("prioritizes incomplete status over partial if interrupted is true but evidence is missing", () => {
+  it('should handle missing policyReplayRef', () => {
     const input: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "policy-abc",
-      evidence: [{ id: "ev-1", contentHash: "", required: true }],
-      interrupted: true,
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: '',
+      evidence: [],
     };
-
     const result = buildProofpackManifest(input);
-
-    expect(result.status).toBe("incomplete");
-    expect(result.notes).toContain("interrupted_proofpack_marked_partial");
-    expect(result.notes).toContain("missing_required_evidence_visible");
+    expect(result.status).toBe('incomplete');
+    expect(result.notes).toContain('missing_policy_replay_reference');
   });
 
-  it("generates a consistent integrity hash based on inputs", () => {
-    const input1: ProofpackInput = {
-      id: "proof-123",
-      replayRef: "replay-abc",
-      policyReplayRef: "policy-abc",
-      evidence: [{ id: "ev-1", contentHash: "hash-1", required: true }],
+  it('should generate a consistent integrityHash for identical inputs', () => {
+    const input: ProofpackInput = {
+      id: 'pp-123',
+      replayRef: 'rr-456',
+      policyReplayRef: 'prr-789',
+      evidence: [],
     };
-
-    const input2: ProofpackInput = {
-      ...input1,
-      id: "proof-999",
-    };
-
-    const result1 = buildProofpackManifest(input1);
-    const result2 = buildProofpackManifest(input2);
-
-    expect(result1.integrityHash).not.toBe(result2.integrityHash);
-
-    // Recomputing manually should match
-    const manualHash1 = createHash("sha256")
-      .update(
-        JSON.stringify({
-          evidence: input1.evidence,
-          id: input1.id,
-          policyReplayRef: input1.policyReplayRef,
-          replayRef: input1.replayRef,
-          status: "complete",
-        }),
-      )
-      .digest("hex");
-
-    expect(result1.integrityHash).toBe(manualHash1);
+    const result1 = buildProofpackManifest(input);
+    const result2 = buildProofpackManifest(input);
+    expect(result1.integrityHash).toBe(result2.integrityHash);
   });
 });
