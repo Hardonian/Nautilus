@@ -1,0 +1,931 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Nautilus Operator Walkthrough (Terminal-First) &#8212; NVIDIA NemoClaw Developer Guide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/nvidia-sphinx-theme.css?v=933278ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/enhanced-search.css?v=ef2c6a0b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+
+
+    <script src="../_static/documentation_options.js?v=218434ba"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=6dbb43f8"></script>
+    <script src="../_static/search-assets.bundle.js?v=099b119e"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nautilus/WALKTHROUGH';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '../versions1.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.38';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+
+    <link rel="canonical" href="https://docs.nvidia.com/nemoclaw/latest/nautilus/WALKTHROUGH.html" />
+    <link rel="icon" href="../_static/favicon.png"/>
+
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="event-fabric" href="event-fabric.html" />
+    <link rel="prev" title="Verify Nautilus Locally" href="VERIFY_LOCALLY.html" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/c1061d2c5e7b/launch-191c2462b890.min.js"></script>
+
+  </head>
+
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+<aside class="bd-header-announcement" aria-label="Announcement">
+  <div class="bd-header-announcement__content">&#x1F514; NVIDIA NemoClaw is <strong>alpha software</strong>. APIs and behavior may change without notice. Do not use in production.</div>
+</aside>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+  
+  
+    <p class="title logo__title">NVIDIA NemoClaw Developer Guide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+
+
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVIDIA/NemoClaw" title="NemoClaw GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/XFpfPv9Uvx" title="NemoClaw Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+  
+  
+    <p class="title logo__title">NVIDIA NemoClaw Developer Guide</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+
+
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVIDIA/NemoClaw" title="NemoClaw GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/XFpfPv9Uvx" title="NemoClaw Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">About NemoClaw</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/how-it-works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/ecosystem.html">Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fork-rationale.html">Fork Rationale</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gap-analysis.html">Gap Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Roadmap</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../get-started/prerequisites.html">Prerequisites</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../get-started/windows-preparation.html">Prepare Windows for NemoClaw</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/quickstart.html">Quickstart with OpenClaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/quickstart-hermes.html">Quickstart with Hermes</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../inference/inference-options.html">Inference Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference/set-up-sub-agent.html">Set up Sub Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference/switch-inference-providers.html">Switch Inference Providers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference/use-local-inference.html">Use Local Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference-acceleration.html">Inference Acceleration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-routing.html">Model Routing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Manage Sandboxes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/lifecycle.html">Manage Sandbox Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/messaging-channels.html">Set Up Messaging Channels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/workspace-files.html">Workspace Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/backup-restore.html">Backup and Restore</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Network Policy</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../network-policy/approve-network-requests.html">Approve or Deny Network Requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network-policy/customize-network-policy.html">Customize the Network Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network-policy/integration-policy-examples.html">Integration Policy Examples</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../deployment/deploy-to-remote-gpu.html">Deploy to Remote GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/sandbox-hardening.html">Sandbox Hardening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/brev-web-ui.html">Brev Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/install-openclaw-plugins.html">Install OpenClaw Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orchestration.html">Orchestration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../proofpack.html">Proofpack</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Monitoring</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../monitoring/monitor-sandbox-activity.html">Monitor Sandbox Activity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../replay-inspector.html">Replay Inspector</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Security</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../security/best-practices.html">Security Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security/credential-storage.html">Credential Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security/openclaw-controls.html">OpenClaw Controls</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Nautilus</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="ARCHITECTURE_AUDIT.html">Architecture Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="BACKPRESSURE.html">Backpressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CAPABILITY_MATRIX.html">Capability Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EXAMPLES.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EXECUTION_SURVIVABILITY.html">Execution Survivability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GOLDEN_PATH.html">Golden Path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HARDENING_AUDIT.html">Hardening Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HOT_PATH_AUDIT.html">Hot Path Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MIGRATIONS_AND_UPGRADES.html">Migrations &amp; Upgrades</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MVP_FOUNDATION_READINESS.html">MVP Foundation Readiness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MVP_PACKAGE.html">MVP Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="NOT_YET_SUPPORTED.html">Not Yet Supported</a></li>
+<li class="toctree-l1"><a class="reference internal" href="OPERATOR_QUICKSTART.html">Operator Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="OPTIMIZATION_AUDIT.html">Optimization Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PROOFPACKS.html">Proofpacks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RELEASE_CHECKLIST.html">Release Checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RELEASE_READINESS.html">Release Readiness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REPLAY_AND_IDEMPOTENCY.html">Replay &amp; Idempotency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REPLAY_ENGINE.html">Replay Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RETENTION_AND_ARCHIVAL.html">Retention &amp; Archival</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUNBOOKS.html">Runbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="RUNTIME_HEALTH.html">Runtime Health</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SMOKE_TESTS.html">Smoke Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="STORAGE_LIFECYCLE.html">Storage Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="THREAT_MODEL.html">Threat Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TIME_SEMANTICS.html">Time Semantics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TOPOLOGY_MODEL.html">Topology Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TOP_50_TODOS.html">Top 50 Todos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="TRUTH_BOUNDARIES.html">Truth Boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="UNSUPPORTED.html">Unsupported</a></li>
+<li class="toctree-l1"><a class="reference internal" href="VERIFY_LOCALLY.html">Verify Locally</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="event-fabric.html">Event Fabric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="master-execution-audit.html">Master Execution Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="meshrag.html">MeshRAG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operatorgraph.html">OperatorGraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pillar-foundations.html">Pillar Foundations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform-evolution.html">Platform Evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recallforge.html">RecallForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threatmesh.html">ThreatMesh</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/architecture.html">Reference Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/cli-selection-guide.html">CLI Selection Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/commands.html">CLI Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/network-policies.html">Network Policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/troubleshooting.html">Troubleshooting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../architecture/CONTROL_PLANE_BOUNDARIES.html">Control Plane Boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/NAUTILUS_TRUTHS.html">Nautilus Truths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/REPO_INVARIANTS.html">Repo Invariants</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/current-state.html">Current State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/target-state.html">Target State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/status-matrix.html">Status Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/failure-semantics.html">Failure Semantics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/replayability.html">Replayability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/observability.html">Observability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/diagnostics.html">Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/control-plane.html">Control Plane</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/policy-engine.html">Policy Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/task-classification.html">Task Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/worker-identity-trust.html">Worker Identity Trust</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/capability-attestation.html">Capability Attestation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/governance-invariants.html">Governance Invariants</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/governance-threat-model.html">Governance Threat Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/security-threat-model.html">Security Threat Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/security-policy-model.html">Security Policy Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/security-policy.html">Security Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/policy-promotion.html">Policy Promotion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/policy-tracing.html">Policy Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/policy-inheritance.html">Policy Inheritance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/runtime-capabilities.html">Runtime Capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/operational-memory.html">Operational Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/device-registry.html">Device Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/registry-synchronization.html">Registry Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/registry-telemetry-policy.html">Registry Telemetry Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/local-probes.html">Local Probes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/worker-probes.html">Worker Probes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/remote-probe-security.html">Remote Probe Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/telemetry-adapters.html">Telemetry Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/runtime-telemetry-parsers.html">Runtime Telemetry Parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/gpu-telemetry.html">GPU Telemetry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/scheduler.html">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/scheduler-provider-bridge.html">Scheduler Provider Bridge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/provider-routing-integration.html">Provider Routing Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/heterogeneous-routing.html">Heterogeneous Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/governed-fallbacks.html">Governed Fallbacks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/receipts-and-degraded-states.html">Receipts and Degraded States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/local-stack-security-profiles.html">Local Stack Security Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/worker-adapters.html">Worker Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/runtime-integration.html">Runtime Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/runtime-dispatch-integration.html">Runtime Dispatch Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/remote-execution-adapters.html">Remote Execution Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/command-execution-safety.html">Command Execution Safety</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/transport-security.html">Transport Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/secret-redaction-doctrine.html">Secret Redaction Doctrine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/secret-redaction.html">Secret Redaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/network-policy.html">Network Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/command-safety.html">Command Safety</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Verification</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../verification-matrix.html">Verification Matrix (Root)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/verification-matrix.html">Verification Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/security-hardening.html">Security Hardening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/security-verification-matrix.html">Security Verification Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/policy-verification.html">Policy Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/release-checklist.html">Release Checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/release-readiness.html">Release Readiness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release/nautilus-rc1-hardening.html">Nautilus RC1 Hardening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/degraded-state-chaos.html">Degraded State Chaos</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../contributing/branch-strategy.html">Branch Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/control-plane-rules.html">Control Plane Rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/local-bootstrap.html">Local Bootstrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/pr-template-guide.html">PR Template Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/verification.html">Verification</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture Decision Records (ADRs)</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../adr/0001-fork-purpose.html">ADR 0001: Fork Purpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0002-control-plane-separation.html">ADR 0002: Control Plane Separation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0003-deterministic-routing.html">ADR 0003: Deterministic Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0004-supervised-policy-promotion.html">ADR 0004: Supervised Policy Promotion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0005-receipts-and-degraded-state-truth.html">ADR 0005: Receipts and Degraded State Truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0006-device-registry-before-scheduler.html">ADR 0006: Device Registry Before Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0007-policy-outside-prompts.html">ADR 0007: Policy Outside Prompts</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture Decision Records (ADRs)</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../adr/0001-fork-purpose.html">ADR 0001: Fork Purpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0002-control-plane-separation.html">ADR 0002: Control Plane Separation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0003-deterministic-routing.html">ADR 0003: Deterministic Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0004-supervised-policy-promotion.html">ADR 0004: Supervised Policy Promotion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0005-receipts-and-degraded-state-truth.html">ADR 0005: Receipts and Degraded State Truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0006-device-registry-before-scheduler.html">ADR 0006: Device Registry Before Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0007-policy-outside-prompts.html">ADR 0007: Policy Outside Prompts</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Operators</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../operators/local-env.html">Local Environment</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../resources/agent-skills.html">Agent Skills</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVIDIA/NemoClaw/blob/main/SECURITY.md">Report Vulnerabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../resources/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/XFpfPv9Uvx">Discord</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Nautilus Operator Walkthrough (Terminal-First)</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<section class="tex2jax_ignore mathjax_ignore" id="nautilus-operator-walkthrough-terminal-first">
+<h1>Nautilus Operator Walkthrough (Terminal-First)<a class="headerlink" href="#nautilus-operator-walkthrough-terminal-first" title="Link to this heading">#</a></h1>
+<section id="quick-operator-commands">
+<h2>Quick operator commands<a class="headerlink" href="#quick-operator-commands" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>nautilus:demo
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-proofpack
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-proofpack<span class="w"> </span>--<span class="w"> </span>partial
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-replay
+</pre></div>
+</div>
+</section>
+<section id="mvp-architecture-diagrams">
+<h2>MVP architecture diagrams<a class="headerlink" href="#mvp-architecture-diagrams" title="Link to this heading">#</a></h2>
+<section id="execution-flow">
+<h3>Execution flow<a class="headerlink" href="#execution-flow" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>operator command
+  -&gt; deterministic scenario fixture
+  -&gt; contract validation
+  -&gt; state transitions emitted
+  -&gt; scenario output (ok/degraded/failure truth)
+</pre></div>
+</div>
+</section>
+<section id="proofpack-flow">
+<h3>Proofpack flow<a class="headerlink" href="#proofpack-flow" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>scenario evidence
+  -&gt; proofpack sample builder
+  -&gt; completeness status (complete|partial)
+  -&gt; degradedReasons (if partial)
+</pre></div>
+</div>
+</section>
+<section id="replay-flow">
+<h3>Replay flow<a class="headerlink" href="#replay-flow" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>evidence snapshot
+  -&gt; replay report builder
+  -&gt; reproducedFinalState
+  -&gt; read_only replay marker (no side effects)
+</pre></div>
+</div>
+</section>
+<section id="degraded-state-flow">
+<h3>Degraded-state flow<a class="headerlink" href="#degraded-state-flow" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>dependency gap/failure semantic
+  -&gt; degraded=true or finalState=failed
+  -&gt; failure + evidence events emitted
+  -&gt; operator triage (inspect, do not over-claim)
+</pre></div>
+</div>
+</section>
+</section>
+<section id="deterministic-transcript-capture">
+<h2>Deterministic transcript capture<a class="headerlink" href="#deterministic-transcript-capture" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span>docs/nautilus/transcripts
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:demo<span class="w"> </span>&gt;<span class="w"> </span>docs/nautilus/transcripts/nautilus-demo.json
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-proofpack<span class="w"> </span>--<span class="w"> </span>partial<span class="w"> </span>&gt;<span class="w"> </span>docs/nautilus/transcripts/proofpack-partial.json
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-replay<span class="w"> </span>&gt;<span class="w"> </span>docs/nautilus/transcripts/replay.json
+</pre></div>
+</div>
+</section>
+<section id="asciinema-support-if-installed">
+<h2>Asciinema support (if installed)<a class="headerlink" href="#asciinema-support-if-installed" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat<span class="w"> </span>&gt;<span class="w"> </span>scripts/nautilus/asciinema-demo.sh<span class="w"> </span><span class="s">&lt;&lt;&#39;SCRIPT&#39;</span>
+<span class="s">#!/usr/bin/env bash</span>
+<span class="s">set -euo pipefail</span>
+<span class="s">npm run nautilus:demo</span>
+<span class="s">npm run nautilus:show-proofpack -- partial</span>
+<span class="s">npm run nautilus:show-replay</span>
+<span class="s">SCRIPT</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>scripts/nautilus/asciinema-demo.sh
+asciinema<span class="w"> </span>rec<span class="w"> </span>docs/nautilus/transcripts/nautilus-demo.cast<span class="w"> </span>--command<span class="w"> </span><span class="s2">&quot;bash scripts/nautilus/asciinema-demo.sh&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="expected-output-interpretation">
+<h2>Expected output interpretation<a class="headerlink" href="#expected-output-interpretation" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fixture=true</span></code> and <code class="docutils literal notranslate"><span class="pre">deterministicSample=true</span></code> prove sample mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">degraded=true</span></code> means partial truth; inspect <code class="docutils literal notranslate"><span class="pre">failure</span></code> and <code class="docutils literal notranslate"><span class="pre">evidence.events</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">finalState=failed</span></code> means supported flow reached a terminal failure.</p></li>
+<li><p>Unsupported boundaries are documented in <code class="docutils literal notranslate"><span class="pre">docs/nautilus/UNSUPPORTED.md</span></code>.</p></li>
+</ul>
+</section>
+<section id="proofpack-inspection">
+<h2>Proofpack inspection<a class="headerlink" href="#proofpack-inspection" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-proofpack<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.status, .evidenceCount, .degradedReasons&#39;</span>
+npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-proofpack<span class="w"> </span>--<span class="w"> </span>partial<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.status, .degradedReasons, .evidence.events | length&#39;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">status=complete</span></code> means full sample evidence package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status=partial</span></code> means sample package intentionally includes degraded reasons.</p></li>
+</ul>
+</section>
+<section id="replay-interpretation">
+<h2>Replay interpretation<a class="headerlink" href="#replay-interpretation" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>nautilus:show-replay<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.replayMode, .reproducedFinalState, .mutationSafe&#39;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">replayMode=read_only</span></code> and <code class="docutils literal notranslate"><span class="pre">mutationSafe=true</span></code> mean no external side effects are replayed.</p></li>
+</ul>
+</section>
+<section id="example-readability-checklist">
+<h2>Example readability checklist<a class="headerlink" href="#example-readability-checklist" title="Link to this heading">#</a></h2>
+<p>Each <code class="docutils literal notranslate"><span class="pre">examples/nautilus/*/README.md</span></code> includes:</p>
+<ul class="simple">
+<li><p>what this demonstrates</p></li>
+<li><p>unsupported vs failed</p></li>
+<li><p>how operator should react</p></li>
+<li><p>degraded-state explanation</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="VERIFY_LOCALLY.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Verify Nautilus Locally</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="event-fabric.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">event-fabric</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-operator-commands">Quick operator commands</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mvp-architecture-diagrams">MVP architecture diagrams</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#execution-flow">Execution flow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proofpack-flow">Proofpack flow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#replay-flow">Replay flow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#degraded-state-flow">Degraded-state flow</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deterministic-transcript-capture">Deterministic transcript capture</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#asciinema-support-if-installed">Asciinema support (if installed)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expected-output-interpretation">Expected output interpretation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proofpack-inspection">Proofpack inspection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replay-interpretation">Replay interpretation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-readability-checklist">Example readability checklist</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Your Privacy Choices</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2026, NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">if (typeof _satellite !== "undefined") {_satellite.pageBottom();}</script>
+
+  </body>
+</html>
