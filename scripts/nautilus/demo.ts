@@ -1,7 +1,13 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { buildOperatorReport, buildProofpack, buildReplayReport, getScenario, buildScenarioOutput } from "./fixtures";
+import {
+  buildOperatorReport,
+  buildProofpack,
+  buildReplayReport,
+  getScenario,
+  buildScenarioOutput,
+} from "./fixtures";
 
 const scenario = buildScenarioOutput(getScenario("full-mvp-demo"));
 const proofpack = buildProofpack("complete");

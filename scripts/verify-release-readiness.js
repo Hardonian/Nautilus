@@ -8,7 +8,11 @@ const { join } = require("node:path");
 const CHECK_TIMEOUT_MS = Number(process.env.NEMOCLAW_RELEASE_GATE_TIMEOUT_MS ?? 20 * 60 * 1000);
 
 const checks = [
-  { id: "changelog", label: "CHANGELOG hygiene", command: ["npm", "run", "verify:changelog-hygiene"] },
+  {
+    id: "changelog",
+    label: "CHANGELOG hygiene",
+    command: ["npm", "run", "verify:changelog-hygiene"],
+  },
   { id: "typecheck", label: "TypeScript typecheck", command: ["npm", "run", "typecheck"] },
   { id: "lint", label: "Lint", command: ["npm", "run", "lint"] },
   { id: "unit", label: "Unit tests", command: ["npm", "run", "test:unit"] },
@@ -17,7 +21,11 @@ const checks = [
   { id: "proofpack", label: "Proofpack validation", command: ["npm", "run", "verify:proofpack"] },
   { id: "replay", label: "Replay validation", command: ["npm", "run", "verify:replay"] },
   { id: "export", label: "Export validation", command: ["npm", "run", "verify:export"] },
-  { id: "benchmarks", label: "Performance verification", command: ["npm", "run", "verify:benchmarks"] },
+  {
+    id: "benchmarks",
+    label: "Performance verification",
+    command: ["npm", "run", "verify:benchmarks"],
+  },
 ];
 
 const startedAt = new Date();
@@ -41,7 +49,14 @@ for (const check of checks) {
   const timedOut = result.signal === "SIGTERM" && result.status === null;
   const failure = timedOut ? "timeout" : "exit_nonzero";
   console.log(`FAIL ${check.label} (${failure})`);
-  results.push({ ...check, status: "fail", durationMs, failure, signal: result.signal ?? null, exitCode: result.status });
+  results.push({
+    ...check,
+    status: "fail",
+    durationMs,
+    failure,
+    signal: result.signal ?? null,
+    exitCode: result.status,
+  });
 }
 
 const summary = {
@@ -53,7 +68,10 @@ const summary = {
   checks: results,
 };
 mkdirSync("artifacts", { recursive: true });
-writeFileSync(join("artifacts", "release-readiness-gate.json"), `${JSON.stringify(summary, null, 2)}\n`);
+writeFileSync(
+  join("artifacts", "release-readiness-gate.json"),
+  `${JSON.stringify(summary, null, 2)}\n`,
+);
 
 if (failures > 0) {
   console.log(`Summary: PASS=${checks.length - failures} FAIL=${failures}`);
