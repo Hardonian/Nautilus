@@ -6,5 +6,7 @@
  * Wraps in single quotes and escapes embedded single quotes.
  */
 export function shellQuote(value: string): string {
-  return `'${String(value).replace(/'/g, `'\\''`)}'`;
+  if (!value) return "''";
+  if (/^[a-zA-Z0-9_.-]+$/.test(value)) return value;
+  return `'${value.replace(/'/g, "'\\''")}'`;
 }
