@@ -10,6 +10,7 @@ export interface OperatorConsoleInput {
   traceId?: string;
   topology: { nodes: string[]; unavailableReason?: string };
   timeline: { events: Array<{ at: string; status: string; summary: string }>; unavailableReason?: string };
+  routing?: { selected?: string; rejected?: string[]; reasonCodes?: string[] };
   replay?: OperatorGraphReplayRecord | null;
   retrieval?: { ref?: string; state: "completed" | "unavailable"; lineage: string[] };
   policy?: { ref?: string; decision?: PolicyDecision; unavailableReason?: string };
@@ -25,10 +26,12 @@ export interface OperatorConsoleSurface {
   labels: string[];
   topology: { state: "ready" | "empty" | "unavailable"; details: string };
   timeline: { state: "ready" | "empty" | "unavailable"; details: string };
+  routeExplanation: { state: "ready" | "empty"; details: string };
   replay: { state: "ready" | "empty" | "unavailable"; reference?: string; details: string };
   retrievalLineage: { state: "ready" | "empty" | "unavailable"; reference?: string; details: string };
   policyEvaluation: { state: "ready" | "empty" | "unavailable"; reference?: string; details: string };
   degradedStates: { explicit: boolean; reasons: string[] };
+  recovery: { state: "none" | "actionable"; action: string };
   runtimeHealth: { state: "healthy" | "degraded" | "unavailable"; details: string[] };
   executionOutcome: { status: "completed" | "failed" | "denied"; summary: string };
   memoryProvenance: { state: "ready" | "empty"; references: string[] };
@@ -68,6 +71,12 @@ export function buildOperatorConsoleSurface(input: OperatorConsoleInput): Operat
             ? "No timeline events recorded"
             : `Timeline unavailable: ${input.timeline.unavailableReason}`,
     },
+    routeExplanation: {
+      state: input.routing?.reasonCodes?.length ? "ready" : "empty",
+      details: input.routing?.reasonCodes?.length
+        ? `Selected ${input.routing.selected ?? "none"} because ${input.routing.reasonCodes.join(", ")}`
+        : "No routing explanation available",
+    },
     replay: {
       state: replayState,
       reference: input.traceId,
@@ -96,6 +105,10 @@ export function buildOperatorConsoleSurface(input: OperatorConsoleInput): Operat
     degradedStates: {
       explicit: input.degraded.length !== 0,
       reasons: input.degraded,
+    },
+    recovery: {
+      state: input.degraded.length ? "actionable" : "none",
+      action: input.degraded.length ? "Resolve degraded reason codes from receipt and retry execution." : "No recovery required.",
     },
     runtimeHealth: input.health,
     executionOutcome: input.outcome,
