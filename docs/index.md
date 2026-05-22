@@ -297,9 +297,12 @@ This software automatically retrieves, accesses or interacts with external mater
 :hidden:
 
 Overview <about/overview>
-Architecture Overview <about/how-it-works>
+How it works <about/how-it-works>
 Ecosystem <about/ecosystem>
 Release Notes <about/release-notes>
+Fork Rationale <fork-rationale>
+Gap Analysis <gap-analysis>
+Roadmap <roadmap>
 ```
 
 ```{toctree}
@@ -316,9 +319,11 @@ Quickstart with Hermes <get-started/quickstart-hermes>
 :hidden:
 
 Inference Options <inference/inference-options>
-Use Local Inference <inference/use-local-inference>
+Set up Sub Agent <inference/set-up-sub-agent>
 Switch Inference Providers <inference/switch-inference-providers>
-Set Up Task-Specific Sub-Agents <inference/set-up-sub-agent>
+Use Local Inference <inference/use-local-inference>
+Inference Acceleration <inference-acceleration>
+Model Routing <model-routing>
 ```
 
 ```{toctree}
@@ -344,10 +349,12 @@ Integration Policy Examples <network-policy/integration-policy-examples>
 :caption: Deployment
 :hidden:
 
-Deploy to a Remote GPU Instance <deployment/deploy-to-remote-gpu>
+Deploy to Remote GPU <deployment/deploy-to-remote-gpu>
+Sandbox Hardening <deployment/sandbox-hardening>
 Brev Web UI <deployment/brev-web-ui>
 Install OpenClaw Plugins <deployment/install-openclaw-plugins>
-Sandbox Hardening <deployment/sandbox-hardening>
+Orchestration <orchestration>
+Proofpack <proofpack>
 ```
 
 ```{toctree}
@@ -355,6 +362,7 @@ Sandbox Hardening <deployment/sandbox-hardening>
 :hidden:
 
 Monitor Sandbox Activity <monitoring/monitor-sandbox-activity>
+Replay Inspector <replay-inspector>
 ```
 
 ```{toctree}
@@ -367,12 +375,58 @@ OpenClaw Controls <security/openclaw-controls>
 ```
 
 ```{toctree}
+:caption: Nautilus
+:hidden:
+
+Architecture Audit <nautilus/ARCHITECTURE_AUDIT>
+Backpressure <nautilus/BACKPRESSURE>
+Capability Matrix <nautilus/CAPABILITY_MATRIX>
+Examples <nautilus/EXAMPLES>
+Execution Survivability <nautilus/EXECUTION_SURVIVABILITY>
+Golden Path <nautilus/GOLDEN_PATH>
+Hardening Audit <nautilus/HARDENING_AUDIT>
+Hot Path Audit <nautilus/HOT_PATH_AUDIT>
+Migrations & Upgrades <nautilus/MIGRATIONS_AND_UPGRADES>
+MVP Foundation Readiness <nautilus/MVP_FOUNDATION_READINESS>
+MVP Package <nautilus/MVP_PACKAGE>
+Not Yet Supported <nautilus/NOT_YET_SUPPORTED>
+Operator Quickstart <nautilus/OPERATOR_QUICKSTART>
+Optimization Audit <nautilus/OPTIMIZATION_AUDIT>
+Proofpacks <nautilus/PROOFPACKS>
+Release Checklist <nautilus/RELEASE_CHECKLIST>
+Release Readiness <nautilus/RELEASE_READINESS>
+Replay & Idempotency <nautilus/REPLAY_AND_IDEMPOTENCY>
+Replay Engine <nautilus/REPLAY_ENGINE>
+Retention & Archival <nautilus/RETENTION_AND_ARCHIVAL>
+Runbooks <nautilus/RUNBOOKS>
+Runtime Health <nautilus/RUNTIME_HEALTH>
+Smoke Tests <nautilus/SMOKE_TESTS>
+Storage Lifecycle <nautilus/STORAGE_LIFECYCLE>
+Threat Model <nautilus/THREAT_MODEL>
+Time Semantics <nautilus/TIME_SEMANTICS>
+Topology Model <nautilus/TOPOLOGY_MODEL>
+Top 50 Todos <nautilus/TOP_50_TODOS>
+Truth Boundaries <nautilus/TRUTH_BOUNDARIES>
+Unsupported <nautilus/UNSUPPORTED>
+Verify Locally <nautilus/VERIFY_LOCALLY>
+Walkthrough <nautilus/WALKTHROUGH>
+Event Fabric <nautilus/event-fabric>
+Master Execution Audit <nautilus/master-execution-audit>
+MeshRAG <nautilus/meshrag>
+OperatorGraph <nautilus/operatorgraph>
+Pillar Foundations <nautilus/pillar-foundations>
+Platform Evolution <nautilus/platform-evolution>
+RecallForge <nautilus/recallforge>
+ThreatMesh <nautilus/threatmesh>
+```
+
+```{toctree}
 :caption: Reference
 :hidden:
 
-Architecture <reference/architecture>
-CLI Commands Reference <reference/commands>
+Reference Architecture <reference/architecture>
 CLI Selection Guide <reference/cli-selection-guide>
+CLI Commands <reference/commands>
 Network Policies <reference/network-policies>
 Troubleshooting <reference/troubleshooting>
 ```
@@ -381,8 +435,55 @@ Troubleshooting <reference/troubleshooting>
 :caption: Architecture
 :hidden:
 
+Control Plane Boundaries <architecture/CONTROL_PLANE_BOUNDARIES>
+Nautilus Truths <architecture/NAUTILUS_TRUTHS>
+Repo Invariants <architecture/REPO_INVARIANTS>
+Architecture <reference/architecture>
+Current State <architecture/current-state>
+Target State <architecture/target-state>
+Status Matrix <architecture/status-matrix>
+Failure Semantics <architecture/failure-semantics>
+Replayability <architecture/replayability>
+Observability <architecture/observability>
+Diagnostics <architecture/diagnostics>
+Control Plane <architecture/control-plane>
+Policy Engine <architecture/policy-engine>
+Task Classification <architecture/task-classification>
+Worker Identity Trust <architecture/worker-identity-trust>
+Capability Attestation <architecture/capability-attestation>
+Governance Invariants <architecture/governance-invariants>
+Governance Threat Model <architecture/governance-threat-model>
+Security Threat Model <architecture/security-threat-model>
+Security Policy Model <architecture/security-policy-model>
 Security Policy <architecture/security-policy>
+Policy Promotion <architecture/policy-promotion>
+Policy Tracing <architecture/policy-tracing>
+Policy Inheritance <architecture/policy-inheritance>
+Runtime Capabilities <architecture/runtime-capabilities>
+Operational Memory <architecture/operational-memory>
+Device Registry <architecture/device-registry>
+Registry Synchronization <architecture/registry-synchronization>
+Registry Telemetry Policy <architecture/registry-telemetry-policy>
+Local Probes <architecture/local-probes>
+Worker Probes <architecture/worker-probes>
+Remote Probe Security <architecture/remote-probe-security>
+Telemetry Adapters <architecture/telemetry-adapters>
+Runtime Telemetry Parsers <architecture/runtime-telemetry-parsers>
+GPU Telemetry <architecture/gpu-telemetry>
+Scheduler <architecture/scheduler>
+Scheduler Provider Bridge <architecture/scheduler-provider-bridge>
+Provider Routing Integration <architecture/provider-routing-integration>
+Heterogeneous Routing <architecture/heterogeneous-routing>
+Governed Fallbacks <architecture/governed-fallbacks>
+Receipts and Degraded States <architecture/receipts-and-degraded-states>
+Local Stack Security Profiles <architecture/local-stack-security-profiles>
+Worker Adapters <architecture/worker-adapters>
+Runtime Integration <architecture/runtime-integration>
+Runtime Dispatch Integration <architecture/runtime-dispatch-integration>
+Remote Execution Adapters <architecture/remote-execution-adapters>
+Command Execution Safety <architecture/command-execution-safety>
 Transport Security <architecture/transport-security>
+Secret Redaction Doctrine <architecture/secret-redaction-doctrine>
 Secret Redaction <architecture/secret-redaction>
 Network Policy <architecture/network-policy>
 Command Safety <architecture/command-safety>
@@ -392,10 +493,59 @@ Command Safety <architecture/command-safety>
 :caption: Verification
 :hidden:
 
+Verification Matrix (Root) <verification-matrix>
 Verification Matrix <verification/verification-matrix>
 Security Hardening <verification/security-hardening>
+Security Verification Matrix <verification/security-verification-matrix>
+Policy Verification <verification/policy-verification>
 Release Checklist <verification/release-checklist>
 Release Readiness <verification/release-readiness>
+Nautilus RC1 Hardening <release/nautilus-rc1-hardening>
+Degraded State Chaos <verification/degraded-state-chaos>
+```
+
+```{toctree}
+:caption: Contributing
+:hidden:
+
+Branch Strategy <contributing/branch-strategy>
+Control Plane Rules <contributing/control-plane-rules>
+Local Bootstrap <contributing/local-bootstrap>
+PR Template Guide <contributing/pr-template-guide>
+Verification <contributing/verification>
+```
+
+```{toctree}
+:caption: Architecture Decision Records (ADRs)
+:hidden:
+
+ADR 0001: Fork Purpose <adr/0001-fork-purpose>
+ADR 0002: Control Plane Separation <adr/0002-control-plane-separation>
+ADR 0003: Deterministic Routing <adr/0003-deterministic-routing>
+ADR 0004: Supervised Policy Promotion <adr/0004-supervised-policy-promotion>
+ADR 0005: Receipts and Degraded State Truth <adr/0005-receipts-and-degraded-state-truth>
+ADR 0006: Device Registry Before Scheduler <adr/0006-device-registry-before-scheduler>
+ADR 0007: Policy Outside Prompts <adr/0007-policy-outside-prompts>
+```
+
+```{toctree}
+:caption: Architecture Decision Records (ADRs)
+:hidden:
+
+ADR 0001: Fork Purpose <adr/0001-fork-purpose>
+ADR 0002: Control Plane Separation <adr/0002-control-plane-separation>
+ADR 0003: Deterministic Routing <adr/0003-deterministic-routing>
+ADR 0004: Supervised Policy Promotion <adr/0004-supervised-policy-promotion>
+ADR 0005: Receipts and Degraded State Truth <adr/0005-receipts-and-degraded-state-truth>
+ADR 0006: Device Registry Before Scheduler <adr/0006-device-registry-before-scheduler>
+ADR 0007: Policy Outside Prompts <adr/0007-policy-outside-prompts>
+```
+
+```{toctree}
+:caption: Operators
+:hidden:
+
+Local Environment <operators/local-env>
 ```
 
 ```{toctree}
