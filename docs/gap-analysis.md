@@ -66,3 +66,11 @@ Highest-risk themes:
 
 ## Future roadmap linkage
 See `docs/roadmap.md` for R0-R5 prioritized execution plan and ownership-ready task slices.
+
+## R0 implementation update (2026-05-22)
+- Default `npm test` is now bounded to deterministic unit projects (`plugin` + `nautilus`) via `test:unit`.
+- Full-repo Vitest sweep moved to explicit opt-in command: `npm run test:full`.
+- Restricted/proxy install behavior is now treated as explicit degraded path:
+  - `npm ci` may fail when postinstall fetch for `@j178/prek` is blocked (403/proxy).
+  - `npm ci --ignore-scripts` is the supported restricted bootstrap path for local auditing.
+  - CI remains fail-closed on normal path; restricted mode is a documented local fallback and does not mutate lockfile.

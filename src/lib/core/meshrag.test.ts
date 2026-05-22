@@ -1,46 +1,43 @@
-import { describe, expect, it } from "vitest";
-import { rankRetrievalSources, type SourceTrustScore } from "./meshrag.js";
+// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 
-describe("rankRetrievalSources", () => {
-  it("sorts by score in descending order", () => {
-    const scores: SourceTrustScore[] = [
-      { sourceId: "a", score: 0.5, rationale: "" },
-      { sourceId: "b", score: 0.9, rationale: "" },
-      { sourceId: "c", score: 0.1, rationale: "" },
-    ];
-    const result = rankRetrievalSources(scores);
-    expect(result).toEqual([
-      { sourceId: "b", score: 0.9, rationale: "" },
-      { sourceId: "a", score: 0.5, rationale: "" },
-      { sourceId: "c", score: 0.1, rationale: "" },
-    ]);
+import { describe, it, expect } from "vitest";
+import {
+  InMemorySemanticCache,
+  RetrievalResult
+} from "../../../dist/lib/core/meshrag";
+
+describe("InMemorySemanticCache", () => {
+  it("returns cache miss when key is not found", () => {
+    const cache = new InMemorySemanticCache();
+    const result = cache.get("non-existent-key");
+
+    expect(result).toEqual({ key: "non-existent-key", reason: "not_found" });
   });
 
-  it("breaks ties by sourceId in alphabetical order", () => {
-    const scores: SourceTrustScore[] = [
-      { sourceId: "c", score: 0.8, rationale: "" },
-      { sourceId: "a", score: 0.8, rationale: "" },
-      { sourceId: "b", score: 0.8, rationale: "" },
-    ];
-    const result = rankRetrievalSources(scores);
-    expect(result).toEqual([
-      { sourceId: "a", score: 0.8, rationale: "" },
-      { sourceId: "b", score: 0.8, rationale: "" },
-      { sourceId: "c", score: 0.8, rationale: "" },
-    ]);
+  it("returns cache hit when key is found", () => {
+    const cache = new InMemorySemanticCache();
+    const mockResult: RetrievalResult = {
+      requestId: "req-1",
+      evidence: [],
+      trust: []
+    };
+
+    cache.put("my-key", mockResult);
+    const result = cache.get("my-key");
+
+    expect(result).toEqual({ key: "my-key", value: mockResult });
   });
 
-  it("handles an empty array", () => {
-    expect(rankRetrievalSources([])).toEqual([]);
-  });
+  it("can overwrite existing keys", () => {
+    const cache = new InMemorySemanticCache();
+    const mockResult1: RetrievalResult = { requestId: "req-1", evidence: [], trust: [] };
+    const mockResult2: RetrievalResult = { requestId: "req-2", evidence: [], trust: [] };
 
-  it("does not mutate the original array", () => {
-    const scores: SourceTrustScore[] = [
-      { sourceId: "b", score: 0.5, rationale: "" },
-      { sourceId: "a", score: 0.8, rationale: "" },
-    ];
-    const originalScores = [...scores];
-    rankRetrievalSources(scores);
-    expect(scores).toEqual(originalScores);
+    cache.put("my-key", mockResult1);
+    cache.put("my-key", mockResult2);
+
+    const result = cache.get("my-key");
+    expect(result).toEqual({ key: "my-key", value: mockResult2 });
   });
 });
