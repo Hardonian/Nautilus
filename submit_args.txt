@@ -1,0 +1,4 @@
+branch_name: feat/proofpack-tests
+commit_message: "test: add tests for proofpack manifest builder"
+title: "test: add tests for proofpack manifest builder"
+description: "🎯 **What:** The testing gap addressed\nMissing test coverage for `buildProofpackManifest` in `core/event-fabric/proofpack.ts`.\n\n📊 **Coverage:** What scenarios are now tested\n- Happy path (creates complete manifest)\n- Incomplete status due to missing required evidence\n- Incomplete status due to partial required evidence\n- Incomplete status due to missing replay references\n- Partial status handling for interrupted proofs\n- Notes array generation verification\n- Integrity Hash generation verification\n\n✨ **Result:** The improvement in test coverage\nThe `buildProofpackManifest` function is now fully tested, preventing regressions when making modifications to proofpack manifest structures.\n\nSigned-off-by: Jules <jules@example.com>"
