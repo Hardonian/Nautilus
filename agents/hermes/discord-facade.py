@@ -26,10 +26,22 @@ import shlex
 import shutil
 import signal
 import sys
+
+
+
 import time
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import parse_qsl, urlencode
+
+
+def _write_file_sync(filepath: str, data: str) -> None:
+    with open(filepath, "w", encoding="utf-8") as handle:
+        handle.write(data)
+
+def _read_file_sync(filepath: str) -> str:
+    with open(filepath, "r", encoding="utf-8") as handle:
+        return handle.read()
 
 try:
     from aiohttp import ClientSession, WSMsgType, web
@@ -879,8 +891,8 @@ async def _run_tunnel_command(
             match = url_re.search(line)
             if match:
                 url = match.group(0).decode("utf-8").rstrip("/")
-                with open(public_url_file, "w", encoding="utf-8") as handle:
-                    handle.write(url + "\n")
+                loop = asyncio.get_running_loop()
+                await loop.run_in_executor(None, _write_file_sync, public_url_file, url + "\n")
                 LOGGER.info("Discord interactions tunnel URL discovered")
 
     capture_task = asyncio.create_task(_capture_url())
@@ -928,8 +940,8 @@ async def main() -> None:
     if not public_base_url:
         for _ in range(20 if tunnel_proc else 1):
             if os.path.exists(public_url_file):
-                with open(public_url_file, "r", encoding="utf-8") as handle:
-                    public_base_url = handle.read().strip() or None
+                loop = asyncio.get_running_loop()
+                public_base_url = (await loop.run_in_executor(None, _read_file_sync, public_url_file)).strip() or None
                 if public_base_url:
                     break
             await asyncio.sleep(0.25)

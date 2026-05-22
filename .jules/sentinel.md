@@ -1,4 +1,7 @@
-## 2026-05-17 - [Command Injection]
-**Vulnerability:** Shell Command Injection in SSH Remote Execution
-**Learning:** `child_process.exec` passes commands to a shell (`/bin/sh -c` on Unix), meaning shell metacharacters in constructed command strings are evaluated by the local host running the agent/cli. This allowed an attacker or malicious config to inject commands (e.g. `; touch /tmp/pwned`) into the remote execution SSH string, causing local command execution.
-**Prevention:** Use `child_process.execFile` (or `spawn`) and pass arguments as an array instead of a concatenated string. This skips local shell evaluation entirely, ensuring arguments are sent directly to the `ssh` binary.
+## 2025-02-27 - Command Injection in docker pull
+
+**Vulnerability:** In `src/lib/inference/vllm.ts`, the `pullImage` function was susceptible to command injection because the `profile.image` value was directly interpolated into a shell string executed via `runShell`. An attacker who could control `profile.image` could inject arbitrary shell commands.
+
+**Learning:** When invoking external commands like `docker`, one should prefer spawning the command directly with its arguments in an array instead of concatenating them into a shell string.
+
+**Prevention:** Use `run` instead of `runShell` where possible, taking advantage of the argv array parameter. Avoid passing un-sanitized user input into strings executed via the shell.

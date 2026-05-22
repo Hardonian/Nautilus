@@ -172,6 +172,84 @@ export function captureOpenshellCommand(
   };
 }
 
+class AsyncCommandContext {
+  private stdout = "";
+  private stderr = "";
+  private settled = false;
+  private timedOut = false;
+  private timeout: NodeJS.Timeout | undefined;
+  private killTimer: NodeJS.Timeout | undefined;
+  private forceTimer: NodeJS.Timeout | undefined;
+  private capturedError: Error | undefined;
+
+  constructor(
+    private readonly child: ChildProcess,
+    private readonly resolve: (value: CaptureOpenshellResult) => void,
+    private readonly opts: CaptureOpenshellAsyncOptions,
+    private readonly binary: string,
+    private readonly args: string[],
+  ) {}
+
+  private clearTimers(): void {
+    if (this.timeout) clearTimeout(this.timeout);
+    if (this.killTimer) clearTimeout(this.killTimer);
+    if (this.forceTimer) clearTimeout(this.forceTimer);
+  }
+
+  private buildOutput(): string {
+    return `${this.stdout}${this.opts.ignoreError ? "" : this.stderr}`.trim();
+  }
+
+  private settle(status: number | null, signal: NodeJS.Signals | null, error?: Error): void {
+    if (this.settled) return;
+    this.settled = true;
+    this.clearTimers();
+    this.resolve({
+      status: status ?? (this.timedOut ? null : 1),
+      output: this.buildOutput(),
+      ...(error ? { error } : {}),
+      signal,
+    });
+  }
+
+  public setupStreams(): void {
+    this.child.stdout?.setEncoding("utf8");
+    this.child.stderr?.setEncoding("utf8");
+    this.child.stdout?.on("data", (chunk) => {
+      this.stdout += chunk;
+    });
+    this.child.stderr?.on("data", (chunk) => {
+      this.stderr += chunk;
+    });
+    this.child.on("error", (error) => {
+      this.capturedError = error;
+      this.settle(1, null, error);
+    });
+    this.child.on("close", (status, signal) => {
+      this.settle(status, signal, this.capturedError);
+    });
+  }
+
+  public setupTimeouts(): void {
+    if (this.opts.timeout && this.opts.timeout > 0) {
+      this.timeout = setTimeout(() => {
+        this.timedOut = true;
+        this.capturedError = timeoutError(this.binary, this.args, this.opts.timeout as number);
+        this.child.unref();
+        signalProcessTree(this.child, "SIGTERM");
+        this.killTimer = setTimeout(() => {
+          signalProcessTree(this.child, "SIGKILL");
+          this.forceTimer = setTimeout(() => {
+            this.child.stdout?.destroy();
+            this.child.stderr?.destroy();
+            this.settle(null, "SIGKILL", this.capturedError);
+          }, this.opts.killGraceMs ?? 1000);
+        }, this.opts.killGraceMs ?? 1000);
+      }, this.opts.timeout);
+    }
+  }
+}
+
 export function captureOpenshellCommandAsync(
   binary: string,
   args: string[],
@@ -186,71 +264,9 @@ export function captureOpenshellCommandAsync(
       stdio: ["ignore", "pipe", "pipe"],
     }) as ChildProcess;
 
-    let stdout = "";
-    let stderr = "";
-    let settled = false;
-    let timedOut = false;
-    let timeout: NodeJS.Timeout | undefined;
-    let killTimer: NodeJS.Timeout | undefined;
-    let forceTimer: NodeJS.Timeout | undefined;
-    let capturedError: Error | undefined;
-
-    const clearTimers = () => {
-      if (timeout) clearTimeout(timeout);
-      if (killTimer) clearTimeout(killTimer);
-      if (forceTimer) clearTimeout(forceTimer);
-    };
-
-    const buildOutput = () => `${stdout}${opts.ignoreError ? "" : stderr}`.trim();
-
-    const settle = (
-      status: number | null,
-      signal: NodeJS.Signals | null,
-      error?: Error,
-    ) => {
-      if (settled) return;
-      settled = true;
-      clearTimers();
-      resolve({
-        status: status ?? (timedOut ? null : 1),
-        output: buildOutput(),
-        ...(error ? { error } : {}),
-        signal,
-      });
-    };
-
-    child.stdout?.setEncoding("utf8");
-    child.stderr?.setEncoding("utf8");
-    child.stdout?.on("data", (chunk) => {
-      stdout += chunk;
-    });
-    child.stderr?.on("data", (chunk) => {
-      stderr += chunk;
-    });
-    child.on("error", (error) => {
-      capturedError = error;
-      settle(1, null, error);
-    });
-    child.on("close", (status, signal) => {
-      settle(status, signal, capturedError);
-    });
-
-    if (opts.timeout && opts.timeout > 0) {
-      timeout = setTimeout(() => {
-        timedOut = true;
-        capturedError = timeoutError(binary, args, opts.timeout as number);
-        child.unref();
-        signalProcessTree(child, "SIGTERM");
-        killTimer = setTimeout(() => {
-          signalProcessTree(child, "SIGKILL");
-          forceTimer = setTimeout(() => {
-            child.stdout?.destroy();
-            child.stderr?.destroy();
-            settle(null, "SIGKILL", capturedError);
-          }, opts.killGraceMs ?? 1000);
-        }, opts.killGraceMs ?? 1000);
-      }, opts.timeout);
-    }
+    const context = new AsyncCommandContext(child, resolve, opts, binary, args);
+    context.setupStreams();
+    context.setupTimeouts();
   });
 }
 
