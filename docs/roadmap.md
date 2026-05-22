@@ -43,3 +43,8 @@
 ## Status update (2026-05-22)
 - R0.2 (bounded default test path): implemented (`npm test` => `npm run test:unit`; `npm run test:full` opt-in).
 - R0.1 (restricted install resilience): partially addressed via explicit degraded local bootstrap contract (`npm ci --ignore-scripts`) while preserving fail-closed CI semantics.
+
+## Status update (2026-05-22, implementation batch)
+- R1: **partial+** (hardening utilities implemented with focused tests; broader trust-boundary matrix and contract-ownership lint still pending).
+- R4: **implemented core primitives** (handoff schema validation, context compaction, fingerprints/reuse guard, token budget overflow degrade, checkpoint shape + replay helpers).
+- R5: **implemented core governance/evidence** (queue admission/idempotency/retry/dead-letter/load-shed timeline, proofpack evidence builder, release gate waiver logic, benchmark harness unavailable/latency behavior, verification matrix script-existence check).
