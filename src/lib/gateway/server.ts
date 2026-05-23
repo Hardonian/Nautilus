@@ -82,7 +82,7 @@ export class ApiGateway {
         return;
       }
 
-      if (req.url === "/grid/workload" && req.method === "POST") {
+      if (req.url === "/grid/workload") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
         req.on("end", () => {
