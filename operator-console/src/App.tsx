@@ -54,6 +54,9 @@ export function App() {
 
   return (
     <Shell currentHash={hash} onNavigate={navigate}>
+      <div aria-live="polite" style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", border: 0 }}>
+        Navigated to {hash || "overview"} view.
+      </div>
       {renderRoute()}
     </Shell>
   );
