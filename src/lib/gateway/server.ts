@@ -63,8 +63,8 @@ export class ApiGateway {
         return;
       }
     }
-    if (req.method === "POST") {
-      if (req.url === "/grid/register") {
+
+    if (req.url === "/grid/register" && req.method === "POST") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
         req.on("end", () => {
@@ -120,7 +120,6 @@ export class ApiGateway {
         }
         return;
       }
-    }
 
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "not found" }));

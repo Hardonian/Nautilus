@@ -397,6 +397,7 @@ export function loadAgent(name: string): AgentDefinition {
       return messagingPlatforms?.supported ?? [];
     },
 
+
     get dockerfileBasePath(): string | null {
       const dockerfileBase = path.join(agentDir, "Dockerfile.base");
       return fs.existsSync(dockerfileBase) ? dockerfileBase : null;
