@@ -62,6 +62,7 @@ export class ApiGateway {
         }
         return;
       }
+    }
 
       }
 
@@ -122,7 +123,6 @@ export class ApiGateway {
         }
         return;
       }
-    }
 
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "not found" }));
