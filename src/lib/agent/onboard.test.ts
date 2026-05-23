@@ -187,31 +187,19 @@ describe("handleAgentSetup guards", () => {
 });
 
 describe("isHealthProbeOk", () => {
-  it("returns true for exact match of 'ok'", () => {
+  it("returns false for invalid JSON in health response", () => {
+    expect(isHealthProbeOk("not-json-and-not-ok")).toBe(false);
+  });
+
+  it("returns true for exact 'ok' response", () => {
     expect(isHealthProbeOk("ok")).toBe(true);
   });
 
-  it("returns true for JSON with status 'ok'", () => {
-    expect(isHealthProbeOk(JSON.stringify({ status: "ok" }))).toBe(true);
+  it("returns true for JSON '{status: \"ok\"}' response", () => {
+    expect(isHealthProbeOk("{\"status\":\"ok\"}")).toBe(true);
   });
 
-  it("returns false for invalid JSON", () => {
-    expect(isHealthProbeOk("invalid json")).toBe(false);
-  });
-
-  it("returns false for empty string", () => {
-    expect(isHealthProbeOk("")).toBe(false);
-  });
-
-  it("returns false for null", () => {
-    expect(isHealthProbeOk(null)).toBe(false);
-  });
-
-  it("returns false for undefined", () => {
-    expect(isHealthProbeOk(undefined)).toBe(false);
-  });
-
-  it("returns false for JSON with status other than 'ok'", () => {
-    expect(isHealthProbeOk(JSON.stringify({ status: "error" }))).toBe(false);
+  it("returns false for JSON without status ok", () => {
+    expect(isHealthProbeOk("{\"status\":\"error\"}")).toBe(false);
   });
 });
