@@ -29,8 +29,8 @@ export class WasmExecutor implements RuntimeExecutor {
     const wasmBuffer = await fs.promises.readFile(wasmPath);
 
     // Instantiate WASM module completely isolated from OS imports
-    const WebAssemblyGlobal = (globalThis as any).WebAssembly;
-    const wasmModule = await WebAssemblyGlobal.instantiate(wasmBuffer, {
+    // @ts-ignore
+    const wasmModule = await WebAssembly.instantiate(wasmBuffer, {
       env: {
         // Expose no OS-level imports to ensure 100% micro-sandboxing
         abort: () => { throw new Error("WASM aborted"); }
