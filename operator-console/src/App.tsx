@@ -55,10 +55,10 @@ export function App() {
 
   return (
     <Shell currentHash={hash} onNavigate={navigate}>
-      <div aria-live="polite" style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", border: 0 }}>
+      <div aria-live="polite" className="visually-hidden">
         Navigated to {hash || "overview"} view.
       </div>
-      <Suspense fallback={<div style={{ padding: "2rem", color: "var(--color-text-secondary)" }}>Loading view...</div>}>
+      <Suspense fallback={<div className="suspense-fallback">Loading view...</div>}>
         {renderRoute()}
       </Suspense>
     </Shell>

@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+version: '3.8'
+
+services:
+  nemoclaw:
+    build:
+      context: ..
+      dockerfile: nemo-docker-blueprint/Dockerfile
+    user: "nemo"
+    security_opt:
+      - no-new-privileges:true
+      - apparmor:unconfined # will be restricted when apparmor is applied
+    network_mode: "bridge"
+    volumes:
+      - nemo_state:/home/nemo/.nemoclaw
+    environment:
+      - NODE_ENV=production
+      - NEMOCLAW_RUNTIME_ENV=container
+
+volumes:
+  nemo_state:
