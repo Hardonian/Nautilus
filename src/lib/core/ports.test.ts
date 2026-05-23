@@ -70,8 +70,8 @@ describe("parsePort", () => {
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
 
-  it("rejects floating point numbers", () => {
-    process.env[ENV_KEY] = "8080.5";
+  it("rejects whitespace-only string", () => {
+    process.env[ENV_KEY] = "   ";
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
 
@@ -80,17 +80,22 @@ describe("parsePort", () => {
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
 
-  it("rejects hexadecimal format", () => {
-    process.env[ENV_KEY] = "0x1f90";
+  it("rejects float numbers", () => {
+    process.env[ENV_KEY] = "8080.5";
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
 
-  it("rejects whitespace-only strings", () => {
-    process.env[ENV_KEY] = "   ";
+  it("rejects hex strings", () => {
+    process.env[ENV_KEY] = "0x1F90";
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
 
-  it("accepts valid ports with leading zeros", () => {
+  it("rejects zero", () => {
+    process.env[ENV_KEY] = "0";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
+  });
+
+  it("accepts valid port with leading zeros", () => {
     process.env[ENV_KEY] = "08080";
     expect(parsePort(ENV_KEY, 8080)).toBe(8080);
   });
