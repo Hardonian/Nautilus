@@ -1,0 +1,29 @@
+.routeContainer {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--color-text-primary);
+}
+
+.pageSubtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 2rem 0;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

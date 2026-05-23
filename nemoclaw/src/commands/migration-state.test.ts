@@ -109,11 +109,6 @@ vi.mock("tar", () => ({
   create: vi.fn(async () => {}),
 }));
 
-vi.mock("node:path", async (importOriginal) => {
-  const original = await importOriginal<typeof import("node:path")>();
-  return { ...original.posix, default: original.posix };
-});
-
 import {
   detectHostOpenClaw,
   createSnapshotBundle,
