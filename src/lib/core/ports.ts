@@ -14,7 +14,6 @@ export function parsePort(envVar: string, fallback: number): number {
   const raw = process.env[envVar];
   if (raw === undefined || raw === "") return fallback;
   const trimmed = String(raw).trim();
-  if (trimmed === "") return fallback;
   if (!/^\d+$/.test(trimmed)) {
     throw new Error(
       `Invalid port: ${envVar}="${raw}" — must be an integer between 1024 and 65535`,
