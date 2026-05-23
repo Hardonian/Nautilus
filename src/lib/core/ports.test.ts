@@ -69,4 +69,34 @@ describe("parsePort", () => {
     process.env[ENV_KEY] = ".*";
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
+
+  it("rejects whitespace-only string", () => {
+    process.env[ENV_KEY] = "   ";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
+  });
+
+  it("rejects negative numbers", () => {
+    process.env[ENV_KEY] = "-8080";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
+  });
+
+  it("rejects float numbers", () => {
+    process.env[ENV_KEY] = "8080.5";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
+  });
+
+  it("rejects hex strings", () => {
+    process.env[ENV_KEY] = "0x1F90";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
+  });
+
+  it("rejects zero", () => {
+    process.env[ENV_KEY] = "0";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
+  });
+
+  it("accepts valid port with leading zeros", () => {
+    process.env[ENV_KEY] = "08080";
+    expect(parsePort(ENV_KEY, 8080)).toBe(8080);
+  });
 });

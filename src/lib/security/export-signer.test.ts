@@ -12,11 +12,11 @@ describe('Export Signer', () => {
     };
 
     const signed = signExport(payload);
-    
+
     expect(signed.signature).toBeTruthy();
     expect(signed.publicKey).toBeTruthy();
     expect(signed.algorithm).toBe('Ed25519');
-    
+
     const isValid = verifyExport(signed);
     expect(isValid).toBe(true);
   });
@@ -24,10 +24,10 @@ describe('Export Signer', () => {
   it('rejects tampered payloads', () => {
     const payload = { test: true };
     const signed = signExport(payload);
-    
+
     // Tamper payload
     signed.payload.test = false;
-    
+
     const isValid = verifyExport(signed);
     expect(isValid).toBe(false);
   });
@@ -35,10 +35,10 @@ describe('Export Signer', () => {
   it('rejects tampered signatures', () => {
     const payload = { test: true };
     const signed = signExport(payload);
-    
+
     // Tamper signature
     signed.signature = signed.signature.replace('A', 'B');
-    
+
     const isValid = verifyExport(signed);
     expect(isValid).toBe(false);
   });

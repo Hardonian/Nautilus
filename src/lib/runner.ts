@@ -8,9 +8,9 @@ import type {
 } from "node:child_process";
 import { NAME_ALLOWED_FORMAT } from "./name-validation";
 
-const { spawnSync } = require("child_process");
-const path = require("path");
-const { detectDockerHost } = require("./platform");
+import { spawnSync } from "child_process";
+import * as path from "path";
+import { detectDockerHost } from "./platform";
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const SCRIPTS = path.join(ROOT, "scripts");
@@ -57,12 +57,12 @@ function spawnAndHandle(
 ): SpawnResult {
   const result = spawnSync(file, args, {
     ...opts,
-    stdio,
+    stdio: stdio as any,
     cwd: ROOT,
     env: { ...process.env, ...opts.env },
   });
   if (!opts.suppressOutput) {
-    writeRedactedResult(result, stdio);
+    writeRedactedResult(result, (stdio as string | string[]) || "pipe");
   }
   if (result.error && !opts.ignoreError) {
     console.error(
@@ -131,12 +131,12 @@ function runArrayCmd(
 
   const result = spawnSync(exe, args, {
     ...spawnOpts,
-    stdio,
+    stdio: stdio as any,
     cwd: ROOT,
     env: { ...process.env, ...extraEnv },
   });
   if (!suppressOutput) {
-    writeRedactedResult(result, stdio);
+    writeRedactedResult(result, (stdio as string | string[]) || "pipe");
   }
   // Check result.error first — spawnSync sets this (with status === null) when
   // the executable is missing (ENOENT), the call times out, or the spawn fails.
@@ -238,7 +238,7 @@ function runCapture(cmd: readonly string[], opts: CaptureOptions = {}): string {
     }
 
     const stdout = result.stdout || "";
-    return (typeof stdout === "string" ? stdout : stdout.toString("utf-8")).trim();
+    return String(stdout).trim();
   } catch (err) {
     if (ignoreError) return "";
     throw redactError(err);
@@ -246,7 +246,7 @@ function runCapture(cmd: readonly string[], opts: CaptureOptions = {}): string {
 }
 
 // Unified redaction — see redact.ts (#2381).
-const { redact, redactError, writeRedactedResult } = require("./security/redact");
+import { redact, redactError, writeRedactedResult } from "./security/redact";
 
 /**
  * Shell-quote a value for safe interpolation into bash -c strings.

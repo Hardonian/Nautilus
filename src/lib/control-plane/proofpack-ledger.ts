@@ -46,9 +46,9 @@ export function loadLedger(): LedgerEntry[] {
 export function appendToLedger(proofpack: Proofpack): LedgerEntry {
   const ledger = loadLedger();
   const previousHash = ledger.length > 0 ? ledger[ledger.length - 1].hash : "0000000000000000000000000000000000000000000000000000000000000000";
-  
+
   const hash = computeProofpackHash(proofpack, previousHash);
-  
+
   const entry: LedgerEntry = {
     proofpackId: proofpack.id,
     timestamp: new Date().toISOString(),
@@ -56,17 +56,17 @@ export function appendToLedger(proofpack: Proofpack): LedgerEntry {
     hash,
     payload: proofpack,
   };
-  
+
   ledger.push(entry);
   writeFileSync(getLedgerPath(), JSON.stringify(ledger, null, 2));
-  
+
   return entry;
 }
 
 export function verifyLedgerSignatureChains(ledger?: LedgerEntry[]): boolean {
   const entries = ledger ?? loadLedger();
   let expectedPreviousHash = "0000000000000000000000000000000000000000000000000000000000000000";
-  
+
   for (const entry of entries) {
     if (entry.previousHash !== expectedPreviousHash) {
       return false;
@@ -77,6 +77,6 @@ export function verifyLedgerSignatureChains(ledger?: LedgerEntry[]): boolean {
     }
     expectedPreviousHash = computedHash;
   }
-  
+
   return true;
 }
