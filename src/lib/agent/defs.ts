@@ -71,7 +71,6 @@ export interface AgentDefinition {
   state_dirs?: string[];
   state_files?: AgentStateFile[];
   messaging_platforms?: { supported?: string[] };
-  subagents?: string[];
   _legacy_paths?: StringMap;
   agentDir: string;
   manifestPath: string;
@@ -324,7 +323,6 @@ export function loadAgent(name: string): AgentDefinition {
     state_dirs: stateDirs,
     state_files: stateFiles,
     messaging_platforms: messagingPlatforms,
-    subagents,
     _legacy_paths: legacyPathConfig,
     agentDir,
     manifestPath,
