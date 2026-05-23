@@ -32,6 +32,13 @@ export interface ArtifactDocument {
   lastUpdated: string;
 }
 
+export interface MediaArtifactDocument extends Omit<ArtifactDocument, "content"> {
+  mimeType: string;
+  blob: Buffer;
+  transcription?: string;
+  visionClasses?: string[];
+}
+
 export interface ArtifactIndex {
   indexArtifact(doc: ArtifactDocument): void;
   searchArtifacts(query: string, filter?: Record<string, unknown>): ArtifactDocument[];

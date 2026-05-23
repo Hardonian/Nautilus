@@ -11,7 +11,7 @@ services:
     user: "nemo"
     security_opt:
       - no-new-privileges:true
-      - apparmor:unconfined # will be restricted when apparmor is applied
+      - apparmor:nemo
     network_mode: "bridge"
     volumes:
       - nemo_state:/home/nemo/.nemoclaw

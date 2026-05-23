@@ -5,6 +5,9 @@ import * as http from "node:http";
 import { getStatusReport } from "../inventory-commands";
 import { buildStatusCommandDeps } from "../status-command-deps";
 import { ROOT } from "../runner";
+import { LocalGridNode } from "../core/grid";
+
+const gridNode = new LocalGridNode("gateway-node");
 
 export class ApiGateway {
   private server: http.Server | null = null;
@@ -57,6 +60,41 @@ export class ApiGateway {
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: err.message }));
         }
+        return;
+      }
+
+      if (req.url === "/grid/register" && req.method === "POST") {
+        let body = "";
+        req.on("data", chunk => { body += chunk.toString(); });
+        req.on("end", () => {
+          try {
+            const data = JSON.parse(body);
+            if (!data.url) throw new Error("url required");
+            void gridNode.registerPeer(data.url);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ status: "registered" }));
+          } catch {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "invalid request" }));
+          }
+        });
+        return;
+      }
+
+      if (req.url === "/grid/workload" && req.method === "POST") {
+        let body = "";
+        req.on("data", chunk => { body += chunk.toString(); });
+        req.on("end", () => {
+          try {
+            const data = JSON.parse(body);
+            // In a real system, route this to the executor queue
+            res.writeHead(202, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
+          } catch {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "invalid workload" }));
+          }
+        });
         return;
       }
       
