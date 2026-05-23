@@ -117,15 +117,15 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
     const score = Math.round(
       (node.role === "local" ? 100 : 50) +
         (model?.flags.streaming === input.classification.requiresStreaming ? 10 : 0) +
-        vramHeadroom -
+        (capabilityInputs.vramAvailableMb - capabilityInputs.vramRequiredMb) / 1024 -
         capabilityInputs.queuePressure * 15 -
         (capabilityInputs.queueDepth > 5 ? capabilityInputs.queueDepth * 3 : 0) -  // Penalize deep queues
         capabilityInputs.recentLatencyMs / 100 -
         capabilityInputs.estimatedCost * 2 -
         contextPenalty,
     );
-    scoringMetadata.set(node.nodeId, { contextUtilization, queuePressure: capabilityInputs.queuePressure, vramHeadroom });
-    candidates.push({ nodeId: node.nodeId, modelId: model?.modelId ?? "unknown", score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score},context_util=${contextUtilization.toFixed(2)},vram_headroom=${vramHeadroom.toFixed(1)},queue_pressure=${capabilityInputs.queuePressure}`, source: "scheduler" }] });
+    const selectedModelId = model?.modelId ?? input.request.requestedModel ?? "degraded-model-unavailable";
+    candidates.push({ nodeId: node.nodeId, modelId: selectedModelId, score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score}`, source: "scheduler" }] });
   }
 
   candidates.sort((a, b) => b.score - a.score || a.nodeId.localeCompare(b.nodeId) || a.modelId.localeCompare(b.modelId));

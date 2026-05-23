@@ -88,7 +88,7 @@
     "verify:release-readiness": "node scripts/verify-release-readiness.js",
     "build": "npm run build:cli",
     "proof:orchestration": "tsx scripts/proof-orchestration.ts",
-    "verify:release-gate": "node scripts/verify-release-gate.js"
+    "verify:release-gate": "tsx scripts/verify-release-gate.ts"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
