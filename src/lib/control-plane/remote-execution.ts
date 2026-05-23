@@ -70,6 +70,21 @@ export interface RemoteExecutionLineageSummary {
   replayReferenceId?: string;
 }
 
+export interface RemoteExecutionResponsePayload {
+  status?: string;
+  output?: string;
+  signature?: string; // Scaffolding for cryptographic response signing
+}
+
+export function verifyRemoteResponseIntegrity(body: RemoteExecutionResponsePayload, enforceSignature = false): boolean {
+  if (enforceSignature) {
+    if (!body.signature) return false;
+    // Scaffold: actual cryptographic signature verification against worker's public key would go here.
+    return body.signature.length > 0;
+  }
+  return true;
+}
+
 export function parseRemoteExecutionConfig(env: NodeJS.ProcessEnv): RemoteExecutionConfig {
   const enabled = env.NEMOCLAW_REMOTE_EXECUTION === "1";
   return { enabled, source: enabled ? "env" : "default" };
@@ -263,8 +278,13 @@ export async function runRemoteExecution(input: { request: RemoteExecutionReques
     const response = await input.transport.execute({ endpoint: urlDecision.url.toString(), command: safeCommand, timeoutMs: commandDecision.descriptor.timeoutMs, auth: request.auth });
     if (response.status === 401 || response.status === 403) return finalize("degraded", "auth_rejected", "auth_rejected", "policy_blocked");
     if (response.status < 200 || response.status >= 300) return finalize("degraded", `http_${response.status}`, `http_${response.status}`, "transport_unreachable");
-    let body: { status?: string; output?: string };
-    try { body = JSON.parse(response.body) as { status?: string; output?: string }; } catch { return finalize("degraded", "malformed_response", "malformed_response", "unknown_error"); }
+    let body: RemoteExecutionResponsePayload;
+    try { body = JSON.parse(response.body) as RemoteExecutionResponsePayload; } catch { return finalize("degraded", "malformed_response", "malformed_response", "unknown_error"); }
+    
+    if (!verifyRemoteResponseIntegrity(body, false /* opt-in flag for legacy workers */)) {
+      return finalize("degraded", "invalid_signature", "invalid_signature", "transport_unreachable");
+    }
+
     if (body.status !== "ok") return finalize("failed", "remote_failed", "remote_failed", "unknown_error");
     const ok = finalize("succeeded", "execution_succeeded", undefined, undefined, input.executionPlan);
     return { ...ok, output: body.output };
