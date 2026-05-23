@@ -9,7 +9,10 @@ const replay = buildReplayReport();
 const checks = [
   { id: "read_only_mode", ok: replay.replayMode === "read_only" },
   { id: "replayable_events", ok: replay.eventsReplayed > 0 },
-  { id: "deterministic_hash", ok: typeof replay.evidenceDigest === "string" && replay.evidenceDigest.length > 0 },
+  {
+    id: "deterministic_hash",
+    ok: typeof replay.evidenceDigest === "string" && replay.evidenceDigest.length > 0,
+  },
 ];
 const result = {
   kind: "nautilus.replay.verify",

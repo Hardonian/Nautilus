@@ -8,12 +8,10 @@ This page documents every configurable knob, its default, what it protects, the 
 
 For background on how the layers fit together, refer to How It Works (use the `nemoclaw-user-overview` skill).
 
-<!-- TODO: uncomment after the OpenShell docs are published
 :::{seealso}
 OpenShell enforces the platform-level mechanisms that NemoClaw configures, including network namespace isolation, seccomp filters, SSRF protection, TLS termination, and gateway authentication.
 For the full platform-level controls reference, see [OpenShell Security Best Practices](https://docs.nvidia.com/openshell/latest/security/best-practices.html).
 :::
--->
 
 ## Protection Layers at a Glance
 
@@ -536,4 +534,4 @@ The following patterns weaken security without providing meaningful benefit.
 - Sandbox Hardening (use the `nemoclaw-user-deploy-remote` skill) for container-level security measures.
 - Inference Options (use the `nemoclaw-user-configure-inference` skill) for provider configuration details.
 - How It Works (use the `nemoclaw-user-overview` skill) for the protection layer architecture.
-<!-- - OpenShell [Security Best Practices](https://docs.nvidia.com/openshell/latest/security/best-practices.html) for the platform-level controls reference, including network namespace isolation, seccomp filters, SSRF protection, TLS termination, and gateway authentication. -->
+- OpenShell [Security Best Practices](https://docs.nvidia.com/openshell/latest/security/best-practices.html) for the platform-level controls reference, including network namespace isolation, seccomp filters, SSRF protection, TLS termination, and gateway authentication.

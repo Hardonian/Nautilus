@@ -28,7 +28,9 @@ function addSymlink(p: string): void {
   store.set(p, { type: "symlink" });
 }
 
-function norm(p: string) { return p.replace(/^[a-zA-Z]:/, "").replace(/\\/g, "/"); }
+function norm(p: string) {
+  return p.replace(/^[a-zA-Z]:/, "").replace(/\\/g, "/");
+}
 
 vi.mock("node:fs", async (importOriginal) => {
   const original = await importOriginal<typeof import("node:fs")>();

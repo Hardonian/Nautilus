@@ -1,3 +1,4 @@
+declare var WebAssembly: any;
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -26,7 +27,7 @@ export class WasmExecutor implements RuntimeExecutor {
     }
 
     const wasmBuffer = await fs.promises.readFile(wasmPath);
-    
+
     // Instantiate WASM module completely isolated from OS imports
     // @ts-ignore
     const wasmModule = await WebAssembly.instantiate(wasmBuffer, {
@@ -37,7 +38,7 @@ export class WasmExecutor implements RuntimeExecutor {
     });
 
     const exports = wasmModule.instance.exports;
-    
+
     // Execute a standard entrypoint
     if (typeof exports.execute === "function") {
       // Very simplified: assuming the function returns an integer result for now

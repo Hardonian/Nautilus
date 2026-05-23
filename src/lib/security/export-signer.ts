@@ -50,7 +50,7 @@ export function signExport<T>(payload: T): SignedExport<T> {
   const keys = getSessionKey();
   const serialized = serializeForSigning(payload);
   const signatureBuffer = sign(null, Buffer.from(serialized, "utf-8"), keys.privateKey);
-  
+
   return {
     payload,
     signature: signatureBuffer.toString("base64"),

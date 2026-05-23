@@ -628,11 +628,11 @@ function applyPresetContent(
   const merged = mergePresetIntoPolicy(currentPolicy, presetEntries);
 
   const endpoints = getPresetEndpoints(presetContent);
-  
+
   // ThreatMesh Intercept
   const gate = new FailClosedApprovalGate();
-  const riskSignals: RiskSignal[] = endpoints.some(e => e.includes("*")) 
-    ? [{ id: "wildcard_egress", severity: "medium", reason: "Preset contains wildcard network egress" }] 
+  const riskSignals: RiskSignal[] = endpoints.some(e => e.includes("*"))
+    ? [{ id: "wildcard_egress", severity: "medium", reason: "Preset contains wildcard network egress" }]
     : [];
 
   const decision = evaluateExecutionGovernance({
@@ -786,7 +786,7 @@ function loadPresetFromFile(filePath: string): { presetName: string; content: st
     console.error(`  Preset schema validation failed: ${error?.instancePath} ${error?.message} in ${filePath}`);
     return null;
   }
-  
+
   const presetName = (parsed.preset as any).name;
   const builtin = listPresets().map((p) => p.name);
   if (builtin.includes(presetName)) {
