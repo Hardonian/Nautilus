@@ -88,30 +88,56 @@ const SECRET_PATTERNS: SecretPattern[] = [
  */
 export function scanForSecrets(content: string): SecretMatch[] {
   const matches: SecretMatch[] = [];
-  const seen = new Set<string>();
+  const seenValues = new Set<string>();
 
   for (const { name, regex } of SECRET_PATTERNS) {
     const flags = regex.flags.includes("g") ? regex.flags : `${regex.flags}g`;
     for (const match of content.matchAll(new RegExp(regex.source, flags))) {
       const value = match[0];
-      const key = `${name}:${value}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
+      if (seenValues.has(value)) continue;
+      seenValues.add(value);
       const redacted = value.length > 8 ? `${value.slice(0, 4)}..${value.slice(-4)}` : "****";
       matches.push({ pattern: name, redacted });
+    }
+  }
+
+  // Scan for high-entropy strings (Base64/Hex like credentials)
+  const genericSecretRegex = /\b[A-Za-z0-9+/=_-]{20,}\b/g;
+  for (const match of content.matchAll(genericSecretRegex)) {
+    const value = match[0];
+    if (seenValues.has(value)) continue;
+    if (calculateEntropy(value) > 4.5) {
+      if ([...seenValues].some((v) => v.includes(value) || value.includes(v))) continue;
+      seenValues.add(value);
+      const redacted = `${value.slice(0, 4)}..${value.slice(-4)}`;
+      matches.push({ pattern: "High-entropy credential", redacted });
     }
   }
 
   return matches;
 }
 
+function calculateEntropy(str: string): number {
+  if (str.length === 0) return 0;
+  const counts: Record<string, number> = {};
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    counts[char] = (counts[char] || 0) + 1;
+  }
+  let entropy = 0;
+  for (const count of Object.values(counts)) {
+    const p = count / str.length;
+    entropy -= p * Math.log2(p);
+  }
+  return entropy;
+}
+
 /**
  * Memory paths that the scanner should protect. A Write tool call targeting
  * any path containing these segments is considered a memory write.
  */
-// Known bypass vectors: base64-encoded secrets, hex-encoded secrets, and
-// secrets split across multiple writes are not detectable by regex alone.
-// These are inherent limitations of content-based scanning.
+// Known bypass vectors: split secrets across multiple writes.
+// High-entropy strings are caught via the Shannon entropy fallback calculation.
 const MEMORY_PATH_SEGMENTS = [
   "/.openclaw/memory/",
   "/.openclaw/workspace/",

@@ -14,7 +14,7 @@ describe("NautilusCIRunner", () => {
       run: vi.fn().mockResolvedValue({ success: true }),
     };
     const policyGate: ApprovalGate = {
-      evaluate: vi.fn().mockReturnValue({ allowed: true, reasons: [] }),
+      evaluate: vi.fn().mockReturnValue({ allowed: true, reasons: [], action: "test", trustScore: { value: 100, source: "mock" }, riskSignals: [] }),
     };
 
     const runner = new NautilusCIRunner({
@@ -40,7 +40,7 @@ describe("NautilusCIRunner", () => {
       run: vi.fn(),
     };
     const policyGate: ApprovalGate = {
-      evaluate: vi.fn().mockReturnValue({ allowed: false, reasons: ["blocked"] }),
+      evaluate: vi.fn().mockReturnValue({ allowed: false, reasons: ["blocked"], action: "test", trustScore: { value: 0, source: "mock" }, riskSignals: [] }),
     };
 
     const runner = new NautilusCIRunner({
@@ -65,7 +65,7 @@ describe("NautilusCIRunner", () => {
       run: vi.fn().mockResolvedValue({ success: true }),
     };
     const policyGate: ApprovalGate = {
-      evaluate: vi.fn().mockReturnValue({ allowed: true, reasons: [] }),
+      evaluate: vi.fn().mockReturnValue({ allowed: true, reasons: [], action: "test", trustScore: { value: 100, source: "mock" }, riskSignals: [] }),
     };
 
     // Note: No traceWriter, memoryStore, or retriever provided => leads to degraded states.

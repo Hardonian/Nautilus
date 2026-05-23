@@ -30,8 +30,8 @@ export default class RunCiCommand extends NemoClawCommand {
     const policyGate: ApprovalGate = {
       evaluate: (action) => {
         // Simple deny list for demonstration
-        if (action.includes("rm -rf")) return { allowed: false, reasons: ["Destructive action"], action, trustScore: 0, riskSignals: [] };
-        return { allowed: true, reasons: [], action, trustScore: 100, riskSignals: [] };
+        if (action.includes("rm -rf")) return { allowed: false, reasons: ["Destructive action"], action, trustScore: { value: 0, source: "mock" }, riskSignals: [] };
+        return { allowed: true, reasons: [], action, trustScore: { value: 100, source: "mock" }, riskSignals: [] };
       },
     };
 

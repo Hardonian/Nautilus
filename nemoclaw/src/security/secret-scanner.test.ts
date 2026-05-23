@@ -129,6 +129,15 @@ describe("scanForSecrets", () => {
       expect(matches).toHaveLength(1);
       expect(matches[0].pattern).toBe("URL-embedded credentials");
     });
+
+    it("High-entropy credentials", () => {
+      // Create a random base64 string that has high entropy and length > 20
+      const highEntropyString = "c2VjdXJlUmFuZG9tU3RyaW5nVGhhdElzVmVyeUxvbmdBbmRDb21wbGV4";
+      const matches = scanForSecrets(`my secret is ${highEntropyString}`);
+      expect(matches).toHaveLength(1);
+      expect(matches[0].pattern).toBe("High-entropy credential");
+      expect(matches[0].redacted).toBe("c2Vj..bGV4");
+    });
   });
 
   describe("does not false-positive on safe content", () => {
