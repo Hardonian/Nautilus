@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { Shell } from "./components/layout/shell";
-import { OverviewRoute } from "./routes";
-import { ExecutionPlansRoute } from "./routes/execution-plans";
-import { ReceiptsRoute } from "./routes/receipts";
-import { ReplayValidationRoute } from "./routes/replay-validation";
-import { DegradedStatesRoute } from "./routes/degraded-states";
-import { TrustAttestationRoute } from "./routes/trust-attestation";
-import { RoutingDecisionsRoute } from "./routes/routing-decisions";
-import { EventsRoute } from "./routes/events";
-import { DiagnosticsRoute } from "./routes/diagnostics";
-import { TelemetryRoute } from "./routes/telemetry";
 import { useSnapshot } from "./hooks/use-snapshot";
+
+const OverviewRoute = React.lazy(() => import("./routes").then((m) => ({ default: m.OverviewRoute })));
+const ExecutionPlansRoute = React.lazy(() => import("./routes/execution-plans").then((m) => ({ default: m.ExecutionPlansRoute })));
+const ReceiptsRoute = React.lazy(() => import("./routes/receipts").then((m) => ({ default: m.ReceiptsRoute })));
+const ReplayValidationRoute = React.lazy(() => import("./routes/replay-validation").then((m) => ({ default: m.ReplayValidationRoute })));
+const DegradedStatesRoute = React.lazy(() => import("./routes/degraded-states").then((m) => ({ default: m.DegradedStatesRoute })));
+const TrustAttestationRoute = React.lazy(() => import("./routes/trust-attestation").then((m) => ({ default: m.TrustAttestationRoute })));
+const RoutingDecisionsRoute = React.lazy(() => import("./routes/routing-decisions").then((m) => ({ default: m.RoutingDecisionsRoute })));
+const EventsRoute = React.lazy(() => import("./routes/events").then((m) => ({ default: m.EventsRoute })));
+const DiagnosticsRoute = React.lazy(() => import("./routes/diagnostics").then((m) => ({ default: m.DiagnosticsRoute })));
+const TelemetryRoute = React.lazy(() => import("./routes/telemetry").then((m) => ({ default: m.TelemetryRoute })));
 
 export function App() {
   const [hash, setHash] = useState(() => window.location.hash.replace("#", ""));
@@ -57,7 +58,9 @@ export function App() {
       <div aria-live="polite" style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", border: 0 }}>
         Navigated to {hash || "overview"} view.
       </div>
-      {renderRoute()}
+      <Suspense fallback={<div style={{ padding: "2rem", color: "var(--color-text-secondary)" }}>Loading view...</div>}>
+        {renderRoute()}
+      </Suspense>
     </Shell>
   );
 }

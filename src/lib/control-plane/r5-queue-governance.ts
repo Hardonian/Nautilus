@@ -57,6 +57,10 @@ export class QueueGovernance {
     return item;
   }
 
+  markReplayed(queueId: string): void {
+    this.timeline.push({ at: this.now(), type: "replayed", queueId, reason: "replay_executed" });
+  }
+
   private now(): string {
     return this.config.now ? this.config.now() : new Date().toISOString();
   }
