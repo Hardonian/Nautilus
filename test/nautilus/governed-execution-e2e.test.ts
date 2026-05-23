@@ -7,7 +7,7 @@ import { InMemoryNautilusEventBus } from '../../src/lib/core/nautilus-event-fabr
 import { QueueGovernance } from '../../src/lib/control-plane/r5-queue-governance';
 import { buildOperatorConsoleSurface, type OperatorConsoleInput } from '../../src/lib/core/operator-console';
 import type { Proofpack } from '../../src/lib/core/proofpacks';
-import type { ApprovalGate, RiskSignal } from '../../src/lib/threatmesh';
+import type { ApprovalGate, RiskSignal } from '../../src/lib/core/threatmesh';
 
 describe('Governed Execution E2E', () => {
   it('runs complete integrated execution flow with queue governance, reuse, and proofpack generation', async () => {
@@ -33,7 +33,8 @@ describe('Governed Execution E2E', () => {
       },
       traceWriter: {
         append: () => {},
-        export: () => [],
+        addEdge: () => {},
+        addSnapshot: () => {},
       },
     };
 

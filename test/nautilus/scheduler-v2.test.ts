@@ -6,7 +6,9 @@ const baseRequest = {
   version: '1', requestId: 'r', receivedAt: '2026-01-01T00:00:00.000Z', source: 't', actor: 'a', action: 'provider:select', requestedModel: 'm', constraints: [], metadata: { estimatedInputTokens: '1024', estimatedOutputTokens: '1024', vramRequiredMb: '8192' },
 };
 
-function node(nodeId: string, vram: number, context: number, recentLatencyMs = 50) {
+import type { NodeDescriptor } from '../../src/lib/control-plane/types';
+
+function node(nodeId: string, vram: number, context: number, recentLatencyMs = 50): NodeDescriptor {
   return {
     version: '1', nodeId, role: 'local', transport: 'unix', endpoint: 'x', trustClass: 'trusted', registeredAt: '2026-01-01T00:00:00.000Z', lastHeartbeatAt: '2026-01-01T00:00:00.000Z', health: 'healthy', metadata: { recentLatencyMs, queuePressure: 0, estimatedCost: 0 }, capabilities: { version:'1', capturedAt:'2026-01-01T00:00:00.000Z', source:'t', runtimeBackend:'x', executionMode:'local', gpus:[{vendor:'n',model:'g',vramMb:vram,count:1}], models:[{modelId:'m',maxContextTokens:context,flags:{streaming:false,tools:false,batch:false,multimodal:false,quantization:false},inferenceConstraints:[],executionRestrictions:[]}], policyTags:[], reliabilityTags:[], runtimeTags:[], transportRequirements:[] },
   };

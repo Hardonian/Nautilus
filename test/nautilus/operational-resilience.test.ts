@@ -552,7 +552,7 @@ describe('Deterministic routing invariants', () => {
       request: baseRequest,
       classification: defaultClassification,
       registry,
-      policy: { allowed: false, requiredApproval: true, reasonCode: 'policy_rule_deny' as const, sourceRuleId: 'r' },
+      policy: { decision: 'deny' as any, allowed: false, requiredApproval: true, reasonCode: 'policy_rule_deny' as const, sourceRuleId: 'r', matchedRuleIds: ['r'] },
       degradedStates: [],
     });
 
