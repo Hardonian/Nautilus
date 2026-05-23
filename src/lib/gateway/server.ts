@@ -39,7 +39,7 @@ export class ApiGateway {
   }
 
   private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
-    if (req.method === "GET") {
+    if (req.method === "GET" || req.method === "POST") {
       if (req.url === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ status: "ok" }));

@@ -128,28 +128,4 @@
       );
     } catch (_) {}
   });
-
-  var _shutdownSignalReceived = false;
-  function handleShutdownSignal(signal) {
-    if (_shutdownSignalReceived) return;
-    _shutdownSignalReceived = true;
-    try {
-      process.stderr.write('[sandbox-safety-net] received ' + signal + ', initiating graceful shutdown\n');
-    } catch (_) {}
-
-    setTimeout(function () {
-      try {
-        process.stderr.write('[sandbox-safety-net] ' + signal + ' graceful shutdown timed out, forcing exit\n');
-      } catch (_) {}
-      process.exit(128 + (signal === 'SIGINT' ? 2 : 15));
-    }, 1000).unref();
-
-    if (process.listenerCount(signal) === 1) {
-      // We are the only listener, so no one else is handling graceful shutdown.
-      process.exit(128 + (signal === 'SIGINT' ? 2 : 15));
-    }
-  }
-
-  process.on('SIGINT', function () { handleShutdownSignal('SIGINT'); });
-  process.on('SIGTERM', function () { handleShutdownSignal('SIGTERM'); });
 })();
