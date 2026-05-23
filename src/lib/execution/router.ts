@@ -15,7 +15,7 @@ export class CrossSandboxRouter implements RuntimeExecutor {
     // 1. Discover available sandboxes
     const deps = buildStatusCommandDeps(ROOT);
     const report = getStatusReport(deps);
-    
+
     // 2. Filter healthy connected sandboxes
     const available = report.sandboxes.filter(s => s.connected);
     if (available.length === 0) {

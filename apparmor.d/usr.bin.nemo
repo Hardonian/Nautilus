@@ -10,10 +10,10 @@ profile nemo /usr/bin/node flags=(attach_disconnected,mediate_deleted) {
 
   # Allow reading node modules and application code
   /app/** r,
-  
+
   # Allow execution of the node binary
   /usr/bin/node ix,
-  
+
   # Deny all other execution (no shells, no sub-processes)
   audit deny /** x,
 

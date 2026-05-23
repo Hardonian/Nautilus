@@ -17,7 +17,7 @@ export function Header() {
       <div className={styles.content}>
         <h1 className={styles.title}>NemoClaw Operator Console</h1>
         <div className={styles.actions}>
-          <button 
+          <button
             onClick={() => setHighContrast(!highContrast)}
             className={styles.themeToggle}
             aria-pressed={highContrast ? "true" : "false"}

@@ -69,7 +69,7 @@ describe('Governed Execution E2E', () => {
       action: 'run_task_A',
     });
     // queueGovernance returns 'existing' which is handled as admitted but reusing idempotency key.
-    // BUT wait, in my implementation if outcome === "existing", I didn't actually return early. 
+    // BUT wait, in my implementation if outcome === "existing", I didn't actually return early.
     // Wait, in nautilus-truth-loop.ts:
     //   if (enqueueResult.outcome === "load_shed") { ... return }
     //   else if (enqueueResult.outcome === "admitted") { ... emit queue.admitted }
@@ -79,7 +79,7 @@ describe('Governed Execution E2E', () => {
     const fingerprint = '2ea1c5d01211e4027732d84714fc20d36746f3459cda81180b57e4e83c270529'; // We can just mock the fingerprint checking by adding a generic entry to cache or relying on actual compute.
     const fingerprintToCache = require('node:crypto').createHash('sha256').update(JSON.stringify({ objective: 'run_task_A', constraints: [], inputs: [] })).digest('hex');
     reuseCache.set(fingerprintToCache, { safeToReuse: true, result: { output: 'reused_success' } });
-    
+
     const report3 = await runTruthLoop(deps, {
       executionId: 'exec-3',
       correlationId: 'trace-3',

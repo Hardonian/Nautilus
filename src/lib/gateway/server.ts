@@ -63,7 +63,10 @@ export class ApiGateway {
         return;
       }
 
-      if (req.url === "/grid/register" && req.method === "POST") {
+      }
+
+    if (req.method === "POST") {
+      if (req.url === "/grid/register") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
         req.on("end", () => {
@@ -81,7 +84,7 @@ export class ApiGateway {
         return;
       }
 
-      if (req.url === "/grid/workload" && req.method === "POST") {
+      if (req.url === "/grid/workload") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
         req.on("end", () => {
@@ -97,7 +100,7 @@ export class ApiGateway {
         });
         return;
       }
-      
+
       const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
       if (statusMatch) {
         const sandboxName = statusMatch[1];

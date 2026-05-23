@@ -10,14 +10,39 @@ const ARTIFACTS_DIR = join(process.cwd(), "artifacts");
 const GATE_FILE = join(ARTIFACTS_DIR, "release-gate.json");
 
 const checks = [
-  { id: "typecheck", label: "TypeScript typecheck", command: ["npm", "run", "typecheck"], severity: "high" },
+  {
+    id: "typecheck",
+    label: "TypeScript typecheck",
+    command: ["npm", "run", "typecheck"],
+    severity: "high",
+  },
   { id: "lint", label: "Biome lint", command: ["npm", "run", "lint"], severity: "high" },
   { id: "build", label: "Build", command: ["npm", "run", "build"], severity: "high" },
   { id: "test:unit", label: "Unit tests", command: ["npm", "run", "test:unit"], severity: "high" },
-  { id: "verify:control-plane", label: "Control-plane tests", command: ["npm", "run", "verify:control-plane"], severity: "high" },
-  { id: "verify:chaos", label: "Chaos/degraded tests", command: ["npm", "run", "verify:chaos"], severity: "medium" },
-  { id: "verify:proofpack", label: "Proofpack verification", command: ["npm", "run", "verify:proofpack"], severity: "high" },
-  { id: "verify:replay", label: "Replay verification", command: ["npm", "run", "verify:replay"], severity: "high" },
+  {
+    id: "verify:control-plane",
+    label: "Control-plane tests",
+    command: ["npm", "run", "verify:control-plane"],
+    severity: "high",
+  },
+  {
+    id: "verify:chaos",
+    label: "Chaos/degraded tests",
+    command: ["npm", "run", "verify:chaos"],
+    severity: "medium",
+  },
+  {
+    id: "verify:proofpack",
+    label: "Proofpack verification",
+    command: ["npm", "run", "verify:proofpack"],
+    severity: "high",
+  },
+  {
+    id: "verify:replay",
+    label: "Replay verification",
+    command: ["npm", "run", "verify:replay"],
+    severity: "high",
+  },
 ];
 
 function isToolchainFailure(result) {
@@ -56,13 +81,26 @@ for (const check of checks) {
 
   if (result.status === 0) {
     console.log(`PASS ${check.label}`);
-    results.push({ id: check.id, label: check.label, severity: check.severity, resolved: true, waived: false });
+    results.push({
+      id: check.id,
+      label: check.label,
+      severity: check.severity,
+      resolved: true,
+      waived: false,
+    });
     continue;
   }
 
   if (isToolchainFailure(result)) {
     console.log(`SKIP ${check.label} (toolchain failure)`);
-    results.push({ id: check.id, label: check.label, severity: "low", resolved: false, waived: true, reason: "toolchain_failure" });
+    results.push({
+      id: check.id,
+      label: check.label,
+      severity: "low",
+      resolved: false,
+      waived: true,
+      reason: "toolchain_failure",
+    });
     continue;
   }
 
@@ -96,7 +134,9 @@ const gateOutput = {
   timestamp: new Date().toISOString(),
   checks: results,
   waivers: waivers,
-  blocked: results.filter((r) => !r.resolved && !r.waived && r.severity === "high").map((r) => r.id),
+  blocked: results
+    .filter((r) => !r.resolved && !r.waived && r.severity === "high")
+    .map((r) => r.id),
 };
 
 writeFileSync(GATE_FILE, JSON.stringify(gateOutput, null, 2));
