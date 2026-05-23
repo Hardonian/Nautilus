@@ -47,6 +47,14 @@ describe("ApiGateway", () => {
     expect(res.data).toEqual({ status: "ok" });
   });
 
+  it("should return telemetry data for /telemetry", async () => {
+    const res = await fetchJson("/telemetry");
+    expect(res.status).toBe(200);
+    expect(res.data.activeSandboxes).toBe(1);
+    expect(res.data.totalSandboxes).toBe(1);
+    expect(typeof res.data.timestamp).toBe("string");
+  });
+
   it("should return sandbox data for /sandbox/:name/status", async () => {
     const res = await fetchJson("/sandbox/test-sandbox/status");
     expect(res.status).toBe(200);

@@ -293,6 +293,23 @@ export async function runTruthLoop(
       deps.checkpointStore.set(executionId, checkpointRef);
     }
 
+    const handoff: HandoffPacket = {
+      schemaVersion: "1.0.0",
+      runId: input.correlationId,
+      taskId: executionId,
+      step: "completion",
+      objective: input.action,
+      evidenceRefs: memoryRecords.map((r) => ({ id: r.id, link: "memory" })),
+      context: input.query ? [input.query] : [],
+      createdAt: completedEvent.timestamp,
+    };
+    const handoffValidation = validateHandoffPacket(handoff);
+    if (!handoffValidation.ok) {
+      degraded.push(`handoff_invalid:${handoffValidation.reason}`);
+    }
+
+    const compacted = compactContextPreservingEvidence(handoff, 3);
+
     const proofpack = buildProofpack({
       executionId,
       correlationId: input.correlationId,
@@ -301,6 +318,7 @@ export async function runTruthLoop(
       degradedStates: degraded,
       queueTimeline,
       checkpointRef,
+      routingDecision: { selected: "local-runtime", reason: "truth-loop-default" },
     });
     deps.proofpackSink?.(proofpack);
 
@@ -353,6 +371,8 @@ export async function runTruthLoop(
       degradedStates: degraded,
       queueTimeline,
       checkpointRef,
+      replayMetadata,
+      routingDecision: { selected: "none", reason: "execution_failed" },
     });
     deps.proofpackSink?.(proofpack);
 

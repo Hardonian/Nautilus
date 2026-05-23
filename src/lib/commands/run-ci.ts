@@ -7,6 +7,7 @@ import { NautilusCIRunner } from "../core/ci-runner";
 import { InMemoryNautilusEventBus } from "../core/nautilus-event-fabric";
 import type { TruthLoopDependencies, RuntimeExecutor } from "../core/nautilus-truth-loop";
 import type { ApprovalGate } from "../core/threatmesh";
+import { appendToLedger } from "../control-plane/proofpack-ledger";
 
 export default class RunCiCommand extends NemoClawCommand {
   static id = "run-ci";
@@ -39,6 +40,7 @@ export default class RunCiCommand extends NemoClawCommand {
       eventBus,
       runtime,
       policyGate,
+      proofpackSink: appendToLedger,
     };
 
     const runner = new NautilusCIRunner(deps);

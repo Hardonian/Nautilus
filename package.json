@@ -87,7 +87,8 @@
     "test:nautilus": "vitest run --project nautilus",
     "verify:release-readiness": "node scripts/verify-release-readiness.js",
     "build": "npm run build:cli",
-    "proof:orchestration": "tsx scripts/proof-orchestration.ts"
+    "proof:orchestration": "tsx scripts/proof-orchestration.ts",
+    "verify:release-gate": "node scripts/verify-release-gate.js"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",

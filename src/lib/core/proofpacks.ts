@@ -18,7 +18,13 @@ export interface Proofpack {
   evidenceRefs: string[];
   queueTimeline?: Record<string, unknown>[];
   routingDecision?: Record<string, unknown>;
+  schedulerReasoning?: Record<string, unknown>;
+  rejectedCandidates?: Record<string, unknown>[];
+  retryEvidence?: { attemptCount: number; lastReason?: string; exhausted: boolean }[];
+  deadLetterEvidence?: { queueId: string; reason: string; at: string }[];
   checkpointRef?: string;
+  replayMetadata?: Record<string, unknown>;
+  runtimeAvailabilityState?: Record<string, unknown>;
   verificationEvidence?: string[];
 }
 
@@ -30,7 +36,13 @@ export function buildProofpack(input: {
   degradedStates: string[];
   queueTimeline?: Record<string, unknown>[];
   routingDecision?: Record<string, unknown>;
+  schedulerReasoning?: Record<string, unknown>;
+  rejectedCandidates?: Record<string, unknown>[];
+  retryEvidence?: { attemptCount: number; lastReason?: string; exhausted: boolean }[];
+  deadLetterEvidence?: { queueId: string; reason: string; at: string }[];
   checkpointRef?: string;
+  replayMetadata?: Record<string, unknown>;
+  runtimeAvailabilityState?: Record<string, unknown>;
   verificationEvidence?: string[];
 }): Proofpack {
   const generatedAt = new Date().toISOString();
@@ -48,6 +60,29 @@ export function buildProofpack(input: {
     ...memoryRefs.map((id) => `memory:${id}`),
   ];
 
+  const runtimeAvailabilityState = input.runtimeAvailabilityState ?? (() => {
+    const state: Record<string, string> = {};
+    if (input.degradedStates.some((s) => s.includes("retrieval_engine_unavailable"))) {
+      state.retrieval = "unavailable";
+    }
+    if (input.degradedStates.some((s) => s.includes("memory_store_unavailable"))) {
+      state.memory = "unavailable";
+    }
+    if (input.degradedStates.some((s) => s.includes("policy_engine_unavailable"))) {
+      state.policy = "unavailable";
+    }
+    if (input.degradedStates.some((s) => s.includes("trace_store_unavailable"))) {
+      state.trace = "unavailable";
+    }
+    if (input.degradedStates.some((s) => s.includes("token_budget_overflow"))) {
+      state.tokenBudget = "overflow";
+    }
+    if (input.degradedStates.some((s) => s.includes("queue_saturated") || s.includes("queue_over_capacity"))) {
+      state.queue = "saturated";
+    }
+    return Object.keys(state).length > 0 ? state : undefined;
+  })();
+
   return {
     id: `${input.executionId}:proofpack:${generatedAt}`,
     generatedAt,
@@ -62,7 +97,13 @@ export function buildProofpack(input: {
     evidenceRefs,
     queueTimeline: input.queueTimeline,
     routingDecision: input.routingDecision,
+    schedulerReasoning: input.schedulerReasoning,
+    rejectedCandidates: input.rejectedCandidates,
+    retryEvidence: input.retryEvidence,
+    deadLetterEvidence: input.deadLetterEvidence,
     checkpointRef: input.checkpointRef,
+    replayMetadata: input.replayMetadata,
+    runtimeAvailabilityState: runtimeAvailabilityState as Record<string, unknown> | undefined,
     verificationEvidence: input.verificationEvidence,
   };
 }

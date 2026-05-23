@@ -42,6 +42,23 @@ export class ApiGateway {
         res.end(JSON.stringify({ status: "ok" }));
         return;
       }
+
+      if (req.url === "/telemetry") {
+        try {
+          const deps = buildStatusCommandDeps(ROOT);
+          const report = getStatusReport(deps);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({
+            activeSandboxes: report.sandboxes.filter((s) => s.connected).length,
+            totalSandboxes: report.sandboxes.length,
+            timestamp: new Date().toISOString(),
+          }));
+        } catch (err: any) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
+        }
+        return;
+      }
       
       const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
       if (statusMatch) {
