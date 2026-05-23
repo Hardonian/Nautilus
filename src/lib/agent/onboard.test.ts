@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach, afterEach, afterAll, vi } from "vites
 import fs from "node:fs";
 import path from "node:path";
 // Import from compiled dist/ so coverage is attributed correctly.
-import { printDashboardUi, verifyAgentBinaryAvailable } from "../../../dist/lib/agent/onboard";
+import { printDashboardUi, verifyAgentBinaryAvailable, isHealthProbeOk } from "../../../dist/lib/agent/onboard";
 import type { AgentDefinition } from "./defs";
 
 function makeAgent(overrides: Partial<AgentDefinition> = {}): AgentDefinition {
@@ -183,5 +183,23 @@ describe("handleAgentSetup guards", () => {
 
     expect(result).toEqual({ available: true });
     expect(script).toContain("NEMOCLAW_AGENT_BINARY_CHECK:ok");
+  });
+});
+
+describe("isHealthProbeOk", () => {
+  it("returns false for invalid JSON in health response", () => {
+    expect(isHealthProbeOk("not-json-and-not-ok")).toBe(false);
+  });
+
+  it("returns true for exact 'ok' response", () => {
+    expect(isHealthProbeOk("ok")).toBe(true);
+  });
+
+  it("returns true for JSON '{status: \"ok\"}' response", () => {
+    expect(isHealthProbeOk("{\"status\":\"ok\"}")).toBe(true);
+  });
+
+  it("returns false for JSON without status ok", () => {
+    expect(isHealthProbeOk("{\"status\":\"error\"}")).toBe(false);
   });
 });
