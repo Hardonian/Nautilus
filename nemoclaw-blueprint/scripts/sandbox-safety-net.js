@@ -26,10 +26,11 @@
 //      "Unknown means crash" is the wrong default for shared
 //      infrastructure; "unknown means log loudly" is the right default.
 //
-//   4. No process.exit interception. An earlier iteration intercepted
-//      process.exit during swallow windows, which masked legitimate
-//      shutdown signals and was itself the kind of catch-all hack we
-//      want to avoid.
+//   4. Graceful shutdown fallback. The gateway handles SIGINT/SIGTERM
+//      naturally, but if a third-party library hangs the event loop or
+//      fails to exit, the safety net provides a 5-second fallback to
+//      ensure the process eventually terminates, replacing an earlier
+//      catch-all hack that intercepted process.exit.
 //
 //   5. Only active when OPENSHELL_SANDBOX=1 (set by OpenShell at runtime),
 //      and only for gateway processes. The gateway can appear as the
@@ -127,5 +128,29 @@
         ' \u2014 gateway continues\n'
       );
     } catch (_) {}
+  });
+
+  process.on('SIGTERM', function () {
+    try {
+      process.stderr.write('[sandbox-safety-net] received SIGTERM \u2014 gateway shutting down\n');
+    } catch (_) {}
+    setTimeout(function () {
+      try {
+        process.stderr.write('[sandbox-safety-net] SIGTERM fallback timeout \u2014 forcing exit 143\n');
+      } catch (_) {}
+      process.exit(143);
+    }, 5000).unref();
+  });
+
+  process.on('SIGINT', function () {
+    try {
+      process.stderr.write('[sandbox-safety-net] received SIGINT \u2014 gateway shutting down\n');
+    } catch (_) {}
+    setTimeout(function () {
+      try {
+        process.stderr.write('[sandbox-safety-net] SIGINT fallback timeout \u2014 forcing exit 130\n');
+      } catch (_) {}
+      process.exit(130);
+    }, 5000).unref();
   });
 })();
