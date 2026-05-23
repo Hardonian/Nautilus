@@ -99,6 +99,7 @@ export interface StatusSandboxRow {
   agent: string | null;
   dashboardPort?: number | null;
   isDefault: boolean;
+  connected?: boolean;
 }
 
 export interface StatusServiceRow {
@@ -280,6 +281,7 @@ function buildStatusSandboxRow(
     agent: safeStatusString(sandbox.agent || null),
     ...(dashboardPort != null ? { dashboardPort } : {}),
     isDefault,
+    connected: true, // simplified for status report
   };
 }
 

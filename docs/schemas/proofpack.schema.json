@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proofpack",
+  "description": "Nautilus Execution Evidence Proofpack",
+  "type": "object",
+  "properties": {
+    "executionPlanId": { "type": "string" },
+    "authorizationLineageId": { "type": "string" },
+    "executionPolicySnapshotHash": { "type": "string" },
+    "executionTrustSnapshotHash": { "type": "string" },
+    "executionIntentHash": { "type": "string" },
+    "replayReferenceId": { "type": "string" },
+    "telemetry": { "type": "object" },
+    "receipts": { "type": "array" }
+  },
+  "required": ["executionPlanId"]
+}

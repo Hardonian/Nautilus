@@ -60,6 +60,44 @@
   --spacing-8: 32px;
 }
 
+[data-theme="high-contrast"] {
+  --color-bg: #ffffff;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f0f0f0;
+  --color-border: #000000;
+  --color-border-strong: #000000;
+  --color-text-primary: #000000;
+  --color-text-secondary: #000000;
+  --color-text-muted: #111111;
+  --color-text-inverse: #ffffff;
+
+  --color-info: #0000ee;
+  --color-info-bg: #ffffff;
+  --color-warning: #704000;
+  --color-warning-bg: #ffffff;
+  --color-error: #cc0000;
+  --color-error-bg: #ffffff;
+  --color-critical: #990000;
+  --color-critical-bg: #ffffff;
+  --color-success: #006600;
+  --color-success-bg: #ffffff;
+  --color-unknown: #000000;
+  --color-unknown-bg: #ffffff;
+
+  --color-stale: #8a4a00;
+  --color-stale-bg: #ffffff;
+  --color-partial: #906600;
+  --color-partial-bg: #ffffff;
+  --color-approval-blocked: #5c00d2;
+  --color-approval-blocked-bg: #ffffff;
+  --color-unreachable: #cc0000;
+  --color-unreachable-bg: #ffffff;
+
+  --color-text: var(--color-text-primary);
+  --color-primary: var(--color-info);
+  --color-primary-dark: #0000bb;
+}
+
 *,
 *::before,
 *::after {
@@ -141,6 +179,7 @@ button:focus-visible {
 
 summary {
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -190,4 +229,20 @@ details[open] > summary::before {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
   margin: 0 0 1.5rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.suspense-fallback {
+  padding: 2rem;
+  color: var(--color-text-secondary);
 }

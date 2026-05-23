@@ -104,8 +104,11 @@ export function createExecutionPlan(input: {
     if (input.constraints.requiresStreaming && !node.capabilityProfile.supportsStreaming) reasons.push("streaming_not_supported");
     if (input.constraints.requiredQuantization && !node.capabilityProfile.quantizationSupport.includes(input.constraints.requiredQuantization)) reasons.push("quantization_not_supported");
     const vram = node.gpu[0]?.availableVramMiB;
-    if (input.constraints.minVramMiB && vram?.state === "known" && vram.value < input.constraints.minVramMiB) reasons.push("insufficient_vram");
+    if (input.constraints.minVramMiB && vram?.state === "known" && vram.value < input.constraints.minVramMiB) reasons.push(`insufficient_vram:available=${vram.value},required=${input.constraints.minVramMiB}`);
     if (input.constraints.minVramMiB && (!vram || vram.state !== "known")) reasons.push("vram_unknown");
+
+    // Queue starvation detection: reject nodes whose queue is already saturated
+    if (node.health.queueState === "saturated") reasons.push("queue_saturated");
 
     if (reasons.length > 0) rejectedNodes.push({ nodeId: node.id, reasons });
     return reasons.length === 0;

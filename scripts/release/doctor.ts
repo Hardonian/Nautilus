@@ -23,7 +23,12 @@ checks.push({
 });
 
 for (const dir of ["scripts", "docs", "examples", "test/fixtures/nautilus"]) {
-  checks.push({ name: `required-dir:${dir}`, pass: existsSync(dir), detail: dir, severity: "hard" });
+  checks.push({
+    name: `required-dir:${dir}`,
+    pass: existsSync(dir),
+    detail: dir,
+    severity: "hard",
+  });
 }
 checks.push({
   name: "fixture-integrity",

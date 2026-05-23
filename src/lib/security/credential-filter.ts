@@ -11,6 +11,7 @@
 // They are injected at runtime via OpenShell's provider credential mechanism.
 
 import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 function parseJson<T>(text: string): T {
   return JSON.parse(text);
@@ -131,17 +132,29 @@ export function stripCredentials(obj: ConfigValue): ConfigValue {
  */
 export function sanitizeConfigFile(configPath: string): void {
   if (!existsSync(configPath)) return;
+  const content = readFileSync(configPath, "utf-8");
   let parsed: ConfigValue;
+  let isYaml = false;
   try {
-    parsed = parseJson<ConfigValue>(readFileSync(configPath, "utf-8"));
+    parsed = parseJson<ConfigValue>(content);
   } catch {
-    return; // Not valid JSON — skip (may be YAML for Hermes)
+    try {
+      parsed = parseYaml(content);
+      isYaml = true;
+    } catch {
+      return; // Neither JSON nor YAML — skip
+    }
   }
   if (!isConfigObject(parsed)) return;
 
   const { gateway: _gateway, ...config } = parsed;
   const sanitized = stripCredentials(config);
-  writeFileSync(configPath, JSON.stringify(sanitized, null, 2));
+  
+  if (isYaml) {
+    writeFileSync(configPath, stringifyYaml(sanitized));
+  } else {
+    writeFileSync(configPath, JSON.stringify(sanitized, null, 2));
+  }
   chmodSync(configPath, 0o600);
 }
 

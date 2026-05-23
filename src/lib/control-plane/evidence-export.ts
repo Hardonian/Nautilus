@@ -17,6 +17,10 @@
  */
 
 import { createHash } from "node:crypto";
+import * as zlib from "node:zlib";
+import { promisify } from "node:util";
+
+const brotliCompress = promisify(zlib.brotliCompress);
 
 import { deterministicSerialize } from "./serde";
 import type { OperationalEvent } from "./operational-memory";
@@ -316,6 +320,15 @@ export function exportBundle(bundle: EvidenceBundle, format: ProofpackExportForm
   return exportBundleAsJson(bundle);
 }
 
+export async function exportBundleCompressed(bundle: EvidenceBundle, format: ProofpackExportFormat = "json"): Promise<Buffer> {
+  const payload = exportBundle(bundle, format);
+  return brotliCompress(Buffer.from(payload, "utf-8"), {
+    params: {
+      [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+    },
+  });
+}
+
 export function exportReplayPackageAsJson(pkg: ReplayEvidencePackage): string {
   return deterministicSerialize(pkg);
 }
@@ -349,6 +362,15 @@ export function exportReplayPackageAsNdjson(pkg: ReplayEvidencePackage): string 
 export function exportReplayPackage(pkg: ReplayEvidencePackage, format: ProofpackExportFormat = "json"): string {
   if (format === "ndjson") return exportReplayPackageAsNdjson(pkg);
   return exportReplayPackageAsJson(pkg);
+}
+
+export async function exportReplayPackageCompressed(pkg: ReplayEvidencePackage, format: ProofpackExportFormat = "json"): Promise<Buffer> {
+  const payload = exportReplayPackage(pkg, format);
+  return brotliCompress(Buffer.from(payload, "utf-8"), {
+    params: {
+      [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
+    },
+  });
 }
 
 // ── Verification ───────────────────────────────────────────────

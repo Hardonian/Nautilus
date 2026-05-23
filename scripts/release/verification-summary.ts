@@ -32,4 +32,7 @@ const summary = {
   checks: results,
 };
 
-writeFileSync(join("artifacts", "verification-summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
+writeFileSync(
+  join("artifacts", "verification-summary.json"),
+  `${JSON.stringify(summary, null, 2)}\n`,
+);

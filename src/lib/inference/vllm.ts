@@ -5,7 +5,7 @@
 // offer vLLM at all" lives in onboard.ts; this module owns picking the
 // right profile per platform and running the install.
 
-const { runCapture, runShell } = require("../runner");
+const { run, runCapture, runShell } = require("../runner");
 const { dockerCapture, dockerSpawn } = require("../adapters/docker");
 const { VLLM_PORT } = require("../core/ports");
 const { getGpuIndicesByName } = require("./nim");
@@ -193,8 +193,12 @@ function pullImage(profile: VllmProfile): { ok: boolean; reason?: string } {
   const hasTimeout = !!runCapture(["sh", "-c", "command -v timeout"], {
     ignoreError: true,
   }).trim();
-  const prefix = hasTimeout ? `timeout ${String(profile.pullTimeoutSec)} ` : "";
-  const result = runShell(`${prefix}docker pull ${profile.image}`, {
+
+  const cmd = hasTimeout
+    ? ["timeout", String(profile.pullTimeoutSec), "docker", "pull", profile.image]
+    : ["docker", "pull", profile.image];
+
+  const result = run(cmd, {
     ignoreError: true,
     suppressOutput: true,
   });

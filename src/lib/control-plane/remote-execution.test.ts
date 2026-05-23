@@ -7,6 +7,7 @@ import type { PolicyBundle } from "./governance";
 import { evaluatePolicy } from "./governance";
 import { OperationalMemoryLog } from "./operational-memory";
 import { parseRemoteExecutionConfig, runRemoteExecution, summarizeRemoteExecutionDiagnostics } from "./remote-execution";
+import { QueueGovernance } from "./r5-queue-governance";
 import {
   approveExecutionPlan,
   createExecutionPlan,
@@ -254,5 +255,32 @@ describe("remote execution", () => {
     expect(diagnostics).toContain("Policy snapshot hash:");
     expect(diagnostics).toContain("Trust snapshot hash:");
     expect(diagnostics).toContain("Intent hash:");
+  });
+
+
+  it("enforces queue capacity and returns degraded load-shed receipt", async () => {
+    const queue = new QueueGovernance({ maxCapacity: 1, maxRetries: 1, now: () => now });
+    const transport = { execute: vi.fn().mockResolvedValue({ status: 200, body: JSON.stringify({ status: "ok", output: "ok" }) }) };
+    const first = await runRemoteExecution({ request: { requestId: "cap-1", nowIso: now, action: "worker:execute", command: "echo hi", targetEndpoint: "https://worker", approved: true }, config: { enabled: true, source: "env" }, transport, policyBundle: allowPolicy, registry: createDeviceRegistry(), queueGovernance: queue });
+    const second = await runRemoteExecution({ request: { requestId: "cap-2", nowIso: now, action: "worker:execute", command: "echo hi", targetEndpoint: "https://worker", approved: true }, config: { enabled: true, source: "env" }, transport, policyBundle: allowPolicy, registry: createDeviceRegistry(), queueGovernance: queue });
+    expect(first.status).toBe("succeeded");
+    expect(second.status).toBe("degraded");
+    expect(second.degradedReason).toBe("queue_over_capacity");
+  });
+
+  it("uses idempotency key to dedupe enqueue", async () => {
+    const queue = new QueueGovernance({ maxCapacity: 2, maxRetries: 1, now: () => now });
+    const transport = { execute: vi.fn().mockResolvedValue({ status: 200, body: JSON.stringify({ status: "ok", output: "ok" }) }) };
+    await runRemoteExecution({ request: { requestId: "same", nowIso: now, action: "worker:execute", command: "echo hi", targetEndpoint: "https://worker", approved: true }, config: { enabled: true, source: "env" }, transport, policyBundle: allowPolicy, registry: createDeviceRegistry(), queueGovernance: queue });
+    await runRemoteExecution({ request: { requestId: "same", nowIso: now, action: "worker:execute", command: "echo hi", targetEndpoint: "https://worker", approved: true }, config: { enabled: true, source: "env" }, transport, policyBundle: allowPolicy, registry: createDeviceRegistry(), queueGovernance: queue });
+    expect(queue.queue.size).toBe(1);
+  });
+
+  it("retry exhaustion transitions queue item to dead-letter", async () => {
+    const queue = new QueueGovernance({ maxCapacity: 2, maxRetries: 0, now: () => now });
+    const transport = { execute: vi.fn().mockRejectedValue(new Error("network down")) };
+    const out = await runRemoteExecution({ request: { requestId: "retry-dead", nowIso: now, action: "worker:execute", command: "echo hi", targetEndpoint: "https://worker", approved: true }, config: { enabled: true, source: "env" }, transport, policyBundle: allowPolicy, registry: createDeviceRegistry(), queueGovernance: queue, retryConfig: { maxAttempts: 1, maxTotalMs: 1000, backoffMs: 1 } });
+    expect(out.degradedReason).toBe("retry_exhausted");
+    expect(queue.timeline.some((event) => event.type === "dead_letter")).toBe(true);
   });
 });
