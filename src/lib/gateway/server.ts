@@ -63,7 +63,7 @@ export class ApiGateway {
         return;
       }
 
-      if (req.url === "/grid/register" && req.method === "POST" as string) {
+      if (req.url === "/grid/register" && req.method === "POST") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
         req.on("end", () => {
@@ -81,7 +81,7 @@ export class ApiGateway {
         return;
       }
 
-      if (req.url === "/grid/workload" && req.method === "POST" as string) {
+      if (req.url === "/grid/workload" && req.method === "POST") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
         req.on("end", () => {
