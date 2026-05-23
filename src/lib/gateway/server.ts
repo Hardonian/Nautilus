@@ -76,14 +76,48 @@ export class ApiGateway {
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: "invalid request" }));
         }
-      });
-      return;
-    }
+        return;
+      }
+    } else if (req.method === "POST") {
 
-    if (req.method === "POST" && req.url === "/grid/workload") {
-      let body = "";
-      req.on("data", chunk => { body += chunk.toString(); });
-      req.on("end", () => {
+      if (req.url === "/grid/register") {
+        let body = "";
+        req.on("data", chunk => { body += chunk.toString(); });
+        req.on("end", () => {
+          try {
+            const data = JSON.parse(body);
+            if (!data.url) throw new Error("url required");
+            void gridNode.registerPeer(data.url);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ status: "registered" }));
+          } catch {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "invalid request" }));
+          }
+        });
+        return;
+      }
+
+      if (req.url === "/grid/workload") {
+        let body = "";
+        req.on("data", chunk => { body += chunk.toString(); });
+        req.on("end", () => {
+          try {
+            const data = JSON.parse(body);
+            // In a real system, route this to the executor queue
+            res.writeHead(202, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
+          } catch {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "invalid workload" }));
+          }
+        });
+        return;
+      }
+
+      const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
+      if (statusMatch) {
+        const sandboxName = statusMatch[1];
         try {
           const data = JSON.parse(body);
           // In a real system, route this to the executor queue
