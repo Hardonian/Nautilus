@@ -179,6 +179,7 @@ button:focus-visible {
 
 summary {
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -228,4 +229,20 @@ details[open] > summary::before {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
   margin: 0 0 1.5rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.suspense-fallback {
+  padding: 2rem;
+  color: var(--color-text-secondary);
 }
