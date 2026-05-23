@@ -1,43 +1,52 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, it, expect } from "vitest";
-import {
-  InMemorySemanticCache,
-  RetrievalResult
-} from "../../../dist/lib/core/meshrag";
+import { describe, it, expect, beforeEach } from "vitest";
+import { InMemorySemanticCache, type RetrievalResult } from "./meshrag";
 
 describe("InMemorySemanticCache", () => {
-  it("returns cache miss when key is not found", () => {
-    const cache = new InMemorySemanticCache();
-    const result = cache.get("non-existent-key");
+  let cache: InMemorySemanticCache;
 
-    expect(result).toEqual({ key: "non-existent-key", reason: "not_found" });
+  beforeEach(() => {
+    cache = new InMemorySemanticCache();
   });
 
-  it("returns cache hit when key is found", () => {
-    const cache = new InMemorySemanticCache();
-    const mockResult: RetrievalResult = {
+  it("should return a cache miss for an unknown key", () => {
+    const result = cache.get("unknown-key");
+    expect(result).toEqual({ key: "unknown-key", reason: "not_found" });
+  });
+
+  it("should return a cache hit after putting a value", () => {
+    const key = "test-query";
+    const value: RetrievalResult = {
       requestId: "req-1",
-      evidence: [],
-      trust: []
+      evidence: [{ sourceId: "doc-1" }],
+      trust: [{ sourceId: "doc-1", score: 0.9, rationale: "good" }],
     };
 
-    cache.put("my-key", mockResult);
-    const result = cache.get("my-key");
+    cache.put(key, value);
 
-    expect(result).toEqual({ key: "my-key", value: mockResult });
+    const result = cache.get(key);
+    expect(result).toEqual({ key, value });
   });
 
-  it("can overwrite existing keys", () => {
-    const cache = new InMemorySemanticCache();
-    const mockResult1: RetrievalResult = { requestId: "req-1", evidence: [], trust: [] };
-    const mockResult2: RetrievalResult = { requestId: "req-2", evidence: [], trust: [] };
+  it("should overwrite an existing value for the same key", () => {
+    const key = "test-query";
+    const value1: RetrievalResult = {
+      requestId: "req-1",
+      evidence: [{ sourceId: "doc-1" }],
+      trust: [{ sourceId: "doc-1", score: 0.9, rationale: "good" }],
+    };
+    const value2: RetrievalResult = {
+      requestId: "req-2",
+      evidence: [{ sourceId: "doc-2" }],
+      trust: [{ sourceId: "doc-2", score: 0.8, rationale: "okay" }],
+    };
 
-    cache.put("my-key", mockResult1);
-    cache.put("my-key", mockResult2);
+    cache.put(key, value1);
+    cache.put(key, value2);
 
-    const result = cache.get("my-key");
-    expect(result).toEqual({ key: "my-key", value: mockResult2 });
+    const result = cache.get(key);
+    expect(result).toEqual({ key, value: value2 });
   });
 });
