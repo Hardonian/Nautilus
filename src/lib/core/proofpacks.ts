@@ -3,6 +3,9 @@
 
 import type { NautilusEventEnvelope } from "./nautilus-event-fabric";
 import type { RecallForgeRecord } from "./recallforge";
+import fs from "node:fs";
+import path from "node:path";
+import { ROOT } from "../runner";
 
 export interface Proofpack {
   id: string;
@@ -106,4 +109,37 @@ export function buildProofpack(input: {
     runtimeAvailabilityState: runtimeAvailabilityState as Record<string, unknown> | undefined,
     verificationEvidence: input.verificationEvidence,
   };
+}
+
+export interface ProofpackLedger {
+  store(proofpack: Proofpack): Promise<void>;
+  retrieve(id: string): Promise<Proofpack | null>;
+}
+
+export class DurableProofpackLedger implements ProofpackLedger {
+  private readonly ledgerDir = path.join(ROOT, ".nemoclaw", "ledger");
+
+  constructor() {
+    if (!fs.existsSync(this.ledgerDir)) {
+      fs.mkdirSync(this.ledgerDir, { recursive: true });
+    }
+  }
+
+  async store(proofpack: Proofpack): Promise<void> {
+    // Sanitize ID for filename
+    const filename = proofpack.id.replace(/[^a-z0-9_-]/gi, '_') + ".json";
+    const filePath = path.join(this.ledgerDir, filename);
+    await fs.promises.writeFile(filePath, JSON.stringify(proofpack, null, 2));
+  }
+
+  async retrieve(id: string): Promise<Proofpack | null> {
+    const filename = id.replace(/[^a-z0-9_-]/gi, '_') + ".json";
+    const filePath = path.join(this.ledgerDir, filename);
+    try {
+      const data = await fs.promises.readFile(filePath, "utf-8");
+      return JSON.parse(data) as Proofpack;
+    } catch {
+      return null;
+    }
+  }
 }

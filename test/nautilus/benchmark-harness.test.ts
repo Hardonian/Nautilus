@@ -8,13 +8,13 @@ describe('Benchmark harness', () => {
   it('returns unavailable when runtime is not available', async () => {
     const result = await runBenchmarkHarness({ runtimeAvailable: false, reasonIfUnavailable: 'no_runtime_node' });
     expect(result.status).toBe('unavailable');
-    expect(result.reason).toBe('no_runtime_node');
+    if (result.status === 'unavailable') expect(result.reason).toBe('no_runtime_node');
   });
 
   it('returns unavailable when callable is not provided', async () => {
     const result = await runBenchmarkHarness({ runtimeAvailable: true });
     expect(result.status).toBe('unavailable');
-    expect(result.reason).toBe('runtime_adapter_unavailable');
+    if (result.status === 'unavailable') expect(result.reason).toBe('runtime_adapter_unavailable');
   });
 
   it('measures latency around callable', async () => {
