@@ -35,23 +35,10 @@ describe("ApiGateway", () => {
     await gateway.stop();
   });
 
-  function fetchJson(path: string): Promise<{ status: number, data: any }> {
-    return new Promise((resolve, reject) => {
-      http.get(`http://localhost:${PORT}${path}`, (res) => {
-        let body = "";
-        res.on("data", chunk => body += chunk);
-        res.on("end", () => {
-          try {
-            resolve({
-              status: res.statusCode || 500,
-              data: JSON.parse(body)
-            });
-          } catch(e) {
-            reject(e);
-          }
-        });
-      }).on("error", reject);
-    });
+  async function fetchJson(path: string): Promise<{ status: number, data: any }> {
+    const res = await fetch(`http://localhost:${PORT}${path}`);
+    const data = await res.json();
+    return { status: res.status, data };
   }
 
   it("should return ok for /health", async () => {

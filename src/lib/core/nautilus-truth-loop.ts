@@ -8,7 +8,9 @@ import type { ApprovalGate, RiskSignal } from "./threatmesh";
 import type { GraphAwareRetriever, RetrievalResult } from "./meshrag";
 import { buildProofpack, type Proofpack } from "./proofpacks";
 import type { QueueGovernance } from "../control-plane/r5-queue-governance";
-import { taskFingerprint, reuseGuard, estimateTokenBudget, saveCheckpoint, type CheckpointState } from "../control-plane/r4-handoff-primitives";
+import { taskFingerprint, reuseGuard, estimateTokenBudget, saveCheckpoint, loadCheckpoint, replayCheckpoint, validateHandoffPacket, compactContextPreservingEvidence, type CheckpointState, type HandoffPacket } from "../control-plane/r4-handoff-primitives";
+import { unavailableDegraded, type DegradedUnavailableState } from "../control-plane/r1-hardening";
+import { buildOperatorConsoleSurface, type OperatorConsoleInput } from "./operator-console";
 
 export type ExecutionId = string & { readonly __type: "execution_id" };
 
@@ -152,12 +154,14 @@ export async function runTruthLoop(
 
   const budgetCheck = estimateTokenBudget({ strings: [input.action, input.query ?? ""], budget: 8192 });
   if (budgetCheck.overBudget) {
-    degraded.push("token_budget_overflow");
+    const overflowState = unavailableDegraded({ kind: "gpu", source: "token-budget", message: `token_budget_overflow: estimated ${budgetCheck.estimatedTokens} tokens exceeds budget of 8192`, at: new Date().toISOString() });
+    degraded.push(`token_budget_overflow:${budgetCheck.estimatedTokens}`);
   }
 
   if (!deps.traceWriter) degraded.push("trace_store_unavailable");
 
   if (!deps.policyGate) {
+    const degradedState = unavailableDegraded({ kind: "probe", source: "threatmesh", message: "policy_engine_unavailable", at: new Date().toISOString() });
     const deniedEvent = buildNautilusEvent({
       type: "policy.denied",
       source: "threatmesh",
@@ -165,17 +169,28 @@ export async function runTruthLoop(
       correlationId: input.correlationId,
       status: "denied",
       severity: "critical",
-      payload: { reason: "policy_engine_unavailable", failClosed: true },
+      payload: { reason: "policy_engine_unavailable", failClosed: true, degradedState },
     });
     deps.eventBus.emit(deniedEvent);
+    degraded.push("policy_engine_unavailable");
+    const proofpack = buildProofpack({
+      executionId,
+      correlationId: input.correlationId,
+      events: [startedEvent, deniedEvent],
+      degradedStates: degraded,
+      queueTimeline,
+    });
+    deps.proofpackSink?.(proofpack);
     return {
       executionId,
       correlationId: input.correlationId,
       startedEvent,
+      failedEvent: deniedEvent,
       retrievalState: "unavailable",
-      degraded: [...degraded, "policy_engine_unavailable"],
+      degraded,
       memoryRecorded: false,
       status: "denied",
+      proofpackId: proofpack.id,
     };
   }
 
@@ -193,15 +208,35 @@ export async function runTruthLoop(
   );
 
   if (!policyDecision.allowed) {
+    const deniedEvent = buildNautilusEvent({
+      type: "policy.denied",
+      source: "threatmesh",
+      executionId,
+      correlationId: input.correlationId,
+      status: "denied",
+      severity: "error",
+      payload: { reason: "policy_denied", policyDecisionRef, reasons: policyDecision.reasons },
+    });
+    deps.eventBus.emit(deniedEvent);
+    const proofpack = buildProofpack({
+      executionId,
+      correlationId: input.correlationId,
+      events: [startedEvent, deniedEvent],
+      degradedStates: degraded,
+      queueTimeline,
+    });
+    deps.proofpackSink?.(proofpack);
     return {
       executionId,
       correlationId: input.correlationId,
       startedEvent,
+      failedEvent: deniedEvent,
       policyDecisionRef,
       retrievalState: "unavailable",
       degraded,
       memoryRecorded: false,
       status: "denied",
+      proofpackId: proofpack.id,
     };
   }
 
@@ -281,12 +316,43 @@ export async function runTruthLoop(
       payload: { reason: error instanceof Error ? error.message : String(error), policyDecisionRef, retrievalRef },
     });
     deps.eventBus.emit(failedEvent);
+
+    if (deps.queueGovernance) {
+      try {
+        const queueId = `queue:${executionId}`;
+        const retryItem = deps.queueGovernance.markRetry(queueId);
+        queueTimeline = deps.queueGovernance.timeline as unknown as Record<string, unknown>[];
+        if (retryItem.status === "dead_letter") {
+          degraded.push("dead_letter_queue");
+        }
+      } catch {
+        degraded.push("queue_retry_tracking_failed");
+      }
+    }
+
+    let checkpointRef: string | undefined;
+    let replayMetadata: Record<string, unknown> | undefined;
+    if (deps.checkpointStore) {
+      const existing = deps.checkpointStore.get(executionId);
+      if (existing) {
+        checkpointRef = `stale:${existing}`;
+        try {
+          const loaded = loadCheckpoint(existing);
+          const replayed = replayCheckpoint(loaded);
+          replayMetadata = { replayed, continuityFrom: loaded.replayCursor };
+        } catch {
+          degraded.push("checkpoint_corrupt");
+        }
+      }
+    }
+
     const proofpack = buildProofpack({
       executionId,
       correlationId: input.correlationId,
       events: [startedEvent, failedEvent],
       degradedStates: degraded,
       queueTimeline,
+      checkpointRef,
     });
     deps.proofpackSink?.(proofpack);
 

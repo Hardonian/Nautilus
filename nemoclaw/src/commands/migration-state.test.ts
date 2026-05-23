@@ -31,7 +31,7 @@ function addSymlink(p: string): void {
 function norm(p: string) { return p.replace(/^[a-zA-Z]:/, "").replace(/\\/g, "/"); }
 
 vi.mock("node:fs", async (importOriginal) => {
-  const original = await importOriginal();
+  const original = await importOriginal<typeof import("node:fs")>();
   return {
     ...original,
     existsSync: (p: string) => store.has(norm(p)),
@@ -100,7 +100,6 @@ vi.mock("node:fs", async (importOriginal) => {
     unlinkSync: vi.fn((p: string) => {
       store.delete(norm(p));
     }),
-    chmodSync: vi.fn(),
   };
 });
 
@@ -883,6 +882,7 @@ describe("commands/migration-state", () => {
 
   describe("createArchiveFromDirectory", () => {
     it("calls tar.create with correct options", async () => {
+      // @ts-ignore
       const { create } = await import("tar");
       await createArchiveFromDirectory("/src", "/dest/archive.tar");
       expect(create).toHaveBeenCalledWith(
