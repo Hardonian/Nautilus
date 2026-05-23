@@ -636,7 +636,7 @@ describe("commands/migration-state", () => {
       }
 
       // Read the sandbox-bundle openclaw.json
-      const sandboxConfigEntry = store.get(bundle.preparedStateDir + "/openclaw.json");
+      const sandboxConfigEntry = store.get(norm(bundle.preparedStateDir + "/openclaw.json"));
       if (!sandboxConfigEntry?.content) {
         expect.unreachable("sandbox config entry should exist with content");
         return;
@@ -831,7 +831,7 @@ describe("commands/migration-state", () => {
       }
 
       // Check the snapshot-level openclaw.json (not sandbox-bundle)
-      const snapshotConfigEntry = store.get(bundle.snapshotDir + "/openclaw/openclaw.json");
+      const snapshotConfigEntry = store.get(norm(bundle.snapshotDir + "/openclaw/openclaw.json"));
       if (!snapshotConfigEntry?.content) {
         expect.unreachable("snapshot config entry should exist with content");
         return;

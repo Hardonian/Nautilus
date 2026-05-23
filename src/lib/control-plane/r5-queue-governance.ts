@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-export type QueueEventType = "admitted" | "retried" | "dead_letter" | "load_shed";
+export type QueueEventType = "admitted" | "retried" | "dead_letter" | "load_shed" | "replayed";
 
 export interface QueueEvent {
   at: string;

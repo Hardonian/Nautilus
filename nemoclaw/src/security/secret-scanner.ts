@@ -101,8 +101,8 @@ export function scanForSecrets(content: string): SecretMatch[] {
     }
   }
 
-  // Scan for high-entropy strings (Base64/Hex like credentials)
-  const genericSecretRegex = /\b[A-Za-z0-9+/=_-]{20,}\b/g;
+  // Scan for high-entropy strings (Base64/Hex like credentials). Disallow '=' in the middle.
+  const genericSecretRegex = /\b[A-Za-z0-9+/_-]{20,}={0,2}\b/g;
   for (const match of content.matchAll(genericSecretRegex)) {
     const value = match[0];
     if (seenValues.has(value)) continue;
