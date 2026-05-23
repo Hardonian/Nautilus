@@ -16,6 +16,10 @@ export interface Proofpack {
   memoryRefs: string[];
   degradedStates: string[];
   evidenceRefs: string[];
+  queueTimeline?: Record<string, unknown>[];
+  routingDecision?: Record<string, unknown>;
+  checkpointRef?: string;
+  verificationEvidence?: string[];
 }
 
 export function buildProofpack(input: {
@@ -24,6 +28,10 @@ export function buildProofpack(input: {
   events: NautilusEventEnvelope[];
   memoryRecords?: RecallForgeRecord[];
   degradedStates: string[];
+  queueTimeline?: Record<string, unknown>[];
+  routingDecision?: Record<string, unknown>;
+  checkpointRef?: string;
+  verificationEvidence?: string[];
 }): Proofpack {
   const generatedAt = new Date().toISOString();
   const eventLineage = input.events.filter((event) => event.executionId === input.executionId || event.correlationId === input.correlationId);
@@ -52,5 +60,9 @@ export function buildProofpack(input: {
     memoryRefs,
     degradedStates: [...new Set(input.degradedStates)],
     evidenceRefs,
+    queueTimeline: input.queueTimeline,
+    routingDecision: input.routingDecision,
+    checkpointRef: input.checkpointRef,
+    verificationEvidence: input.verificationEvidence,
   };
 }

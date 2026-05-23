@@ -52,6 +52,16 @@ export enum QueueReasonCode {
   // Queue ordering
   QUEUE_FULL = 'queue_full',
   QUEUE_PRIORITY_VIOLATION = 'queue_priority_violation',
+  QUEUE_STARVATION = 'queue_starvation',
+
+  // Dead letter
+  DEAD_LETTER = 'dead_letter',
+  DEAD_LETTER_RETRY_EXHAUSTED = 'dead_letter_retry_exhausted',
+  DEAD_LETTER_TOKEN_OVERFLOW = 'dead_letter_token_overflow',
+
+  // Token / context
+  TOKEN_OVERFLOW = 'token_overflow',
+  CONTEXT_WINDOW_EXCEEDED = 'context_window_exceeded',
 
   // Retry
   RETRY_POLICY_EXHAUSTED = 'retry_policy_exhausted',

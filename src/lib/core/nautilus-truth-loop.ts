@@ -7,6 +7,8 @@ import type { RecallForgeRecord, RecallForgeWriter } from "./recallforge";
 import type { ApprovalGate, RiskSignal } from "./threatmesh";
 import type { GraphAwareRetriever, RetrievalResult } from "./meshrag";
 import { buildProofpack, type Proofpack } from "./proofpacks";
+import type { QueueGovernance } from "../control-plane/r5-queue-governance";
+import { taskFingerprint, reuseGuard, estimateTokenBudget, saveCheckpoint, type CheckpointState } from "../control-plane/r4-handoff-primitives";
 
 export type ExecutionId = string & { readonly __type: "execution_id" };
 
@@ -22,6 +24,9 @@ export interface TruthLoopDependencies {
   retriever?: GraphAwareRetriever;
   runtime: RuntimeExecutor;
   proofpackSink?: (proofpack: Proofpack) => void;
+  queueGovernance?: QueueGovernance;
+  checkpointStore?: Map<string, string>;
+  reuseCache?: Map<string, { safeToReuse: boolean; result: Record<string, unknown> }>;
 }
 
 export interface TruthLoopReport {
@@ -36,7 +41,7 @@ export interface TruthLoopReport {
   retrievalState: "completed" | "unavailable";
   memoryRecorded: boolean;
   degraded: string[];
-  status: "completed" | "failed" | "denied";
+  status: "completed" | "failed" | "denied" | "queue_saturated";
   proofpackId?: string;
 }
 
@@ -62,6 +67,93 @@ export async function runTruthLoop(
     payload: { action: input.action },
   });
   deps.eventBus.emit(startedEvent);
+
+  let queueTimeline: Record<string, unknown>[] | undefined = undefined;
+
+  if (deps.queueGovernance) {
+    const enqueueResult = deps.queueGovernance.enqueue({
+      queueId: `queue:${executionId}`,
+      idempotencyKey: `idem:${executionId}`,
+      payload: { action: input.action },
+    });
+
+    queueTimeline = deps.queueGovernance.timeline as unknown as Record<string, unknown>[];
+
+    if (enqueueResult.outcome === "load_shed") {
+      const queueSaturatedEvent = buildNautilusEvent({
+        type: "queue.saturated",
+        source: "queue-governance",
+        executionId,
+        correlationId: input.correlationId,
+        status: "degraded",
+        payload: { reason: "queue_saturated", backpressureReason: enqueueResult.degraded.backpressureReason },
+      });
+      deps.eventBus.emit(queueSaturatedEvent);
+      degraded.push("queue_saturated");
+
+      const proofpack = buildProofpack({
+        executionId,
+        correlationId: input.correlationId,
+        events: [startedEvent, queueSaturatedEvent],
+        degradedStates: degraded,
+        queueTimeline,
+      });
+      deps.proofpackSink?.(proofpack);
+
+      return {
+        executionId,
+        correlationId: input.correlationId,
+        startedEvent,
+        retrievalState: "unavailable",
+        degraded,
+        memoryRecorded: false,
+        status: "queue_saturated",
+        proofpackId: proofpack.id,
+      };
+    } else if (enqueueResult.outcome === "admitted") {
+      deps.eventBus.emit(
+        buildNautilusEvent({
+          type: "queue.admitted",
+          source: "queue-governance",
+          executionId,
+          correlationId: input.correlationId,
+          status: "started",
+          payload: { queueId: enqueueResult.item.queueId },
+        })
+      );
+    }
+  }
+
+  const fingerprint = taskFingerprint({ objective: input.action, constraints: [], inputs: input.query ? [input.query] : [] });
+  if (deps.reuseCache) {
+    const reuse = reuseGuard(deps.reuseCache, fingerprint);
+    if (reuse.reused) {
+      const completedEvent = buildNautilusEvent({
+        type: "execution.completed",
+        source: "runtime",
+        executionId,
+        correlationId: input.correlationId,
+        status: "completed",
+        payload: { reused: true, runtimeResult: reuse.result },
+      });
+      deps.eventBus.emit(completedEvent);
+      
+      const proofpack = buildProofpack({
+        executionId,
+        correlationId: input.correlationId,
+        events: [startedEvent, completedEvent],
+        degradedStates: degraded,
+        queueTimeline,
+      });
+      deps.proofpackSink?.(proofpack);
+      return { executionId, correlationId: input.correlationId, startedEvent, completedEvent, retrievalState: "unavailable", degraded, memoryRecorded: false, traceId: input.correlationId, status: "completed", proofpackId: proofpack.id };
+    }
+  }
+
+  const budgetCheck = estimateTokenBudget({ strings: [input.action, input.query ?? ""], budget: 8192 });
+  if (budgetCheck.overBudget) {
+    degraded.push("token_budget_overflow");
+  }
 
   if (!deps.traceWriter) degraded.push("trace_store_unavailable");
 
@@ -159,12 +251,21 @@ export async function runTruthLoop(
       degraded.push("memory_store_unavailable");
     }
 
+    let checkpointRef: string | undefined;
+    if (deps.checkpointStore) {
+      const cp: CheckpointState = { runId: input.correlationId, taskId: executionId, status: "completed", checkpointAt: completedEvent.timestamp, replayCursor: completedEvent.timestamp };
+      checkpointRef = saveCheckpoint(cp);
+      deps.checkpointStore.set(executionId, checkpointRef);
+    }
+
     const proofpack = buildProofpack({
       executionId,
       correlationId: input.correlationId,
       events: [startedEvent, completedEvent],
       memoryRecords,
       degradedStates: degraded,
+      queueTimeline,
+      checkpointRef,
     });
     deps.proofpackSink?.(proofpack);
 
@@ -185,6 +286,7 @@ export async function runTruthLoop(
       correlationId: input.correlationId,
       events: [startedEvent, failedEvent],
       degradedStates: degraded,
+      queueTimeline,
     });
     deps.proofpackSink?.(proofpack);
 

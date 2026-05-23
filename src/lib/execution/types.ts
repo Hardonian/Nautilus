@@ -20,6 +20,7 @@ export enum QueueStatus {
   FAILED = 'failed',
   CANCELLED = 'cancelled',
   BLOCKED = 'blocked',
+  DEAD_LETTER = 'dead_letter',
 }
 
 export enum ExecutionState {

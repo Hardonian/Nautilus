@@ -10,7 +10,8 @@ export type NautilusEventFamily =
   | "memory"
   | "trace"
   | "fallback"
-  | "agent";
+  | "agent"
+  | "queue";
 
 export type NautilusEventType =
   | "execution.started"
@@ -27,7 +28,9 @@ export type NautilusEventType =
   | "memory.recorded"
   | "trace.recorded"
   | "fallback.triggered"
-  | "agent.escalated";
+  | "agent.escalated"
+  | "queue.admitted"
+  | "queue.saturated";
 
 export type NautilusSeverity = "debug" | "info" | "warn" | "error" | "critical";
 export type NautilusStatus = "started" | "completed" | "failed" | "degraded" | "restored" | "denied";
@@ -61,6 +64,8 @@ const TYPE_FAMILY_MAP: Record<NautilusEventType, NautilusEventFamily> = {
   "trace.recorded": "trace",
   "fallback.triggered": "fallback",
   "agent.escalated": "agent",
+  "queue.admitted": "queue",
+  "queue.saturated": "queue",
 };
 
 export function buildNautilusEvent<TPayload>(event: Omit<NautilusEventEnvelope<TPayload>, "version" | "family" | "timestamp"> & { timestamp?: string }): NautilusEventEnvelope<TPayload> {

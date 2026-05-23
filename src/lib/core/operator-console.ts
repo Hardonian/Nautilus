@@ -18,6 +18,7 @@ export interface OperatorConsoleInput {
   health: { state: "healthy" | "degraded" | "unavailable"; details: string[] };
   outcome: { status: "completed" | "failed" | "denied"; summary: string };
   memoryProvenance: RecallForgeRecord[];
+  queue?: { timeline: Array<{ at: string; type: string; queueId: string }>; idempotencyKey?: string; leaseRef?: string; unavailableReason?: string; };
 }
 
 export interface OperatorConsoleSurface {
@@ -35,6 +36,7 @@ export interface OperatorConsoleSurface {
   runtimeHealth: { state: "healthy" | "degraded" | "unavailable"; details: string[] };
   executionOutcome: { status: "completed" | "failed" | "denied"; summary: string };
   memoryProvenance: { state: "ready" | "empty"; references: string[] };
+  queueEvidence: { state: "ready" | "empty" | "unavailable"; details: string; idempotencyStatus: string };
 }
 
 function renderState(hasData: boolean, unavailableReason?: string): "ready" | "empty" | "unavailable" {
@@ -48,6 +50,7 @@ export function buildOperatorConsoleSurface(input: OperatorConsoleInput): Operat
   const policyState = renderState(Boolean(input.policy?.decision), input.policy?.unavailableReason);
   const timelineState = renderState(input.timeline.events.length !== 0, input.timeline.unavailableReason);
   const topologyState = renderState(input.topology.nodes.length !== 0, input.topology.unavailableReason);
+  const queueState = renderState((input.queue?.timeline.length ?? 0) !== 0, input.queue?.unavailableReason);
 
   return {
     executionId: input.executionId,
@@ -115,6 +118,11 @@ export function buildOperatorConsoleSurface(input: OperatorConsoleInput): Operat
     memoryProvenance: {
       state: input.memoryProvenance.length === 0 ? "empty" : "ready",
       references: input.memoryProvenance.map((record) => record.id),
+    },
+    queueEvidence: {
+      state: queueState,
+      details: queueState === "ready" ? `${input.queue?.timeline.length} queue event(s) recorded` : queueState === "empty" ? "No queue timeline" : `Queue unavailable: ${input.queue?.unavailableReason}`,
+      idempotencyStatus: input.queue?.idempotencyKey ? `Key: ${input.queue.idempotencyKey}` : "No idempotency key",
     },
   };
 }
