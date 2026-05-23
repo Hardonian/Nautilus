@@ -4,6 +4,30 @@
 // Policy preset management — list, load, merge, and apply presets.
 
 import type { JsonValue, JsonObject } from "./core/json-types";
+import Ajv from "ajv";
+
+const ajv = new Ajv();
+
+const presetPolicySchema = {
+  type: "object",
+  required: ["preset", "network_policies"],
+  properties: {
+    preset: {
+      type: "object",
+      required: ["name"],
+      properties: {
+        name: { type: "string", pattern: "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$" },
+        description: { type: "string" }
+      }
+    },
+    network_policies: {
+      type: "object",
+      additionalProperties: true
+    }
+  }
+};
+
+const validatePresetPolicy = ajv.compile(presetPolicySchema);
 
 const fs = require("fs");
 const path = require("path");
@@ -13,6 +37,7 @@ const YAML = require("yaml");
 const { ROOT, run, runCapture } = require("./runner");
 const registry = require("./state/registry");
 const { loadAgent } = require("./agent/defs");
+import { FailClosedApprovalGate, evaluateExecutionGovernance, type RiskSignal } from "./core/threatmesh";
 
 const PRESETS_DIR = path.join(ROOT, "nemoclaw-blueprint", "policies", "presets");
 
@@ -603,6 +628,26 @@ function applyPresetContent(
   const merged = mergePresetIntoPolicy(currentPolicy, presetEntries);
 
   const endpoints = getPresetEndpoints(presetContent);
+  
+  // ThreatMesh Intercept
+  const gate = new FailClosedApprovalGate();
+  const riskSignals: RiskSignal[] = endpoints.some(e => e.includes("*")) 
+    ? [{ id: "wildcard_egress", severity: "medium", reason: "Preset contains wildcard network egress" }] 
+    : [];
+
+  const decision = evaluateExecutionGovernance({
+    action: "widen_sandbox_egress",
+    workloadClass: "network_policy",
+    runtimeTrustScore: 100, // Default for now
+    runtimeIsolation: "trusted",
+    auditRef: `preset:${presetName}`,
+  }, gate, riskSignals);
+
+  if (!decision.allowed) {
+    console.error(`  ThreatMesh blocked policy application. Reasons: ${decision.reasons.join(", ")}`);
+    return false;
+  }
+
   if (endpoints.length > 0) {
     console.log(`  Widening sandbox egress — adding: ${endpoints.join(", ")}`);
   }
@@ -736,29 +781,13 @@ function loadPresetFromFile(filePath: string): { presetName: string; content: st
   } finally {
     fs.closeSync(fd);
   }
-  if (!isPolicyDocument(parsed)) {
-    console.error(`  Preset must be a YAML mapping: ${filePath}`);
+  if (!validatePresetPolicy(parsed)) {
+    const error = validatePresetPolicy.errors?.[0];
+    console.error(`  Preset schema validation failed: ${error?.instancePath} ${error?.message} in ${filePath}`);
     return null;
   }
-  const presetMeta = parsed.preset;
-  const presetName =
-    presetMeta && typeof presetMeta === "object" && !Array.isArray(presetMeta)
-      ? (presetMeta as PolicyObject).name
-      : undefined;
-  if (typeof presetName !== "string" || !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(presetName)) {
-    console.error(
-      `  Preset must declare preset.name (lowercase, hyphenated RFC 1123 label): ${filePath}`,
-    );
-    return null;
-  }
-  if (
-    !parsed.network_policies ||
-    typeof parsed.network_policies !== "object" ||
-    Array.isArray(parsed.network_policies)
-  ) {
-    console.error(`  Preset missing network_policies section: ${filePath}`);
-    return null;
-  }
+  
+  const presetName = (parsed.preset as any).name;
   const builtin = listPresets().map((p) => p.name);
   if (builtin.includes(presetName)) {
     console.error(

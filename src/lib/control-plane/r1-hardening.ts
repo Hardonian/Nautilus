@@ -3,7 +3,7 @@
 
 export interface DegradedUnavailableState {
   state: "degraded";
-  reasonCode: "runtime_unavailable" | "model_unavailable" | "gpu_unavailable" | "probe_unavailable";
+  reasonCode: "runtime_unavailable" | "model_unavailable" | "gpu_unavailable" | "probe_unavailable" | "queue_saturation" | "token_overflow" | "policy_unavailable" | "replay_unavailable" | "checkpoint_unavailable";
   message: string;
   source: string;
   at: string;

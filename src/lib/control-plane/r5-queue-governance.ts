@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-export type QueueEventType = "admitted" | "retried" | "dead_letter" | "load_shed";
+export type QueueEventType = "admitted" | "retried" | "dead_letter" | "load_shed" | "replayed";
 
 export interface QueueEvent {
   at: string;
@@ -55,6 +55,10 @@ export class QueueGovernance {
     }
     this.timeline.push({ at: this.now(), type: "retried", queueId, reason: "retry_scheduled" });
     return item;
+  }
+
+  markReplayed(queueId: string): void {
+    this.timeline.push({ at: this.now(), type: "replayed", queueId, reason: "replay_executed" });
   }
 
   private now(): string {

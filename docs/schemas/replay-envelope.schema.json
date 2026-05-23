@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReplayEnvelope",
+  "description": "Nautilus Cryptographic Replay Envelope",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string" },
+    "id": { "type": "string" },
+    "signature": { "type": "string" },
+    "payload": { "type": "object" },
+    "timestamp": { "type": "string", "format": "date-time" }
+  },
+  "required": ["version", "id", "signature", "payload", "timestamp"]
+}

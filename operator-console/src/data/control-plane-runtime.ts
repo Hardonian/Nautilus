@@ -73,7 +73,7 @@ export function summarizeTelemetryDimensions(events: OperationalEvent[]): { conf
   return { confidence, source };
 }
 
-export function summarizeHeterogeneousDiagnostics(input: { routing: { enabled: boolean; source: string }; governedEnabled: boolean; remote: { enabled: boolean; source: string }; result?: { selectedCandidate?: { candidateId: string }; excludedCandidates?: Array<{ candidateId: string }>; receipt: { degradedEvents: Array<{ reasonCode: string }>; fallbackAttempts: Array<{ reason: string }> } } }): string[] {
+export function summarizeHeterogeneousDiagnostics(input: { routing: { enabled: boolean; source: string }; governedEnabled: boolean; remote: { enabled: boolean; source: string }; result?: { selectedCandidate?: { candidateId: string }; excludedCandidates?: Array<{ candidateId: string }>; receipt: { receiptId?: string; degradedEvents: Array<{ reasonCode: string }>; fallbackAttempts: Array<{ reason: string }> } } }): string[] {
   const noCandidateReason = input.result?.selectedCandidate ? "none" : input.result?.receipt.degradedEvents.map((event) => event.reasonCode).join(",") || "no_selected_candidate";
   const fallbackState = input.result ? (input.result.receipt.fallbackAttempts.length > 0 ? input.result.receipt.fallbackAttempts.map((attempt) => attempt.reason).join(",") : "none") : "none";
   return [

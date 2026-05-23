@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+#include <tunables/global>
+
+profile nemo /usr/bin/node flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/node>
+
+  # Allow reading node modules and application code
+  /app/** r,
+  
+  # Allow execution of the node binary
+  /usr/bin/node ix,
+  
+  # Deny all other execution (no shells, no sub-processes)
+  audit deny /** x,
+
+  # Deny ptrace
+  deny ptrace,
+
+  # State directory permissions
+  /home/nemo/.nemoclaw/** rw,
+  /tmp/** rw,
+
+  # Deny arbitrary network ingress/egress (must be configured via egress proxy/policy)
+  deny network raw,
+  deny network packet,
+
+  # Prevent capability escalation
+  deny capability,
+
+  # Prevent mounting
+  deny mount,
+  deny remount,
+  deny umount,
+}

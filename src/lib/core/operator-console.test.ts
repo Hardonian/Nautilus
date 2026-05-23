@@ -32,7 +32,7 @@ describe("buildOperatorConsoleSurface", () => {
         id: "mem-ref",
         category: "execution_lineage",
         createdAt: "now",
-        provenanceEvent: { type: "test", timestamp: "now", source: "test", executionId: "exec-123", correlationId: "corr-1" },
+        provenanceEvent: { type: "execution.started", timestamp: "now", source: "test", executionId: "exec-123", correlationId: "corr-1" },
         data: {}
       }],
     };

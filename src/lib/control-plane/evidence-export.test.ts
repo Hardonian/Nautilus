@@ -11,7 +11,9 @@ import {
   exportBundleAsJson,
   exportBundleAsNdjson,
   exportBundle,
+  exportBundleCompressed,
   exportReplayPackage,
+  exportReplayPackageCompressed,
   verifyEvidenceBundle,
   verifyReplayEvidencePackage,
   evidenceContainsSecrets,
@@ -267,6 +269,27 @@ describe("evidence-export", () => {
       for (const line of ndjson.trim().split("\n")) {
         expect(() => JSON.parse(line)).not.toThrow();
       }
+    });
+
+    it("compressed export outputs non-empty buffers", async () => {
+      const artifact = buildEvidenceArtifact({ kind: "receipt", classification: "internal", createdAt: T0, payload: { x: 1 }, references: [], redactSecrets: false });
+      const bundle = buildEvidenceBundle({ artifacts: [artifact], generatedAt: T0, classification: "internal" });
+      const compressedJson = await exportBundleCompressed(bundle, "json");
+      expect(Buffer.isBuffer(compressedJson)).toBe(true);
+      expect(compressedJson.length).toBeGreaterThan(0);
+      
+      const compressedNdjson = await exportBundleCompressed(bundle, "ndjson");
+      expect(Buffer.isBuffer(compressedNdjson)).toBe(true);
+      expect(compressedNdjson.length).toBeGreaterThan(0);
+    });
+
+    it("compressed replay package outputs non-empty buffers", async () => {
+      const events = [fakeEvent(0), fakeEvent(1, "execution_plan_created")];
+      const envelope = buildReplayEnvelope(events, T0);
+      const pkg = buildReplayEvidencePackage({ replayEnvelope: envelope, events, generatedAt: T0 });
+      const compressed = await exportReplayPackageCompressed(pkg, "ndjson");
+      expect(Buffer.isBuffer(compressed)).toBe(true);
+      expect(compressed.length).toBeGreaterThan(0);
     });
   });
 

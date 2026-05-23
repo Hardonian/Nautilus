@@ -21,18 +21,18 @@ vi.mock("node:fs", async (importOriginal) => {
   const original = await importOriginal();
   return {
     ...original,
-    existsSync: (p: string) => store.has(p),
+    existsSync: (p: string) => store.has(p.replace(/\\/g, "/")),
     mkdirSync: vi.fn(),
     readFileSync: (p: string) => {
-      const content = store.get(p);
+      const content = store.get(p.replace(/\\/g, "/"));
       if (content === undefined) throw new Error(`ENOENT: ${p}`);
       return content;
     },
     writeFileSync: (p: string, data: string) => {
-      store.set(p, data);
+      store.set(p.replace(/\\/g, "/"), data);
     },
     unlinkSync: (p: string) => {
-      store.delete(p);
+      store.delete(p.replace(/\\/g, "/"));
     },
   };
 });
@@ -145,13 +145,13 @@ describe("onboard/config", () => {
 
     it("returns parsed config when file exists", () => {
       const config = makeConfig();
-      const configPath = `${homedir()}/.nemoclaw/config.json`;
+      const configPath = `${homedir()}/.nemoclaw/config.json`.replace(/\\/g, "/");
       store.set(configPath, JSON.stringify(config));
       expect(loadOnboardConfig()).toEqual(config);
     });
 
     it("returns null when the parsed JSON root is not a valid onboard config", () => {
-      const configPath = `${homedir()}/.nemoclaw/config.json`;
+      const configPath = `${homedir()}/.nemoclaw/config.json`.replace(/\\/g, "/");
       store.set(configPath, JSON.stringify({ endpointType: "bogus" }));
       expect(loadOnboardConfig()).toBeNull();
     });
