@@ -310,7 +310,7 @@ export async function runRemoteExecution(input: { request: RemoteExecutionReques
     if (response.status < 200 || response.status >= 300) return finalize("degraded", `http_${response.status}`, `http_${response.status}`, "transport_unreachable");
     let body: RemoteExecutionResponsePayload;
     try { body = JSON.parse(response.body) as RemoteExecutionResponsePayload; } catch { return finalize("degraded", "malformed_response", "malformed_response", "unknown_error"); }
-    
+
     if (!verifyRemoteResponseIntegrity(body, false /* opt-in flag for legacy workers */)) {
       return finalize("degraded", "invalid_signature", "invalid_signature", "transport_unreachable");
     }

@@ -11,7 +11,7 @@ export default class GatewayStartCommand extends NemoClawCommand {
   static summary = "Start the API Gateway server";
   static description = "Starts a lightweight HTTP server to expose status and health endpoints to 3rd-party clients.";
   static usage = ["gateway start [--port <port>]"];
-  
+
   static flags = {
     port: Flags.integer({
       char: "p",
