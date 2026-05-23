@@ -28,50 +28,55 @@ function addSymlink(p: string): void {
   store.set(p, { type: "symlink" });
 }
 
+function norm(p: string) { return p.replace(/^[a-zA-Z]:/, "").replace(/\\/g, "/"); }
+
 vi.mock("node:fs", async (importOriginal) => {
   const original = await importOriginal();
   return {
     ...original,
-    existsSync: (p: string) => store.has(p),
+    existsSync: (p: string) => store.has(norm(p)),
     mkdirSync: vi.fn((p: string) => {
-      addDir(p);
+      addDir(norm(p));
     }),
     chmodSync: vi.fn(),
     readFileSync: (p: string) => {
-      const entry = store.get(p);
+      const entry = store.get(norm(p));
       if (entry?.type !== "file") throw new Error(`ENOENT: ${p}`);
       return entry.content ?? "";
     },
     writeFileSync: vi.fn((p: string, data: string) => {
-      store.set(p, { type: "file", content: data });
+      store.set(norm(p), { type: "file", content: data });
     }),
     copyFileSync: vi.fn((src: string, dest: string) => {
-      const entry = store.get(src);
+      const entry = store.get(norm(src));
       if (!entry) throw new Error(`ENOENT: ${src}`);
-      store.set(dest, { ...entry });
+      store.set(norm(dest), { ...entry });
     }),
     cpSync: vi.fn((src: string, dest: string, opts?: { filter?: (source: string) => boolean }) => {
-      // Shallow copy: copy all entries whose path starts with src
+      const normSrc = norm(src);
+      const normDest = norm(dest);
       for (const [k, v] of store) {
-        if (k === src || k.startsWith(src + "/")) {
+        if (k === normSrc || k.startsWith(normSrc + "/")) {
           if (opts?.filter && !opts.filter(k)) continue;
-          const relative = k.slice(src.length);
-          store.set(dest + relative, { ...v });
+          const relative = k.slice(normSrc.length);
+          store.set(normDest + relative, { ...v });
         }
       }
     }),
     rmSync: vi.fn(),
     renameSync: vi.fn((oldPath: string, newPath: string) => {
+      const normOld = norm(oldPath);
+      const normNew = norm(newPath);
       for (const [k, v] of store) {
-        if (k === oldPath || k.startsWith(oldPath + "/")) {
-          const relative = k.slice(oldPath.length);
-          store.set(newPath + relative, v);
+        if (k === normOld || k.startsWith(normOld + "/")) {
+          const relative = k.slice(normOld.length);
+          store.set(normNew + relative, v);
           store.delete(k);
         }
       }
     }),
     lstatSync: (p: string) => {
-      const entry = store.get(p);
+      const entry = store.get(norm(p));
       if (!entry) throw new Error(`ENOENT: ${p}`);
       return {
         isSymbolicLink: () => entry.type === "symlink",
@@ -80,7 +85,8 @@ vi.mock("node:fs", async (importOriginal) => {
       };
     },
     readdirSync: (p: string) => {
-      const prefix = p.endsWith("/") ? p : p + "/";
+      const normP = norm(p);
+      const prefix = normP.endsWith("/") ? normP : normP + "/";
       const entries = new Set<string>();
       for (const k of store.keys()) {
         if (k.startsWith(prefix)) {
@@ -92,7 +98,7 @@ vi.mock("node:fs", async (importOriginal) => {
       return [...entries].sort();
     },
     unlinkSync: vi.fn((p: string) => {
-      store.delete(p);
+      store.delete(norm(p));
     }),
     chmodSync: vi.fn(),
   };
@@ -102,6 +108,11 @@ vi.mock("node:fs", async (importOriginal) => {
 vi.mock("tar", () => ({
   create: vi.fn(async () => {}),
 }));
+
+vi.mock("node:path", async (importOriginal) => {
+  const original = await importOriginal<typeof import("node:path")>();
+  return { ...original.posix, default: original.posix };
+});
 
 import {
   detectHostOpenClaw,

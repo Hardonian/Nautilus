@@ -69,8 +69,27 @@ function node(nodeId: string, vram: number, context: number, meta: Record<string
   };
 }
 
-const allowPolicy = { decision: 'allow' as any, allowed: true, requiredApproval: false, reasonCode: 'policy_default_allow' as const, sourceRuleId: 'r', matchedRuleIds: ['r'] };
-const defaultClassification = { taskKind: 'chat' as const, riskLevel: 'low' as const, latencySensitivity: 'standard' as const, contextRequirement: 'small' as const, requiresTools: false, requiresStreaming: false, batchSuitable: false, remoteExecutionEligible: true, approvalRequirementHint: 'none' as const, providerConstraints: [] };
+const allowPolicy = {
+  decision: 'allow' as any,
+  allowed: true,
+  requiredApproval: false,
+  reasonCode: 'policy_default_allow' as const,
+  sourceRuleId: 'r',
+  matchedRuleIds: ['r'],
+};
+
+const defaultClassification = {
+  taskKind: 'chat' as const,
+  riskLevel: 'low' as const,
+  latencySensitivity: 'standard' as const,
+  contextRequirement: 'small' as const,
+  requiresTools: false,
+  requiresStreaming: false,
+  batchSuitable: false,
+  remoteExecutionEligible: true,
+  approvalRequirementHint: 'none' as const,
+  providerConstraints: [],
+};
 
 // ===========================================================================
 // Queue saturation & starvation

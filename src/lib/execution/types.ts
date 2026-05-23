@@ -12,6 +12,17 @@ import { QueueReasonCode } from './reason-codes';
 // Queue Status and Execution States
 // ============================================================================
 
+/**
+ * Queue item lifecycle states.
+ *
+ * Valid transitions:
+ *   PENDING  → RUNNING | CANCELLED
+ *   QUEUED   → PENDING | RUNNING | CANCELLED
+ *   RUNNING  → COMPLETED | FAILED | CANCELLED
+ *   FAILED   → DEAD_LETTER
+ *   BLOCKED  → PENDING | CANCELLED
+ *   COMPLETED, CANCELLED, DEAD_LETTER → (terminal, no outbound transitions)
+ */
 export enum QueueStatus {
   PENDING = 'pending',
   QUEUED = 'queued',
@@ -20,6 +31,7 @@ export enum QueueStatus {
   FAILED = 'failed',
   CANCELLED = 'cancelled',
   BLOCKED = 'blocked',
+  /** Terminal state for items that exhausted retries or exceeded token limits. */
   DEAD_LETTER = 'dead_letter',
 }
 
