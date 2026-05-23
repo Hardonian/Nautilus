@@ -62,6 +62,9 @@ export class ApiGateway {
         }
         return;
       }
+    }
+
+      }
 
       if (req.url === "/grid/register") {
         let body = "";
@@ -97,7 +100,7 @@ export class ApiGateway {
         });
         return;
       }
-      
+
       const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
       if (statusMatch) {
         const sandboxName = statusMatch[1];
@@ -119,7 +122,6 @@ export class ApiGateway {
         }
         return;
       }
-    }
 
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "not found" }));

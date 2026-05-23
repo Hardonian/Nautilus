@@ -16,19 +16,19 @@ export class AutonomousRemediationLoop {
     while (attempts < this.maxRetries) {
       attempts++;
       const report = await runTruthLoop(deps, input);
-      
+
       if (report.status === "completed") {
         return report;
       }
-      
+
       if (report.status === "denied") {
         // Can't heal policy denial autonomously without manual operator approval
         return report;
       }
-      
+
       // If degraded, failed, or queue saturated, try to heal by waiting or re-routing
       console.warn(`[Remediation] Execution ${report.executionId} failed or degraded (${report.status}). Attempt ${attempts} of ${this.maxRetries}`);
-      
+
       const healingEvent = buildNautilusEvent({
         type: "runtime.restored",
         source: "remediation-loop",
@@ -46,7 +46,7 @@ export class AutonomousRemediationLoop {
         return report;
       }
     }
-    
+
     throw new Error("Remediation exhausted without success");
   }
 }
