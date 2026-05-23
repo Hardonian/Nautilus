@@ -53,6 +53,8 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
 
   const candidates: SchedulingCandidate[] = [];
   const rejected: RejectedSchedulingCandidate[] = [];
+  /** Internal scoring metadata per candidate, keyed by nodeId. */
+  const scoringMetadata = new Map<string, { contextUtilization: number; queuePressure: number; vramHeadroom: number }>();
   const requestedInput = Number(input.request.metadata.estimatedInputTokens ?? "0");
   const requestedOutput = Number(input.request.metadata.estimatedOutputTokens ?? "0");
   const requiredVram = Number(input.request.metadata.vramRequiredMb ?? "0");
@@ -122,19 +124,23 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
         capabilityInputs.estimatedCost * 2 -
         contextPenalty,
     );
-    candidates.push({ nodeId: node.nodeId, modelId: model?.modelId ?? "unknown", score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score},context_util=${contextUtilization.toFixed(2)},vram_headroom=${vramHeadroom.toFixed(1)},queue_pressure=${capabilityInputs.queuePressure}`, source: "scheduler" }] } as SchedulingCandidate & { _contextUtilization: number; _queuePressure: number; _vramHeadroom: number });
+    scoringMetadata.set(node.nodeId, { contextUtilization, queuePressure: capabilityInputs.queuePressure, vramHeadroom });
+    candidates.push({ nodeId: node.nodeId, modelId: model?.modelId ?? "unknown", score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score},context_util=${contextUtilization.toFixed(2)},vram_headroom=${vramHeadroom.toFixed(1)},queue_pressure=${capabilityInputs.queuePressure}`, source: "scheduler" }] });
   }
 
   candidates.sort((a, b) => b.score - a.score || a.nodeId.localeCompare(b.nodeId) || a.modelId.localeCompare(b.modelId));
 
   // Build routing receipt from actual scoring inputs
-  const scoringInputs = candidates.map((c) => ({
-    nodeId: c.nodeId,
-    score: c.score,
-    contextUtilization: (c as any)._contextUtilization ?? 0,
-    queuePressure: (c as any)._queuePressure ?? 0,
-    vramHeadroom: (c as any)._vramHeadroom ?? 0,
-  }));
+  const scoringInputs = candidates.map((c) => {
+    const meta = scoringMetadata.get(c.nodeId);
+    return {
+      nodeId: c.nodeId,
+      score: c.score,
+      contextUtilization: meta?.contextUtilization ?? 0,
+      queuePressure: meta?.queuePressure ?? 0,
+      vramHeadroom: meta?.vramHeadroom ?? 0,
+    };
+  });
 
   if (!candidates.length) {
     reasons.push({ code: "no_candidate", explanation: "no eligible candidate after policy/health filtering", source: "scheduler" });

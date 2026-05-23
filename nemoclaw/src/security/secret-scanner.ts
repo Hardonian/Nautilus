@@ -74,6 +74,12 @@ const SECRET_PATTERNS: SecretPattern[] = [
 
   // HuggingFace token
   { name: "HuggingFace token", regex: /\bhf_[A-Za-z0-9]{20,}\b/ },
+
+  // Base64-encoded JWTs
+  { name: "JSON Web Token (JWT)", regex: /\bey[A-Za-z0-9_-]{10,}\.ey[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/ },
+
+  // URL-embedded credentials
+  { name: "URL-embedded credentials", regex: /(?:https?|ftp|postgres|mysql|redis|mongodb):\/\/[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+@/i },
 ];
 
 /**

@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { generateKeyPairSync, sign, verify, KeyPairKeyObjectResult } from "node:crypto";
+import { generateKeyPairSync, sign, verify, type KeyObject } from "node:crypto";
+
+type Ed25519KeyPair = { publicKey: KeyObject; privateKey: KeyObject };
 
 export interface SignedExport<T> {
   payload: T;
@@ -11,9 +13,9 @@ export interface SignedExport<T> {
   signedAt: string;
 }
 
-let sessionKey: KeyPairKeyObjectResult | undefined;
+let sessionKey: Ed25519KeyPair | undefined;
 
-function getSessionKey(): KeyPairKeyObjectResult {
+function getSessionKey(): Ed25519KeyPair {
   if (!sessionKey) {
     sessionKey = generateKeyPairSync("ed25519");
   }
