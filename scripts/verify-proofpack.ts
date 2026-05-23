@@ -10,7 +10,10 @@ const partial = buildProofpack("partial");
 const checks = [
   { id: "complete_has_evidence", ok: complete.evidenceCount > 0 },
   { id: "complete_is_complete", ok: complete.completeness === "complete" },
-  { id: "partial_is_degraded", ok: partial.completeness === "partial" && partial.degradedReasons.length > 0 },
+  {
+    id: "partial_is_degraded",
+    ok: partial.completeness === "partial" && partial.degradedReasons.length > 0,
+  },
 ];
 const result = {
   kind: "nautilus.proofpack.verify",

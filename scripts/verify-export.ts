@@ -9,7 +9,10 @@ const report = buildOperatorReport();
 const checks = [
   { id: "package_ready", ok: report.packageReady === true },
   { id: "has_commands_array", ok: Array.isArray(report.commands) && report.commands.length > 0 },
-  { id: "has_provenance", ok: typeof report.generatedAt === "string" && report.generatedAt.length > 0 },
+  {
+    id: "has_provenance",
+    ok: typeof report.generatedAt === "string" && report.generatedAt.length > 0,
+  },
 ];
 const result = {
   kind: "nautilus.export.verify",

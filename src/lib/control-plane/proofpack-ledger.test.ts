@@ -52,20 +52,20 @@ describe("Proofpack Ledger", () => {
 
   it("should append a proofpack to an empty ledger with zero-hash", () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    
+
     const entry = appendToLedger(mockProofpack1);
-    
+
     expect(entry.previousHash).toBe("0000000000000000000000000000000000000000000000000000000000000000");
     expect(entry.proofpackId).toBe(mockProofpack1.id);
     expect(entry.hash).toBe(computeProofpackHash(mockProofpack1, entry.previousHash));
-    
+
     expect(fs.writeFileSync).toHaveBeenCalled();
   });
 
   it("should append a proofpack to an existing ledger and chain hashes", () => {
     const zeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
     const hash1 = computeProofpackHash(mockProofpack1, zeroHash);
-    
+
     const existingLedger = [
       {
         proofpackId: mockProofpack1.id,
@@ -80,7 +80,7 @@ describe("Proofpack Ledger", () => {
     vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify(existingLedger));
 
     const entry2 = appendToLedger(mockProofpack2);
-    
+
     expect(entry2.previousHash).toBe(hash1);
     expect(entry2.hash).toBe(computeProofpackHash(mockProofpack2, hash1));
   });
@@ -113,7 +113,7 @@ describe("Proofpack Ledger", () => {
   it("should reject an invalid signature chain (tampered payload)", () => {
     const zeroHash = "0000000000000000000000000000000000000000000000000000000000000000";
     const hash1 = computeProofpackHash(mockProofpack1, zeroHash);
-    
+
     const tamperedPayload = { ...mockProofpack1, executionId: "tampered-id" };
 
     const invalidLedger = [

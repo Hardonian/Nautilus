@@ -47,7 +47,7 @@ export class LocalGridNode implements GridNode {
 
     // Simple round-robin for grid routing
     const target = healthyPeers[Math.floor(Math.random() * healthyPeers.length)];
-    
+
     try {
       const res = await fetch(`${target.url}/grid/workload`, {
         method: "POST",

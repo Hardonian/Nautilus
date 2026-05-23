@@ -87,6 +87,7 @@ export interface AgentDefinition {
   readonly hasDevicePairing: boolean;
   readonly phoneHomeHosts: string[];
   readonly messagingPlatforms: string[];
+
   readonly dockerfileBasePath: string | null;
   readonly dockerfilePath: string | null;
   readonly startScriptPath: string | null;
