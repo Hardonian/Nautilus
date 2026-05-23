@@ -30,3 +30,19 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.themeToggle {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.75rem;
+}

@@ -55,19 +55,29 @@ for (const [name, command] of smokeCommands) {
   writeFileSync(join(smokeDir, `${name}.json`), output);
 }
 
-writeFileSync(join(proofpackDir, "sample-proofpack.json"), readFileSync(join(smokeDir, "proofpack-smoke.json"), "utf8"));
-writeFileSync(join(proofpackDir, "sample-replay.json"), readFileSync(join(smokeDir, "replay-smoke.json"), "utf8"));
+writeFileSync(
+  join(proofpackDir, "sample-proofpack.json"),
+  readFileSync(join(smokeDir, "proofpack-smoke.json"), "utf8"),
+);
+writeFileSync(
+  join(proofpackDir, "sample-replay.json"),
+  readFileSync(join(smokeDir, "replay-smoke.json"), "utf8"),
+);
 
 const verificationSummaryPath = join(ARTIFACTS_DIR, "verification-summary.json");
 if (!statSync(verificationSummaryPath, { throwIfNoEntry: false })) {
   writeFileSync(
     verificationSummaryPath,
-    `${JSON.stringify({
-      generatedAt: BUILD_TIMESTAMP,
-      status: "degraded",
-      checks: [],
-      note: "Run npm run verification:summary to produce deterministic check results.",
-    }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        generatedAt: BUILD_TIMESTAMP,
+        status: "degraded",
+        checks: [],
+        note: "Run npm run verification:summary to produce deterministic check results.",
+      },
+      null,
+      2,
+    )}\n`,
   );
 }
 
@@ -95,4 +105,7 @@ const manifest = {
   releaseBundleIndex: "artifacts/release-bundle/index.json",
 };
 
-writeFileSync(join(ARTIFACTS_DIR, "release-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+writeFileSync(
+  join(ARTIFACTS_DIR, "release-manifest.json"),
+  `${JSON.stringify(manifest, null, 2)}\n`,
+);

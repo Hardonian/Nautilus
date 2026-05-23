@@ -231,11 +231,22 @@ function executeProbeWithHttpRetry(probe) {
   let result = probe.execute();
   for (const delayMs of HTTP_PROBE_RETRY_DELAYS_MS) {
     if (!shouldRetryHttpProbe(result)) break;
-    console.log(
-      `  ${probe.name} validation returned HTTP ${result.httpStatus}; retrying in ${Math.round(delayMs / 1000)}s...`,
-    );
-    sleepSync(delayMs);
-    result = probe.execute();
+
+    const stepMs = result.httpStatus === 429 ? delayMs : 2000;
+    let waited = 0;
+    while (waited < delayMs) {
+      const waitTime = Math.min(stepMs, delayMs - waited);
+      console.log(
+        `  ${probe.name} validation returned HTTP ${result.httpStatus}; retrying in ${Math.round(waitTime / 1000)}s...`,
+      );
+      sleepSync(waitTime);
+      waited += waitTime;
+
+      result = probe.execute();
+      if (!shouldRetryHttpProbe(result)) {
+        return result;
+      }
+    }
   }
   return result;
 }
@@ -699,11 +710,20 @@ function probeOpenAiLikeEndpoint(endpointUrl, model, apiKey, options = {}) {
       const reason = isTimeoutOrConnFailure(retryResult.curlStatus)
         ? "timed out"
         : `returned HTTP ${retryResult.httpStatus}`;
-      console.log(
-        `  Chat Completions API validation ${reason}; retrying in ${Math.round(delayMs / 1000)}s...`,
-      );
-      sleepSync(delayMs);
-      retryResult = runRetryProbe();
+      const stepMs = retryResult.httpStatus === 429 ? delayMs : 2000;
+      let waited = 0;
+      while (waited < delayMs) {
+        const waitTime = Math.min(stepMs, delayMs - waited);
+        console.log(
+          `  Chat Completions API validation ${reason}; retrying in ${Math.round(waitTime / 1000)}s...`,
+        );
+        sleepSync(waitTime);
+        waited += waitTime;
+        retryResult = runRetryProbe();
+        if (retryResult.ok || !isRetriableProbeResult(retryResult)) {
+          break;
+        }
+      }
       if (retryResult.ok) {
         return { ok: true, api: "openai-completions", label: "Chat Completions API" };
       }

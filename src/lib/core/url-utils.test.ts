@@ -20,6 +20,21 @@ describe("compactText", () => {
   it("handles empty string", () => {
     expect(compactText("")).toBe("");
   });
+  it("handles newlines and tabs", () => {
+    expect(compactText("hello\n\nworld\t\t")).toBe("hello world");
+  });
+
+  it("handles undefined parameter", () => {
+    expect(compactText(undefined)).toBe("");
+  });
+
+  it("handles whitespace-only string", () => {
+    expect(compactText("   \n \t ")).toBe("");
+  });
+
+  it("handles string without whitespace", () => {
+    expect(compactText("helloworld")).toBe("helloworld");
+  });
 });
 
 describe("stripEndpointSuffix", () => {

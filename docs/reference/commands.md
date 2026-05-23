@@ -909,6 +909,14 @@ $ nemoclaw debug [--quick|-q] [--sandbox NAME] [--output PATH|-o PATH]
 
 If `--output` is set and the tarball cannot be written (for example, the destination directory is missing or read-only), the command exits non-zero so scripts can detect the failure.
 
+### `nemoclaw capability-report`
+
+Generate a diagnostic capability report detailing host status, available sandboxes, and OpenShell properties.
+
+```console
+$ nemoclaw capability-report
+```
+
 ### `nemoclaw credentials list`
 
 List the provider credentials registered with the OpenShell gateway.
@@ -1108,3 +1116,13 @@ Running `nemoclaw setup` now delegates directly to `nemoclaw onboard`.
 ```console
 $ nemoclaw setup
 ```
+
+### \`nemoclaw capability-report\`
+
+Generates a JSON report of the sandbox's capabilities, limits, and runtime configuration.
+
+**Usage:** \`nemoclaw capability-report [OPTIONS]\`
+
+**Options:**
+- \`--output <file>\`: Write the report to a file instead of stdout.
+- \`--format <format>\`: Output format (json, yaml). Default is json.

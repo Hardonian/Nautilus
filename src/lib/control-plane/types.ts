@@ -162,7 +162,30 @@ export interface ControlRequestEnvelope {
 
 export interface ControlDecisionReason { code: string; explanation: string; source: string; }
 export interface SchedulingCandidate { nodeId: string; modelId: string; score: number; reasons: ControlDecisionReason[]; }
-export interface SchedulingDecision { selected?: SchedulingCandidate; rejected: SchedulingCandidate[]; reasons: ControlDecisionReason[]; }
+export interface SchedulingCapabilityInputs {
+  vramAvailableMb: number;
+  vramRequiredMb: number;
+  contextWindowTokens: number;
+  estimatedInputTokens: number;
+  estimatedOutputTokens: number;
+  recentLatencyMs: number;
+  queueDepth: number;
+  queuePressure: number;
+  estimatedCost: number;
+  runtimeAvailable: boolean;
+  modelAvailable: boolean;
+  quantProfile: string;
+  deviceClass: string;
+}
+export interface RejectedSchedulingCandidate extends SchedulingCandidate {
+  rejectionReasons: string[];
+  capabilityInputs: SchedulingCapabilityInputs;
+}
+export interface SchedulingDecision {
+  selected?: SchedulingCandidate;
+  rejected: RejectedSchedulingCandidate[];
+  reasons: ControlDecisionReason[];
+}
 export interface PolicyDecisionReason { code: string; explanation: string; source: string; }
 export interface PolicyDecision { allowed: boolean; reasons: PolicyDecisionReason[]; requiredApproval: boolean; }
 export interface ControlDecision {

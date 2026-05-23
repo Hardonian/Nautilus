@@ -7,12 +7,16 @@ import { execa } from 'execa';
 describe('nautilus golden path', () => {
   it('emits expected JSON shape and proofpack evidence', async () => {
     const { stdout } = await execa('npx', ['tsx', 'scripts/nautilus/golden-path.ts']);
-    const payload = JSON.parse(stdout);
+    const signed = JSON.parse(stdout);
+    const payload = signed.payload;
     expect(payload.evidence.executionId).toBeTruthy();
     expect(payload.evidence.idempotencyKey.length).toBeGreaterThanOrEqual(8);
     expect(payload.evidence.proofpack.status).toBeTruthy();
     expect(payload.evidence.events.length).toBeGreaterThan(0);
     expect(payload.generatedAt).toBe('2026-03-01T00:00:00.000Z');
+    expect(signed.signature).toBeTruthy();
+    expect(signed.publicKey).toBeTruthy();
+    expect(signed.algorithm).toBe('Ed25519');
   });
 
   it('emits deterministic degraded runtime output via runtime-health smoke', async () => {

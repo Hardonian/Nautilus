@@ -681,10 +681,6 @@ export async function runSandboxDoctor(sandboxName: string, args: string[] = [])
   }
 
   const liveSandboxCheck = checkLiveSandbox(sandboxName, openshellBin, openshellConnected);
-  // we only add it if openshellBin was present, or to match the previous logic where
-  // it was only checked if openshellBin was present.
-  // Looking at the original code:
-  // if (openshellBin && openshellConnected) { checks.push(...) } else if (openshellBin) { checks.push(...) }
   if (openshellBin) {
     checks.push(liveSandboxCheck);
   }

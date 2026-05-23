@@ -71,6 +71,7 @@ export interface AgentDefinition {
   state_dirs?: string[];
   state_files?: AgentStateFile[];
   messaging_platforms?: { supported?: string[] };
+  subagents?: string[];
   _legacy_paths?: StringMap;
   agentDir: string;
   manifestPath: string;
@@ -86,6 +87,7 @@ export interface AgentDefinition {
   readonly hasDevicePairing: boolean;
   readonly phoneHomeHosts: string[];
   readonly messagingPlatforms: string[];
+  readonly subagents: string[];
   readonly dockerfileBasePath: string | null;
   readonly dockerfilePath: string | null;
   readonly startScriptPath: string | null;
@@ -302,6 +304,7 @@ export function loadAgent(name: string): AgentDefinition {
   const stateFiles = readStateFiles(raw);
   const phoneHomeHosts = readStringArray(raw, "phone_home_hosts");
   const messagingPlatforms = readMessagingPlatforms(raw);
+  const subagents = readStringArray(raw, "subagents");
   const legacyPathConfig = readStringMap(raw, "_legacy_paths");
 
   const agent: AgentDefinition = {
@@ -321,6 +324,7 @@ export function loadAgent(name: string): AgentDefinition {
     state_dirs: stateDirs,
     state_files: stateFiles,
     messaging_platforms: messagingPlatforms,
+    subagents,
     _legacy_paths: legacyPathConfig,
     agentDir,
     manifestPath,
@@ -392,6 +396,10 @@ export function loadAgent(name: string): AgentDefinition {
 
     get messagingPlatforms(): string[] {
       return messagingPlatforms?.supported ?? [];
+    },
+
+    get subagents(): string[] {
+      return subagents ?? [];
     },
 
     get dockerfileBasePath(): string | null {

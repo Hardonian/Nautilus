@@ -17,13 +17,36 @@ export interface QueueStore {
   getAll(): ExecutionQueueItem[];
 }
 
+export interface QueueCapacityConfig {
+  maxCapacity: number;
+  starvationThresholdMs: number;
+}
+
+const DEFAULT_CAPACITY: QueueCapacityConfig = {
+  maxCapacity: 1000,
+  starvationThresholdMs: 30_000,
+};
+
+export interface QueuePressureSnapshot {
+  depth: number;
+  pendingCount: number;
+  runningCount: number;
+  deadLetterCount: number;
+  oldestPendingAgeMs: number;
+  starvationDetected: boolean;
+  capacityUtilization: number;
+  capturedAt: string;
+}
+
 export class ExecutionQueue {
   private store: QueueStore;
   private predicates: QueuePredicate[] = [];
   private nextPosition = 1;
+  private readonly capacity: QueueCapacityConfig;
 
-  constructor(store: QueueStore) {
+  constructor(store: QueueStore, capacity?: Partial<QueueCapacityConfig>) {
     this.store = store;
+    this.capacity = { ...DEFAULT_CAPACITY, ...capacity };
   }
 
   addPredicate(predicate: QueuePredicate): void {
@@ -46,6 +69,17 @@ export class ExecutionQueue {
       );
     }
 
+    // Bounded capacity — reject deterministically when full
+    const activeCount = this.store.getAll().filter(
+      (i) => i.status === QueueStatus.PENDING || i.status === QueueStatus.RUNNING,
+    ).length;
+    if (activeCount >= this.capacity.maxCapacity) {
+      return QueueDecision.block(
+        QueueReasonCode.QUEUE_FULL,
+        `Queue at capacity (${activeCount}/${this.capacity.maxCapacity}), admission denied for ${item.id}`,
+      );
+    }
+
     for (const predicate of this.predicates) {
       const decision = predicate.evaluate(item);
       if (!decision.allowed) {
@@ -61,10 +95,22 @@ export class ExecutionQueue {
   }
 
   dequeue(): ExecutionQueueItem | undefined {
+    const now = Date.now();
     const items = this.store
       .getAll()
       .filter((i) => i.status === QueueStatus.PENDING)
-      .sort((a, b) => (a.queuePosition ?? 0) - (b.queuePosition ?? 0));
+      .sort((a, b) => {
+        // Starvation prevention: boost priority of items waiting longer than threshold.
+        // This ensures no item can wait indefinitely regardless of queue position.
+        const ageA = a.enqueuedAt ? now - Date.parse(a.enqueuedAt) : 0;
+        const ageB = b.enqueuedAt ? now - Date.parse(b.enqueuedAt) : 0;
+        const starvedA = ageA > this.capacity.starvationThresholdMs ? 1 : 0;
+        const starvedB = ageB > this.capacity.starvationThresholdMs ? 1 : 0;
+
+        // Starved items always dequeue first; within same starvation class, use position
+        if (starvedA !== starvedB) return starvedB - starvedA;
+        return (a.queuePosition ?? 0) - (b.queuePosition ?? 0);
+      });
 
     if (items.length === 0) {
       return undefined;
@@ -155,9 +201,10 @@ export class ExecutionQueue {
         QueueStatus.CANCELLED,
       ],
       [QueueStatus.COMPLETED]: [],
-      [QueueStatus.FAILED]: [],
+      [QueueStatus.FAILED]: [QueueStatus.DEAD_LETTER],
       [QueueStatus.CANCELLED]: [],
       [QueueStatus.BLOCKED]: [QueueStatus.PENDING, QueueStatus.CANCELLED],
+      [QueueStatus.DEAD_LETTER]: [],
     };
 
     const allowed = validTransitions[from] ?? [];
@@ -169,5 +216,67 @@ export class ExecutionQueue {
     }
 
     return { valid: true };
+  }
+
+  /**
+   * Transition a failed item to dead-letter state.
+   * This is an explicit operator-visible action, never automatic.
+   */
+  moveToDeadLetter(
+    id: string,
+    reason: QueueReasonCode = QueueReasonCode.DEAD_LETTER_RETRY_EXHAUSTED,
+  ): QueueDecision {
+    const item = this.store.get(id);
+    if (!item) {
+      return QueueDecision.block(
+        QueueReasonCode.INTERNAL_ERROR,
+        `Item ${id} not found`,
+      );
+    }
+    if (item.status !== QueueStatus.FAILED) {
+      return QueueDecision.block(
+        QueueReasonCode.VALIDATION_FAILED,
+        `Only FAILED items can be moved to dead letter, got ${item.status}`,
+      );
+    }
+    item.status = QueueStatus.DEAD_LETTER;
+    item.lastReason = reason;
+    item.updatedAt = new Date().toISOString();
+    this.store.set(item);
+    return QueueDecision.allow(`Item ${id} moved to dead letter: ${reason}`);
+  }
+
+  /**
+   * Snapshot of current queue pressure derived from actual runtime state.
+   * No synthetic or estimated values — only observable state.
+   */
+  captureQueuePressure(): QueuePressureSnapshot {
+    const now = Date.now();
+    const all = this.store.getAll();
+    const pending = all.filter((i) => i.status === QueueStatus.PENDING);
+    const running = all.filter((i) => i.status === QueueStatus.RUNNING);
+    const deadLetter = all.filter((i) => i.status === QueueStatus.DEAD_LETTER);
+
+    let oldestPendingAgeMs = 0;
+    for (const item of pending) {
+      if (item.enqueuedAt) {
+        const age = now - Date.parse(item.enqueuedAt);
+        if (age > oldestPendingAgeMs) oldestPendingAgeMs = age;
+      }
+    }
+
+    const activeCount = pending.length + running.length;
+    return {
+      depth: all.length,
+      pendingCount: pending.length,
+      runningCount: running.length,
+      deadLetterCount: deadLetter.length,
+      oldestPendingAgeMs,
+      starvationDetected: oldestPendingAgeMs > this.capacity.starvationThresholdMs,
+      capacityUtilization: this.capacity.maxCapacity > 0
+        ? activeCount / this.capacity.maxCapacity
+        : 0,
+      capturedAt: new Date().toISOString(),
+    };
   }
 }

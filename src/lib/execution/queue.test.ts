@@ -353,4 +353,202 @@ describe('ExecutionQueue', () => {
       expect(governance.isOperationAllowed('dequeue')).toBe(true);
     });
   });
+
+  describe('bounded capacity', () => {
+    it('should reject enqueue when active items reach maxCapacity', () => {
+      const items = new Map<string, ExecutionQueueItem>();
+      const boundedStore = {
+        get: (id: string) => items.get(id),
+        set: (item: ExecutionQueueItem) => items.set(item.id, item),
+        delete: (id: string) => items.delete(id),
+        getAll: () => Array.from(items.values()),
+      };
+      const boundedQueue = new ExecutionQueue(boundedStore, { maxCapacity: 2 });
+
+      expect(boundedQueue.enqueue(createTestQueueItem({ id: 'cap-1', executionId: 'e1' })).allowed).toBe(true);
+      expect(boundedQueue.enqueue(createTestQueueItem({ id: 'cap-2', executionId: 'e2' })).allowed).toBe(true);
+
+      const result = boundedQueue.enqueue(createTestQueueItem({ id: 'cap-3', executionId: 'e3' }));
+      expect(result.allowed).toBe(false);
+      expect(result.reasonCode).toBe(QueueReasonCode.QUEUE_FULL);
+    });
+
+    it('should count RUNNING items toward capacity', () => {
+      const items = new Map<string, ExecutionQueueItem>();
+      const boundedStore = {
+        get: (id: string) => items.get(id),
+        set: (item: ExecutionQueueItem) => items.set(item.id, item),
+        delete: (id: string) => items.delete(id),
+        getAll: () => Array.from(items.values()),
+      };
+      const boundedQueue = new ExecutionQueue(boundedStore, { maxCapacity: 2 });
+
+      boundedQueue.enqueue(createTestQueueItem({ id: 'run-1', executionId: 'e1' }));
+      boundedQueue.updateStatus('run-1', QueueStatus.RUNNING);
+      boundedQueue.enqueue(createTestQueueItem({ id: 'run-2', executionId: 'e2' }));
+
+      const result = boundedQueue.enqueue(createTestQueueItem({ id: 'run-3', executionId: 'e3' }));
+      expect(result.allowed).toBe(false);
+      expect(result.reasonCode).toBe(QueueReasonCode.QUEUE_FULL);
+    });
+
+    it('should not count COMPLETED or FAILED items toward capacity', () => {
+      const items = new Map<string, ExecutionQueueItem>();
+      const boundedStore = {
+        get: (id: string) => items.get(id),
+        set: (item: ExecutionQueueItem) => items.set(item.id, item),
+        delete: (id: string) => items.delete(id),
+        getAll: () => Array.from(items.values()),
+      };
+      const boundedQueue = new ExecutionQueue(boundedStore, { maxCapacity: 2 });
+
+      boundedQueue.enqueue(createTestQueueItem({ id: 'done-1', executionId: 'e1' }));
+      boundedQueue.updateStatus('done-1', QueueStatus.RUNNING);
+      boundedQueue.updateStatus('done-1', QueueStatus.COMPLETED);
+
+      boundedQueue.enqueue(createTestQueueItem({ id: 'done-2', executionId: 'e2' }));
+      boundedQueue.updateStatus('done-2', QueueStatus.RUNNING);
+      boundedQueue.updateStatus('done-2', QueueStatus.FAILED);
+
+      // Both slots freed — should accept two more
+      expect(boundedQueue.enqueue(createTestQueueItem({ id: 'new-1', executionId: 'e3' })).allowed).toBe(true);
+      expect(boundedQueue.enqueue(createTestQueueItem({ id: 'new-2', executionId: 'e4' })).allowed).toBe(true);
+    });
+  });
+
+  describe('starvation prevention', () => {
+    it('should boost starved items above newer items in dequeue order', () => {
+      const items = new Map<string, ExecutionQueueItem>();
+      const starvationStore = {
+        get: (id: string) => items.get(id),
+        set: (item: ExecutionQueueItem) => items.set(item.id, item),
+        delete: (id: string) => items.delete(id),
+        getAll: () => Array.from(items.values()),
+      };
+      const starvationQueue = new ExecutionQueue(starvationStore, { starvationThresholdMs: 50 });
+
+      // Directly insert an old item with high position number
+      const oldItem = createTestQueueItem({ id: 'starved' });
+      oldItem.enqueuedAt = new Date(Date.now() - 100).toISOString();
+      oldItem.queuePosition = 999;
+      starvationStore.set(oldItem);
+
+      // Enqueue a fresh item (gets position 1)
+      starvationQueue.enqueue(createTestQueueItem({ id: 'fresh', executionId: 'e2' }));
+
+      const dequeued = starvationQueue.dequeue();
+      expect(dequeued?.id).toBe('starved');
+    });
+
+    it('should preserve FIFO within the same starvation class', () => {
+      const items = new Map<string, ExecutionQueueItem>();
+      const fifoStore = {
+        get: (id: string) => items.get(id),
+        set: (item: ExecutionQueueItem) => items.set(item.id, item),
+        delete: (id: string) => items.delete(id),
+        getAll: () => Array.from(items.values()),
+      };
+      const fifoQueue = new ExecutionQueue(fifoStore, { starvationThresholdMs: 999_999 });
+
+      fifoQueue.enqueue(createTestQueueItem({ id: 'first', executionId: 'e1' }));
+      fifoQueue.enqueue(createTestQueueItem({ id: 'second', executionId: 'e2' }));
+      fifoQueue.enqueue(createTestQueueItem({ id: 'third', executionId: 'e3' }));
+
+      expect(fifoQueue.dequeue()?.id).toBe('first');
+      expect(fifoQueue.dequeue()?.id).toBe('second');
+      expect(fifoQueue.dequeue()?.id).toBe('third');
+    });
+  });
+
+  describe('dead-letter transitions', () => {
+    it('should allow FAILED → DEAD_LETTER via moveToDeadLetter', () => {
+      const item = createTestQueueItem();
+      queue.enqueue(item);
+      queue.updateStatus(item.id, QueueStatus.RUNNING);
+      queue.updateStatus(item.id, QueueStatus.FAILED);
+
+      const result = queue.moveToDeadLetter(item.id);
+      expect(result.allowed).toBe(true);
+      expect(store.get(item.id).status).toBe(QueueStatus.DEAD_LETTER);
+      expect(store.get(item.id).lastReason).toBe(QueueReasonCode.DEAD_LETTER_RETRY_EXHAUSTED);
+    });
+
+    it('should allow FAILED → DEAD_LETTER via updateStatus', () => {
+      const item = createTestQueueItem();
+      queue.enqueue(item);
+      queue.updateStatus(item.id, QueueStatus.RUNNING);
+      queue.updateStatus(item.id, QueueStatus.FAILED);
+
+      const result = queue.updateStatus(item.id, QueueStatus.DEAD_LETTER);
+      expect(result.allowed).toBe(true);
+    });
+
+    it('should reject moveToDeadLetter for non-FAILED items', () => {
+      const item = createTestQueueItem();
+      queue.enqueue(item);
+
+      expect(queue.moveToDeadLetter(item.id).allowed).toBe(false);
+      expect(queue.moveToDeadLetter(item.id).reasonCode).toBe(QueueReasonCode.VALIDATION_FAILED);
+    });
+
+    it('should reject moveToDeadLetter for non-existent items', () => {
+      expect(queue.moveToDeadLetter('ghost').allowed).toBe(false);
+      expect(queue.moveToDeadLetter('ghost').reasonCode).toBe(QueueReasonCode.INTERNAL_ERROR);
+    });
+
+    it('should accept custom reason code for dead-letter', () => {
+      const item = createTestQueueItem();
+      queue.enqueue(item);
+      queue.updateStatus(item.id, QueueStatus.RUNNING);
+      queue.updateStatus(item.id, QueueStatus.FAILED);
+
+      queue.moveToDeadLetter(item.id, QueueReasonCode.DEAD_LETTER_TOKEN_OVERFLOW);
+      expect(store.get(item.id).lastReason).toBe(QueueReasonCode.DEAD_LETTER_TOKEN_OVERFLOW);
+    });
+
+    it('should prevent any transition out of DEAD_LETTER', () => {
+      const item = createTestQueueItem();
+      queue.enqueue(item);
+      queue.updateStatus(item.id, QueueStatus.RUNNING);
+      queue.updateStatus(item.id, QueueStatus.FAILED);
+      queue.moveToDeadLetter(item.id);
+
+      expect(queue.updateStatus(item.id, QueueStatus.PENDING).allowed).toBe(false);
+      expect(queue.updateStatus(item.id, QueueStatus.RUNNING).allowed).toBe(false);
+      expect(queue.updateStatus(item.id, QueueStatus.FAILED).allowed).toBe(false);
+    });
+  });
+
+  describe('queue pressure snapshot', () => {
+    it('should report zero pressure on empty queue', () => {
+      const snapshot = queue.captureQueuePressure();
+      expect(snapshot.depth).toBe(0);
+      expect(snapshot.pendingCount).toBe(0);
+      expect(snapshot.runningCount).toBe(0);
+      expect(snapshot.deadLetterCount).toBe(0);
+      expect(snapshot.starvationDetected).toBe(false);
+      expect(snapshot.capacityUtilization).toBe(0);
+    });
+
+    it('should accurately reflect mixed-status items', () => {
+      queue.enqueue(createTestQueueItem({ id: 'p1', executionId: 'e1' }));
+      queue.enqueue(createTestQueueItem({ id: 'p2', executionId: 'e2' }));
+      queue.enqueue(createTestQueueItem({ id: 'p3', executionId: 'e3' }));
+      queue.updateStatus('p1', QueueStatus.RUNNING);
+      queue.updateStatus('p2', QueueStatus.RUNNING);
+      queue.updateStatus('p2', QueueStatus.FAILED);
+      queue.moveToDeadLetter('p2');
+
+      const snapshot = queue.captureQueuePressure();
+      expect(snapshot.depth).toBe(3);
+      expect(snapshot.pendingCount).toBe(1);
+      expect(snapshot.runningCount).toBe(1);
+      expect(snapshot.deadLetterCount).toBe(1);
+    });
+
+    it('should include ISO timestamp in capturedAt', () => {
+      const snapshot = queue.captureQueuePressure();
+      expect(() => new Date(snapshot.capturedAt).toISOString()).not.toThrow();
+    });
+  });
 });

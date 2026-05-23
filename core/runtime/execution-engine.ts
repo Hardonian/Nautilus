@@ -11,7 +11,9 @@ export type ExecutionEventKind =
   | 'execution.timeout'
   | 'execution.completed'
   | 'execution.failed'
-  | 'execution.queue_overflow';
+  | 'execution.queue_overflow'
+  | 'execution.dead_letter'
+  | 'execution.timing';
 
 export interface ExecutionEventRecord {
   runId: string;
@@ -44,6 +46,7 @@ export class RuntimeExecutionEngine {
   private readonly maxQueue: number;
   private readonly events: ExecutionEventRecord[] = [];
   private pending = 0;
+  private peakPending = 0;
 
   public constructor(maxQueue: number) {
     this.maxQueue = maxQueue;
@@ -53,13 +56,25 @@ export class RuntimeExecutionEngine {
     return [...this.events];
   }
 
+  /** Peak concurrent pending tasks observed since engine creation. */
+  public getPeakPending(): number {
+    return this.peakPending;
+  }
+
+  /** Current queue pressure as a ratio (0.0 – 1.0+). */
+  public getQueuePressure(): number {
+    return this.maxQueue > 0 ? this.pending / this.maxQueue : 0;
+  }
+
   public async execute<T>(task: ExecutionTask<T>, externalSignal?: AbortSignal): Promise<T> {
     if (this.pending >= this.maxQueue) {
-      this.emit(task.runId, 'execution.queue_overflow', 0, 'bounded_queue_limit');
+      this.emit(task.runId, 'execution.queue_overflow', 0, `bounded_queue_limit:pending=${this.pending},max=${this.maxQueue}`);
       throw new ExecutionQueueOverflowError(`queue overflow for run ${task.runId}`);
     }
     this.pending += 1;
+    if (this.pending > this.peakPending) this.peakPending = this.pending;
     let state: ExecutionLifecycleState = 'queued';
+    const queuedAt = Date.now();
     this.emit(task.runId, 'execution.queued', 0);
 
     const deadlineAt = task.deadlineAt ?? Date.now() + task.timeoutMs * (task.retries + 1);
@@ -99,6 +114,8 @@ export class RuntimeExecutionEngine {
             await new Promise((resolve) => setTimeout(resolve, task.backoffMs * attempt));
             continue;
           }
+          // Retry exhaustion — emit dead-letter evidence before final failure
+          this.emit(task.runId, 'execution.dead_letter', attempt, `retry_exhausted:attempts=${attempt},max=${task.retries + 1}`);
           this.emit(task.runId, 'execution.failed', attempt, msg);
           state = state === 'timed_out' ? 'timed_out' : 'failed';
           throw error;
@@ -107,6 +124,9 @@ export class RuntimeExecutionEngine {
       throw new Error('unreachable');
     } finally {
       this.pending -= 1;
+      // Emit execution timing evidence derived from actual wall-clock measurements
+      const totalMs = Date.now() - queuedAt;
+      this.emit(task.runId, 'execution.timing', 0, `totalMs=${totalMs},state=${state}`);
       await task.cleanup?.({ signal: new AbortController().signal, runId: task.runId, attempt: 0, deadlineAt }, state);
     }
   }

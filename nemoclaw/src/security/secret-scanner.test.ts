@@ -21,9 +21,9 @@ const FAKE = {
   huggingface: "hf_" + "ABCDEFGHIJKLMNOPQRSTUVWXYZab",
   discord: "ABCDEFGHIJKLMNOPQRSTUVWx" + ".abc123" + ".ABCDEFGHIJKLMNOPQRSTUVWXYZa",
   awsSecret: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-  authHeader:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
-    ".eyJzdWIiOiIxMjM0NTY3ODkwIn0.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ",
+  authHeader: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+  jwt: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ",
+  urlCreds: "https://admin:superSecret123@database.internal.com/",
 };
 
 describe("scanForSecrets", () => {
@@ -116,6 +116,27 @@ describe("scanForSecrets", () => {
       const matches = scanForSecrets(`Authorization: Bearer ${FAKE.authHeader}`);
       expect(matches).toHaveLength(1);
       expect(matches[0].pattern).toBe("Authorization header");
+    });
+
+    it("JSON Web Token (JWT)", () => {
+      const matches = scanForSecrets(`token is ${FAKE.jwt}`);
+      expect(matches).toHaveLength(1);
+      expect(matches[0].pattern).toBe("JSON Web Token (JWT)");
+    });
+
+    it("URL-embedded credentials", () => {
+      const matches = scanForSecrets(`connect to ${FAKE.urlCreds} today`);
+      expect(matches).toHaveLength(1);
+      expect(matches[0].pattern).toBe("URL-embedded credentials");
+    });
+
+    it("High-entropy credentials", () => {
+      // Create a random base64 string that has high entropy and length > 20
+      const highEntropyString = "c2VjdXJlUmFuZG9tU3RyaW5nVGhhdElzVmVyeUxvbmdBbmRDb21wbGV4";
+      const matches = scanForSecrets(`my secret is ${highEntropyString}`);
+      expect(matches).toHaveLength(1);
+      expect(matches[0].pattern).toBe("High-entropy credential");
+      expect(matches[0].redacted).toBe("c2Vj..bGV4");
     });
   });
 
