@@ -8,9 +8,9 @@ import type {
 } from "node:child_process";
 import { NAME_ALLOWED_FORMAT } from "./name-validation";
 
-const { spawnSync } = require("child_process");
-const path = require("path");
-const { detectDockerHost } = require("./platform");
+import { spawnSync } from "child_process";
+import * as path from "path";
+import { detectDockerHost } from "./platform";
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const SCRIPTS = path.join(ROOT, "scripts");
@@ -246,7 +246,7 @@ function runCapture(cmd: readonly string[], opts: CaptureOptions = {}): string {
 }
 
 // Unified redaction — see redact.ts (#2381).
-const { redact, redactError, writeRedactedResult } = require("./security/redact");
+import { redact, redactError, writeRedactedResult } from "./security/redact";
 
 /**
  * Shell-quote a value for safe interpolation into bash -c strings.
