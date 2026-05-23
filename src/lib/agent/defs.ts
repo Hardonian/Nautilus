@@ -87,7 +87,7 @@ export interface AgentDefinition {
   readonly hasDevicePairing: boolean;
   readonly phoneHomeHosts: string[];
   readonly messagingPlatforms: string[];
-
+  readonly activeSubagents: string[];
   readonly dockerfileBasePath: string | null;
   readonly dockerfilePath: string | null;
   readonly startScriptPath: string | null;
@@ -398,6 +398,9 @@ export function loadAgent(name: string): AgentDefinition {
       return messagingPlatforms?.supported ?? [];
     },
 
+    get activeSubagents(): string[] {
+      return subagents ?? [];
+    },
 
     get dockerfileBasePath(): string | null {
       const dockerfileBase = path.join(agentDir, "Dockerfile.base");

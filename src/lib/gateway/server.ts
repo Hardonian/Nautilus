@@ -66,7 +66,6 @@ export class ApiGateway {
 
       }
 
-    if (req.method === "POST") {
       if (req.url === "/grid/register") {
         let body = "";
         req.on("data", chunk => { body += chunk.toString(); });
