@@ -69,4 +69,34 @@ describe("parsePort", () => {
     process.env[ENV_KEY] = ".*";
     expect(() => parsePort(ENV_KEY, 8080)).toThrow("Invalid port");
   });
+
+  it("rejects purely whitespace input", () => {
+    process.env[ENV_KEY] = "   ";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow('Invalid port: TEST_PORT="   " — must be an integer between 1024 and 65535');
+  });
+
+  it("rejects floating point numbers", () => {
+    process.env[ENV_KEY] = "8080.5";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow('Invalid port: TEST_PORT="8080.5" — must be an integer between 1024 and 65535');
+  });
+
+  it("rejects negative numbers", () => {
+    process.env[ENV_KEY] = "-8080";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow('Invalid port: TEST_PORT="-8080" — must be an integer between 1024 and 65535');
+  });
+
+  it("rejects exact boundary below limit (1023)", () => {
+    process.env[ENV_KEY] = "1023";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow('Invalid port: TEST_PORT="1023" — must be an integer between 1024 and 65535');
+  });
+
+  it("rejects exact boundary above limit (65536)", () => {
+    process.env[ENV_KEY] = "65536";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow('Invalid port: TEST_PORT="65536" — must be an integer between 1024 and 65535');
+  });
+
+  it("verifies exact error message format", () => {
+    process.env[ENV_KEY] = "invalid_port";
+    expect(() => parsePort(ENV_KEY, 8080)).toThrow('Invalid port: TEST_PORT="invalid_port" — must be an integer between 1024 and 65535');
+  });
 });
