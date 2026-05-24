@@ -441,6 +441,7 @@ Repo Invariants <architecture/REPO_INVARIANTS>
 Architecture <reference/architecture>
 Current State <architecture/current-state>
 Target State <architecture/target-state>
+Nautilus 100-Point Audit <architecture/nautilus-100-point-audit>
 Status Matrix <architecture/status-matrix>
 Failure Semantics <architecture/failure-semantics>
 Replayability <architecture/replayability>
