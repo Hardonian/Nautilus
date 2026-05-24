@@ -71,6 +71,7 @@ export interface AgentDefinition {
   state_dirs?: string[];
   state_files?: AgentStateFile[];
   messaging_platforms?: { supported?: string[] };
+  subagents?: string[];
   _legacy_paths?: StringMap;
   agentDir: string;
   manifestPath: string;
