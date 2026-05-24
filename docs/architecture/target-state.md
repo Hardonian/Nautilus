@@ -35,7 +35,7 @@ This document describes intended architecture for this fork. Status labels:
 
 ## Execution plane vs control plane
 
-- **Execution plane (current + future):** performs sandbox/tool/model actions.
+- **Execution plane (current + current):** performs sandbox/tool/model actions.
 - **Control plane (target):** computes deterministic decisions before execution: eligibility, policy checks, approval requirements, routing, and receipt emission.
 
 ## Canonical request envelope
@@ -73,3 +73,9 @@ Target: fail-closed for sensitive decisions, explicit degraded-state outputs for
 ## Future Dynamo-style GPU/device orchestration adapter seam
 
 Target: keep orchestration integration behind adapter interfaces so local contracts remain stable before optional external scheduler/orchestrator integration.
+
+
+## Deterministic governance target
+
+- Governance and architecture claims are validated by `npm run verify:status-truth` and exported at `artifacts/governance/status-truth-map.json`.
+- Threat seam and version-drift closure are release-gated by `npm run verify:governance`.

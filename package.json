@@ -88,7 +88,12 @@
     "verify:release-readiness": "node scripts/verify-release-readiness.js",
     "build": "npm run build:cli",
     "proof:orchestration": "tsx scripts/proof-orchestration.ts",
-    "verify:release-gate": "tsx scripts/verify-release-gate.ts"
+    "verify:release-gate": "tsx scripts/verify-release-gate.ts",
+    "verify:status-truth": "tsx scripts/verify-status-truth.ts",
+    "verify:threat-seams": "tsx scripts/verify-threat-seams.ts",
+    "verify:version-drift": "tsx scripts/verify-version-drift.ts",
+    "verify:governance": "tsx scripts/verify-governance.ts",
+    "verify:parity-bins": "vitest run test/nemohermes-alias.test.ts test/internal-cli.test.ts"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",
