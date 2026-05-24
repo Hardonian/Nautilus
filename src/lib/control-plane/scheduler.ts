@@ -41,6 +41,16 @@ export interface RoutingReceipt {
   decidedAt: string;
 }
 
+interface CandidateComputation {
+  nodeId: string;
+  modelId: string;
+  score: number;
+  capabilityInputs: SchedulingCapabilityInputs;
+  contextUtilization: number;
+  queuePressure: number;
+  vramHeadroom: number;
+}
+
 export function scheduleDeterministically(input: SchedulingInput): SchedulingResult {
   const excludedByPolicy: string[] = [];
   const excludedByHealth: string[] = [];
@@ -52,6 +62,7 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
   }
 
   const candidates: SchedulingCandidate[] = [];
+  const computedCandidates: CandidateComputation[] = [];
   const rejected: RejectedSchedulingCandidate[] = [];
   /** Internal scoring metadata per candidate, keyed by nodeId. */
   const scoringMetadata = new Map<string, { contextUtilization: number; queuePressure: number; vramHeadroom: number }>();
@@ -126,9 +137,20 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
     );
     const selectedModelId = model?.modelId ?? input.request.requestedModel ?? "degraded-model-unavailable";
     candidates.push({ nodeId: node.nodeId, modelId: selectedModelId, score, reasons: [{ code: "candidate_scored", explanation: `deterministic score=${score}`, source: "scheduler" }] });
+    computedCandidates.push({
+      nodeId: node.nodeId,
+      modelId: selectedModelId,
+      score,
+      capabilityInputs,
+      contextUtilization,
+      queuePressure: capabilityInputs.queuePressure,
+      vramHeadroom,
+    });
+    scoringMetadata.set(node.nodeId, { contextUtilization, queuePressure: capabilityInputs.queuePressure, vramHeadroom });
   }
 
   candidates.sort((a, b) => b.score - a.score || a.nodeId.localeCompare(b.nodeId) || a.modelId.localeCompare(b.modelId));
+  computedCandidates.sort((a, b) => b.score - a.score || a.nodeId.localeCompare(b.nodeId) || a.modelId.localeCompare(b.modelId));
 
   // Build routing receipt from actual scoring inputs
   const scoringInputs = candidates.map((c) => {
@@ -169,7 +191,15 @@ export function scheduleDeterministically(input: SchedulingInput): SchedulingRes
     decidedAt: new Date().toISOString(),
   };
 
-  return { decision: { selected, rejected: rejected.concat(rest.map((item) => ({ ...item, rejectionReasons: ["not_selected"], capabilityInputs: {
-    vramAvailableMb: 0, vramRequiredMb: requiredVram, contextWindowTokens: 0, estimatedInputTokens: requestedInput, estimatedOutputTokens: requestedOutput, recentLatencyMs: 0, queueDepth: 0, queuePressure: 0, estimatedCost: 0, runtimeAvailable: true, modelAvailable: true, quantProfile: "unknown", deviceClass: "unknown",
-  } }))), reasons }, excludedByPolicy, excludedByHealth, fallbackPlan, routingReceipt };
+  const restRejected = rest.map((item) => {
+    const computed = computedCandidates.find((c) => c.nodeId === item.nodeId && c.modelId === item.modelId);
+    return {
+      ...item,
+      rejectionReasons: ["not_selected"],
+      capabilityInputs: computed?.capabilityInputs ?? {
+        vramAvailableMb: 0, vramRequiredMb: requiredVram, contextWindowTokens: 0, estimatedInputTokens: requestedInput, estimatedOutputTokens: requestedOutput, recentLatencyMs: 0, queueDepth: 0, queuePressure: 0, estimatedCost: 0, runtimeAvailable: true, modelAvailable: true, quantProfile: "unknown", deviceClass: "unknown",
+      },
+    };
+  });
+  return { decision: { selected, rejected: rejected.concat(restRejected), reasons }, excludedByPolicy, excludedByHealth, fallbackPlan, routingReceipt };
 }

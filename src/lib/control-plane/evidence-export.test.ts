@@ -277,7 +277,7 @@ describe("evidence-export", () => {
       const compressedJson = await exportBundleCompressed(bundle, "json");
       expect(Buffer.isBuffer(compressedJson)).toBe(true);
       expect(compressedJson.length).toBeGreaterThan(0);
-      
+
       const compressedNdjson = await exportBundleCompressed(bundle, "ndjson");
       expect(Buffer.isBuffer(compressedNdjson)).toBe(true);
       expect(compressedNdjson.length).toBeGreaterThan(0);

@@ -6,9 +6,7 @@ import { join } from "node:path";
 import { buildScenarioOutput, scenarioDefinitions } from "./nautilus/fixtures";
 
 const outputs = scenarioDefinitions.map((scenario) => buildScenarioOutput(scenario));
-const latency = outputs
-  .map((item) => item.evidence.events.length * 10)
-  .sort((a, b) => a - b);
+const latency = outputs.map((item) => item.evidence.events.length * 10).sort((a, b) => a - b);
 
 const p50 = latency.length ? latency[Math.floor((latency.length - 1) * 0.5)] : null;
 const p95 = latency.length ? latency[Math.floor((latency.length - 1) * 0.95)] : null;

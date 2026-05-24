@@ -23,7 +23,7 @@ export class LocalEventFabricNode implements EventFabricNode {
         void subscriber.onEvent(event);
       }
     }
-    
+
     // Also notify wildcard subscribers if any
     const wildcardSubscribers = this.subscribers.get("*");
     if (wildcardSubscribers) {

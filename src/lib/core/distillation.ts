@@ -29,7 +29,7 @@ export class PolicyDistillationEngine {
 
     for (const file of files) {
       if (!file.endsWith(".json")) continue;
-      
+
       const filePath = path.join(this.ledgerDir, file);
       try {
         const data = await fs.promises.readFile(filePath, "utf8");

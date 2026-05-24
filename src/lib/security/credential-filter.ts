@@ -149,7 +149,7 @@ export function sanitizeConfigFile(configPath: string): void {
 
   const { gateway: _gateway, ...config } = parsed;
   const sanitized = stripCredentials(config);
-  
+
   if (isYaml) {
     writeFileSync(configPath, stringifyYaml(sanitized));
   } else {

@@ -139,7 +139,7 @@ export async function runTruthLoop(
         payload: { reused: true, runtimeResult: reuse.result },
       });
       deps.eventBus.emit(completedEvent);
-      
+
       const proofpack = buildProofpack({
         executionId,
         correlationId: input.correlationId,

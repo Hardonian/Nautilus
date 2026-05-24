@@ -9,6 +9,17 @@ import { LocalGridNode } from "../core/grid";
 
 const gridNode = new LocalGridNode("gateway-node");
 
+function readRequestBody(req: http.IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => resolve(body));
+    req.on("error", reject);
+  });
+}
+
 export class ApiGateway {
   private server: http.Server | null = null;
 
@@ -39,12 +50,28 @@ export class ApiGateway {
   }
 
   private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
-    if (req.method === "GET") {
-      if (req.url === "/health") {
+    if (req.method === "GET" && req.url === "/health") {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ status: "ok" }));
+      return;
+    }
+
+    if (req.method === "GET" && req.url === "/telemetry") {
+      try {
+        const deps = buildStatusCommandDeps(ROOT);
+        const report = getStatusReport(deps);
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ status: "ok" }));
-        return;
+        res.end(JSON.stringify({
+          activeSandboxes: report.sandboxes.filter((s) => s.connected).length,
+          totalSandboxes: report.sandboxes.length,
+          timestamp: new Date().toISOString(),
+        }));
+      } catch (err: any) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
       }
+      return;
+    }
 
       if (req.url === "/telemetry") {
         try {
@@ -113,14 +140,35 @@ export class ApiGateway {
             res.end(JSON.stringify({ error: "sandbox not found" }));
             return;
           }
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(sandbox));
-        } catch (err: any) {
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: err.message }));
+          return;
         }
-        return;
+
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "not found" }));
+      })();
+      return;
+    }
+
+    const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
+    if (req.method === "GET" && statusMatch) {
+      const sandboxName = statusMatch[1];
+      try {
+        const deps = buildStatusCommandDeps(ROOT);
+        const report = getStatusReport(deps);
+        // find sandbox by name
+        const sandbox = report.sandboxes.find((s) => s.name === sandboxName);
+        if (!sandbox) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "sandbox not found" }));
+          return;
+        }
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(sandbox));
+      } catch (err: any) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: err.message }));
       }
+      return;
     }
 
     res.writeHead(404, { "Content-Type": "application/json" });
