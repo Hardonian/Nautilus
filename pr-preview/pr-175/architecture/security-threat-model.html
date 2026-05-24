@@ -1,0 +1,1083 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Security Threat Model &#8212; NVIDIA NemoClaw Developer Guide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/nvidia-sphinx-theme.css?v=933278ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/enhanced-search.css?v=ef2c6a0b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" type="text/javascript"
+  data-document-language="true" charset="UTF-8" data-domain-script="3e2b62ff-7ae7-4ac5-87c8-d5949ecafff5">
+</script>
+<script type="text/javascript">
+  function OptanonWrapper() {
+    var event = new Event('bannerLoaded');
+    window.dispatchEvent(event);
+  }
+</script>
+<script src="https://images.nvidia.com/aem-dam/Solutions/ot-js/ot-custom.js" type="text/javascript">
+</script>
+
+
+    <script src="../_static/documentation_options.js?v=218434ba"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=6dbb43f8"></script>
+    <script src="../_static/search-assets.bundle.js?v=099b119e"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'architecture/security-threat-model';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '../versions1.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.38';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+
+<script type="text/javascript" src="https://assets.adobedtm.com/5d4962a43b79/c1061d2c5e7b/launch-191c2462b890.min.js"></script>
+
+    <link rel="canonical" href="https://docs.nvidia.com/nemoclaw/latest/architecture/security-threat-model.html" />
+    <link rel="icon" href="../_static/favicon.png"/>
+
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Security Policy Model" href="security-policy-model.html" />
+    <link rel="prev" title="Governance Threat Model" href="governance-threat-model.html" />
+
+<link rel="preload" as="image" href="https://www.nvidia.com/content/dam/1x1-00000000.png">
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+
+
+<script src="https://assets.adobedtm.com/5d4962a43b79/c1061d2c5e7b/launch-191c2462b890.min.js"></script>
+
+  </head>
+
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+<img src="https://www.nvidia.com/content/dam/1x1-00000000.png" width="1" height="1" style="display:none;" alt="country_code">
+
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+<aside class="bd-header-announcement" aria-label="Announcement">
+  <div class="bd-header-announcement__content">&#x1F514; NVIDIA NemoClaw is <strong>alpha software</strong>. APIs and behavior may change without notice. Do not use in production.</div>
+</aside>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+  
+  
+    <p class="title logo__title">NVIDIA NemoClaw Developer Guide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+
+
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVIDIA/NemoClaw" title="NemoClaw GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/XFpfPv9Uvx" title="NemoClaw Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw Discord</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt="NVIDIA NemoClaw Developer Guide - Home"/>
+  
+  
+    <p class="title logo__title">NVIDIA NemoClaw Developer Guide</p>
+  
+</a>
+
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+
+
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVIDIA/NemoClaw" title="NemoClaw GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://discord.gg/XFpfPv9Uvx" title="NemoClaw Discord" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-discord fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">NemoClaw Discord</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Table of Contents">
+  <p class="bd-links__title" role="heading" aria-level="1">Table of Contents</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">About NemoClaw</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/how-it-works.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/ecosystem.html">Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about/release-notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fork-rationale.html">Fork Rationale</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gap-analysis.html">Gap Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Roadmap</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../get-started/prerequisites.html">Prerequisites</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../get-started/windows-preparation.html">Prepare Windows for NemoClaw</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/quickstart.html">Quickstart with OpenClaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/quickstart-hermes.html">Quickstart with Hermes</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../inference/inference-options.html">Inference Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference/set-up-sub-agent.html">Set up Sub Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference/switch-inference-providers.html">Switch Inference Providers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference/use-local-inference.html">Use Local Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../inference-acceleration.html">Inference Acceleration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model-routing.html">Model Routing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Manage Sandboxes</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/lifecycle.html">Manage Sandbox Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/messaging-channels.html">Set Up Messaging Channels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/workspace-files.html">Workspace Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manage-sandboxes/backup-restore.html">Backup and Restore</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Network Policy</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../network-policy/approve-network-requests.html">Approve or Deny Network Requests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network-policy/customize-network-policy.html">Customize the Network Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network-policy/integration-policy-examples.html">Integration Policy Examples</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../deployment/deploy-to-remote-gpu.html">Deploy to Remote GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/sandbox-hardening.html">Sandbox Hardening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/brev-web-ui.html">Brev Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/install-openclaw-plugins.html">Install OpenClaw Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../orchestration.html">Orchestration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../proofpack.html">Proofpack</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Monitoring</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../monitoring/monitor-sandbox-activity.html">Monitor Sandbox Activity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../replay-inspector.html">Replay Inspector</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Security</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../security/best-practices.html">Security Best Practices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security/credential-storage.html">Credential Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security/openclaw-controls.html">OpenClaw Controls</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Nautilus</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/ARCHITECTURE_AUDIT.html">Architecture Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/BACKPRESSURE.html">Backpressure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/CAPABILITY_MATRIX.html">Capability Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/EXAMPLES.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/EXECUTION_SURVIVABILITY.html">Execution Survivability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/GOLDEN_PATH.html">Golden Path</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/HARDENING_AUDIT.html">Hardening Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/HOT_PATH_AUDIT.html">Hot Path Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/MIGRATIONS_AND_UPGRADES.html">Migrations &amp; Upgrades</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/MVP_FOUNDATION_READINESS.html">MVP Foundation Readiness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/MVP_PACKAGE.html">MVP Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/NOT_YET_SUPPORTED.html">Not Yet Supported</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/OPERATOR_QUICKSTART.html">Operator Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/OPTIMIZATION_AUDIT.html">Optimization Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/PROOFPACKS.html">Proofpacks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/RELEASE_CHECKLIST.html">Release Checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/RELEASE_READINESS.html">Release Readiness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/REPLAY_AND_IDEMPOTENCY.html">Replay &amp; Idempotency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/REPLAY_ENGINE.html">Replay Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/RETENTION_AND_ARCHIVAL.html">Retention &amp; Archival</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/RUNBOOKS.html">Runbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/RUNTIME_HEALTH.html">Runtime Health</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/SMOKE_TESTS.html">Smoke Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/STORAGE_LIFECYCLE.html">Storage Lifecycle</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/THREAT_MODEL.html">Threat Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/TIME_SEMANTICS.html">Time Semantics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/TOPOLOGY_MODEL.html">Topology Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/TOP_50_TODOS.html">Top 50 Todos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/TRUTH_BOUNDARIES.html">Truth Boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/UNSUPPORTED.html">Unsupported</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/VERIFY_LOCALLY.html">Verify Locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/WALKTHROUGH.html">Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/event-fabric.html">Event Fabric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/master-execution-audit.html">Master Execution Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/meshrag.html">MeshRAG</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/operatorgraph.html">OperatorGraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/pillar-foundations.html">Pillar Foundations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/platform-evolution.html">Platform Evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/recallforge.html">RecallForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nautilus/threatmesh.html">ThreatMesh</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/architecture.html">Reference Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/cli-selection-guide.html">CLI Selection Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/commands.html">CLI Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/network-policies.html">Network Policies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/troubleshooting.html">Troubleshooting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="CONTROL_PLANE_BOUNDARIES.html">Control Plane Boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="NAUTILUS_TRUTHS.html">Nautilus Truths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="REPO_INVARIANTS.html">Repo Invariants</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="current-state.html">Current State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="target-state.html">Target State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nautilus-100-point-audit.html">Nautilus 100-Point Audit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="status-matrix.html">Status Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="failure-semantics.html">Failure Semantics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="replayability.html">Replayability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="observability.html">Observability</a></li>
+<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="control-plane.html">Control Plane</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy-engine.html">Policy Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="task-classification.html">Task Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worker-identity-trust.html">Worker Identity Trust</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capability-attestation.html">Capability Attestation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governance-invariants.html">Governance Invariants</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governance-threat-model.html">Governance Threat Model</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Security Threat Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-policy-model.html">Security Policy Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-policy.html">Security Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy-promotion.html">Policy Promotion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy-tracing.html">Policy Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="policy-inheritance.html">Policy Inheritance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-capabilities.html">Runtime Capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operational-memory.html">Operational Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="device-registry.html">Device Registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry-synchronization.html">Registry Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry-telemetry-policy.html">Registry Telemetry Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local-probes.html">Local Probes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worker-probes.html">Worker Probes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote-probe-security.html">Remote Probe Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="telemetry-adapters.html">Telemetry Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-telemetry-parsers.html">Runtime Telemetry Parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu-telemetry.html">GPU Telemetry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scheduler.html">Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scheduler-provider-bridge.html">Scheduler Provider Bridge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="provider-routing-integration.html">Provider Routing Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="heterogeneous-routing.html">Heterogeneous Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governed-fallbacks.html">Governed Fallbacks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="receipts-and-degraded-states.html">Receipts and Degraded States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local-stack-security-profiles.html">Local Stack Security Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="worker-adapters.html">Worker Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-integration.html">Runtime Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-dispatch-integration.html">Runtime Dispatch Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remote-execution-adapters.html">Remote Execution Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-execution-safety.html">Command Execution Safety</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transport-security.html">Transport Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="secret-redaction-doctrine.html">Secret Redaction Doctrine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="secret-redaction.html">Secret Redaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="network-policy.html">Network Policy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-safety.html">Command Safety</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Verification</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../verification-matrix.html">Verification Matrix (Root)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/verification-matrix.html">Verification Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/security-hardening.html">Security Hardening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/security-verification-matrix.html">Security Verification Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/policy-verification.html">Policy Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/release-checklist.html">Release Checklist</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/release-readiness.html">Release Readiness</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release/nautilus-rc1-hardening.html">Nautilus RC1 Hardening</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../verification/degraded-state-chaos.html">Degraded State Chaos</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../contributing/branch-strategy.html">Branch Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/control-plane-rules.html">Control Plane Rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/local-bootstrap.html">Local Bootstrap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/pr-template-guide.html">PR Template Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/verification.html">Verification</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture Decision Records (ADRs)</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../adr/0001-fork-purpose.html">ADR 0001: Fork Purpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0002-control-plane-separation.html">ADR 0002: Control Plane Separation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0003-deterministic-routing.html">ADR 0003: Deterministic Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0004-supervised-policy-promotion.html">ADR 0004: Supervised Policy Promotion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0005-receipts-and-degraded-state-truth.html">ADR 0005: Receipts and Degraded State Truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0006-device-registry-before-scheduler.html">ADR 0006: Device Registry Before Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0007-policy-outside-prompts.html">ADR 0007: Policy Outside Prompts</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture Decision Records (ADRs)</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../adr/0001-fork-purpose.html">ADR 0001: Fork Purpose</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0002-control-plane-separation.html">ADR 0002: Control Plane Separation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0003-deterministic-routing.html">ADR 0003: Deterministic Routing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0004-supervised-policy-promotion.html">ADR 0004: Supervised Policy Promotion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0005-receipts-and-degraded-state-truth.html">ADR 0005: Receipts and Degraded State Truth</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0006-device-registry-before-scheduler.html">ADR 0006: Device Registry Before Scheduler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../adr/0007-policy-outside-prompts.html">ADR 0007: Policy Outside Prompts</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Operators</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../operators/local-env.html">Local Environment</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../resources/agent-skills.html">Agent Skills</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVIDIA/NemoClaw/blob/main/SECURITY.md">Report Vulnerabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../resources/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/XFpfPv9Uvx">Discord</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Security Threat Model</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+<div class="header-article-item">
+  <div class="d-flex justify-content-end w-100">
+    <a href="https://surveys.hotjar.com/4904bf71-6484-47a7-83ff-4715cceabdb5" id="openPopupButton">Is this page helpful?</a>
+  </div>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <!-- SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<section class="tex2jax_ignore mathjax_ignore" id="security-threat-model">
+<h1>Security Threat Model<a class="headerlink" href="#security-threat-model" title="Link to this heading">#</a></h1>
+<p>This document catalogs the security threats relevant to the NemoClaw governed execution substrate. Each threat is grounded in implemented code paths and maps to concrete enforcement points. Status reflects repository truth as of this writing.</p>
+<section id="status-taxonomy">
+<h2>Status taxonomy<a class="headerlink" href="#status-taxonomy" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Mitigated:</strong> enforced in code with test coverage.</p></li>
+<li><p><strong>Partially mitigated:</strong> enforcement exists but gaps remain.</p></li>
+<li><p><strong>Scaffolded:</strong> defensive seam exists; enforcement is partial or opt-in.</p></li>
+<li><p><strong>Not yet applicable:</strong> requires infrastructure not yet implemented.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="threat-001-credential-leakage-via-cli-output">
+<h2>THREAT-001: Credential leakage via CLI output<a class="headerlink" href="#threat-001-credential-leakage-via-cli-output" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Secret exposure
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> API keys, tokens, or passwords embedded in subprocess stdout/stderr leak to the operator terminal or diagnostic logs.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/redact.ts</span></code> — All subprocess output passes through <code class="docutils literal notranslate"><span class="pre">redact()</span></code> before terminal emission. Partial redaction (first 4 chars preserved) for CLI output; full replacement via <code class="docutils literal notranslate"><span class="pre">redactFull()</span></code> for diagnostic dumps.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/secret-patterns.ts</span></code> — Canonical regex patterns for NVIDIA, OpenAI, GitHub, Slack, AWS, HuggingFace, GitLab, Groq, PyPI, Telegram, and Discord tokens. Single source of truth; adding a new token class means updating this file only.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/runner.ts:spawnAndHandle()</span></code> — <code class="docutils literal notranslate"><span class="pre">writeRedactedResult()</span></code> is called unconditionally on piped stdout/stderr before process output reaches the terminal.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/redact.ts:redactError()</span></code> — Error objects (message, cmd, stdout, stderr, output array, stack trace) are redacted before surfacing.</p></li>
+</ul>
+<p><strong>Known limitations:</strong></p>
+<ul class="simple">
+<li><p>Secrets encoded as base64 or hex are not detected by regex patterns.</p></li>
+<li><p>Secrets split across multiple output lines may evade per-line pattern matching.</p></li>
+<li><p>Shell <code class="docutils literal notranslate"><span class="pre">sed</span></code> fallback in <code class="docutils literal notranslate"><span class="pre">debug.sh</span></code> covers only <code class="docutils literal notranslate"><span class="pre">EXPECTED_SHELL_PREFIXES</span></code> (nvapi-, nvcf-, ghp_, sk-) when Node.js is unavailable.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">src/lib/security/redact.test.ts</span></code>, <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">src/lib/runner-argv.test.ts</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="threat-002-credential-persistence-in-config-files">
+<h2>THREAT-002: Credential persistence in config files<a class="headerlink" href="#threat-002-credential-persistence-in-config-files" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Secret exposure
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> API keys baked into sandbox filesystem or local backup archives survive beyond their intended runtime scope.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/credential-filter.ts:stripCredentials()</span></code> — Recursively replaces values for credential-bearing field names (<code class="docutils literal notranslate"><span class="pre">apiKey</span></code>, <code class="docutils literal notranslate"><span class="pre">api_key</span></code>, <code class="docutils literal notranslate"><span class="pre">token</span></code>, <code class="docutils literal notranslate"><span class="pre">secret</span></code>, <code class="docutils literal notranslate"><span class="pre">password</span></code>, <code class="docutils literal notranslate"><span class="pre">resolvedKey</span></code>, plus pattern-based <code class="docutils literal notranslate"><span class="pre">*Token</span></code>, <code class="docutils literal notranslate"><span class="pre">*Key</span></code>, <code class="docutils literal notranslate"><span class="pre">*Secret</span></code>, <code class="docutils literal notranslate"><span class="pre">*Password</span></code> suffixes) with <code class="docutils literal notranslate"><span class="pre">[STRIPPED_BY_MIGRATION]</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/credential-filter.ts:sanitizeConfigFile()</span></code> — Strips credentials from JSON config files in-place, removes <code class="docutils literal notranslate"><span class="pre">gateway</span></code> section (contains auth tokens), and sets file permissions to <code class="docutils literal notranslate"><span class="pre">0o600</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/credential-filter.ts:isSensitiveFile()</span></code> — Blocks <code class="docutils literal notranslate"><span class="pre">auth-profiles.json</span></code> and <code class="docutils literal notranslate"><span class="pre">auth.json</span></code> from backup entirely.</p></li>
+<li><p>Credentials are injected at runtime via OpenShell’s provider credential mechanism, never persisted to disk.</p></li>
+</ul>
+<p><strong>Known limitations:</strong></p>
+<ul class="simple">
+<li><p>YAML config files (e.g. Hermes) are skipped if not valid JSON; YAML-specific credential stripping is not implemented.</p></li>
+<li><p>Non-standard credential field names outside the pattern set will pass through.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">src/lib/security/credential-filter.test.ts</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="threat-003-credential-leakage-via-urls">
+<h2>THREAT-003: Credential leakage via URLs<a class="headerlink" href="#threat-003-credential-leakage-via-urls" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Secret exposure
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> Tokens embedded in URL query parameters, userinfo, or path segments leak through logging or diagnostic output.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/redact.ts:redactUrlPartial()</span></code> — Replaces URL username/password with <code class="docutils literal notranslate"><span class="pre">****</span></code>; replaces query parameters matching <code class="docutils literal notranslate"><span class="pre">signature|sig|token|auth|access_token</span></code> with <code class="docutils literal notranslate"><span class="pre">****</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/security/redact.ts:redactUrl()</span></code> — Full URL sanitization: strips userinfo, redacts sensitive query params, removes hash fragment.</p></li>
+<li><p>URL redaction runs as part of the <code class="docutils literal notranslate"><span class="pre">redact()</span></code> pipeline before any token-prefix pattern matching.</p></li>
+</ul>
+<p><strong>Known limitations:</strong></p>
+<ul class="simple">
+<li><p>Tokens embedded in URL path segments (not query params) are only caught if they match a token-prefix pattern.</p></li>
+<li><p>Custom parameter names not matching the <code class="docutils literal notranslate"><span class="pre">signature|sig|token|auth|access_token</span></code> pattern are not redacted.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="threat-004-secret-persistence-in-workspace-memory-writes">
+<h2>THREAT-004: Secret persistence in workspace memory writes<a class="headerlink" href="#threat-004-secret-persistence-in-workspace-memory-writes" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Secret exposure
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> An agent writes an API key or credential into a persistent memory file (MEMORY.md, workspace files, agent skills), where it survives across sessions.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">nemoclaw/src/security/secret-scanner.ts:scanForSecrets()</span></code> — Regex-based scanner covering NVIDIA, OpenAI, GitHub, AWS, Slack, Discord, npm, PEM private keys, Bearer tokens, Telegram, Google, Anthropic, and HuggingFace patterns.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nemoclaw/src/security/secret-scanner.ts:isMemoryPath()</span></code> — Identifies memory write targets across <code class="docutils literal notranslate"><span class="pre">.openclaw/memory/</span></code>, <code class="docutils literal notranslate"><span class="pre">.openclaw/workspace/</span></code>, <code class="docutils literal notranslate"><span class="pre">.openclaw/credentials/</span></code>, <code class="docutils literal notranslate"><span class="pre">.nemoclaw/</span></code>, and 10 other protected path segments.</p></li>
+<li><p>Scanner is invoked on tool call content before persistence to memory paths.</p></li>
+</ul>
+<p><strong>Known limitations:</strong></p>
+<ul class="simple">
+<li><p>Base64-encoded, hex-encoded, and split-across-writes secrets are not detectable by regex alone. This is an inherent limitation documented in code.</p></li>
+<li><p>Scanner targets high-confidence patterns; novel token formats require explicit pattern additions.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">nemoclaw/src/security/secret-scanner.test.ts</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="threat-005-command-injection-via-shell-interpretation">
+<h2>THREAT-005: Command injection via shell interpretation<a class="headerlink" href="#threat-005-command-injection-via-shell-interpretation" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Command execution safety
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> An attacker crafts input containing shell metacharacters (<code class="docutils literal notranslate"><span class="pre">$(whoami)</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span> <span class="pre">rm</span> <span class="pre">-rf</span> <span class="pre">/</span></code>, backtick expansion) that are interpreted if commands are executed via shell.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/runner.ts</span></code> — All command execution uses <code class="docutils literal notranslate"><span class="pre">spawnSync(file,</span> <span class="pre">args,</span> <span class="pre">{</span> <span class="pre">shell:</span> <span class="pre">false</span> <span class="pre">})</span></code> with argv arrays. String commands are rejected with an explicit error.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/runner.ts</span></code> — <code class="docutils literal notranslate"><span class="pre">shell:</span> <span class="pre">true</span></code> is explicitly forbidden and throws <code class="docutils literal notranslate"><span class="pre">shell</span> <span class="pre">option</span> <span class="pre">is</span> <span class="pre">forbidden</span></code> on any attempt.</p></li>
+<li><p>Arguments containing <code class="docutils literal notranslate"><span class="pre">$()</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code>, backticks, pipes are passed as literal strings to the subprocess, not interpreted.</p></li>
+</ul>
+<p><strong>Test coverage:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/runner-argv.test.ts</span></code> — Verifies: empty argv rejection, <code class="docutils literal notranslate"><span class="pre">shell:</span> <span class="pre">true</span></code> rejection, string command rejection, shell metacharacter non-expansion, ENOENT surfacing.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">src/lib/runner-argv.test.ts</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="threat-006-ssrf-via-dns-rebinding-toctou">
+<h2>THREAT-006: SSRF via DNS rebinding (TOCTOU)<a class="headerlink" href="#threat-006-ssrf-via-dns-rebinding-toctou" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Network safety
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> An attacker controls a DNS record that returns a public IP at validation time and a private/internal IP at connection time, bypassing the private-IP check.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">nemoclaw/src/blueprint/ssrf.ts:validateEndpointUrl()</span></code> — Performs DNS lookup, validates all resolved addresses against private IP ranges, then pins the URL to the first resolved IP address. The pinned URL is used for HTTP connections, preventing rebinding between validation and connection.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nemoclaw/src/blueprint/ssrf.ts</span></code> — Blocks private hostnames (localhost, <code class="docutils literal notranslate"><span class="pre">.local</span></code>, <code class="docutils literal notranslate"><span class="pre">.internal</span></code>, link-local) before DNS lookup.</p></li>
+<li><p>Only <code class="docutils literal notranslate"><span class="pre">http:</span></code> and <code class="docutils literal notranslate"><span class="pre">https:</span></code> schemes are allowed; all others are rejected.</p></li>
+<li><p>For HTTPS endpoints, TLS certificate validation provides additional rebinding protection since the attacker cannot present a valid certificate for the rebinding target.</p></li>
+</ul>
+<p><strong>Known limitations:</strong></p>
+<ul class="simple">
+<li><p>DNS pinning is bypassed for already-IP URLs (no rebinding risk for literal IPs).</p></li>
+<li><p>IPv6 zone IDs and exotic address formats may need additional coverage.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">nemoclaw/src/blueprint/ssrf.test.ts</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="threat-007-malicious-or-compromised-remote-worker">
+<h2>THREAT-007: Malicious or compromised remote worker<a class="headerlink" href="#threat-007-malicious-or-compromised-remote-worker" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Transport/trust boundary
+<strong>Status:</strong> Scaffolded
+<strong>Attack vector:</strong> A remote worker endpoint returns forged execution results, manipulated telemetry, or exfiltrates command payloads.</p>
+<p><strong>Enforcement (current):</strong></p>
+<ul class="simple">
+<li><p>Remote execution is disabled by default. Requires explicit <code class="docutils literal notranslate"><span class="pre">NEMOCLAW_REMOTE_EXECUTION=1</span></code> flag.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/remote-execution.ts:runRemoteExecution()</span></code> — Policy evaluation precedes any transport call. Policy can <code class="docutils literal notranslate"><span class="pre">deny</span></code>, require <code class="docutils literal notranslate"><span class="pre">approval</span></code>, or allow execution.</p></li>
+<li><p>Worker trust level and attestation status are checked before transport: revoked trust, expired attestation, and conflict-detected attestation all block execution.</p></li>
+<li><p>Auth credentials in remote execution requests are redacted in receipts (<code class="docutils literal notranslate"><span class="pre">redactedAuth</span></code> field).</p></li>
+<li><p>Response validation: non-2xx status, malformed JSON, and non-<code class="docutils literal notranslate"><span class="pre">ok</span></code> status are all classified as degraded/failed states with explicit reason codes.</p></li>
+</ul>
+<p><strong>Not yet implemented:</strong></p>
+<ul class="simple">
+<li><p>Cryptographic response signing/verification.</p></li>
+<li><p>Mutual TLS for transport authentication.</p></li>
+<li><p>Response content integrity validation beyond JSON structure.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="threat-008-forged-telemetry-injection">
+<h2>THREAT-008: Forged telemetry injection<a class="headerlink" href="#threat-008-forged-telemetry-injection" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Observability integrity
+<strong>Status:</strong> Partially mitigated
+<strong>Attack vector:</strong> An attacker injects fabricated telemetry data (fake GPU counts, false health status) to influence operational intelligence or mislead operators.</p>
+<p><strong>Enforcement (current):</strong></p>
+<ul class="simple">
+<li><p>Governance invariant INV-002: Telemetry is evidence only, never authoritative for execution decisions.</p></li>
+<li><p>Governance invariant INV-005: Probe results update registry evidence, not authorization state.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/operational-intelligence.ts</span></code> — Telemetry aggregation outputs are non-authoritative.</p></li>
+<li><p>Policy decisions are independent of telemetry state.</p></li>
+</ul>
+<p><strong>Residual risk:</strong></p>
+<ul class="simple">
+<li><p>Telemetry data is accepted without cryptographic provenance verification.</p></li>
+<li><p>Operator dashboards display unverified telemetry as evidence, which could mislead human decision-making even though it cannot drive automated execution.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="threat-009-replay-envelope-tampering">
+<h2>THREAT-009: Replay envelope tampering<a class="headerlink" href="#threat-009-replay-envelope-tampering" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Audit integrity
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> An attacker modifies exported replay envelopes (event payloads, sequence numbers, lineage references) to forge execution history.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/replay.ts:validateReplayEnvelope()</span></code> — Validates event count, sequence continuity, governance lineage presence, reason codes, and digest integrity.</p></li>
+<li><p>Digest is computed from deterministic serialization of sorted events. Any modification to event content invalidates the digest.</p></li>
+<li><p>Missing replay lineage (<code class="docutils literal notranslate"><span class="pre">replayRef.lineage</span></code>) is rejected explicitly.</p></li>
+<li><p>Missing governance reason codes on <code class="docutils literal notranslate"><span class="pre">degraded_state</span></code>, <code class="docutils literal notranslate"><span class="pre">fallback</span></code>, and <code class="docutils literal notranslate"><span class="pre">policy_outcome</span></code> events are rejected.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/replay.ts:validateExecutionReplayGovernance()</span></code> — Validates execution plan lineage, approval lineage, authorization lineage, policy snapshot hashes, trust snapshot hashes, and intent hashes.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">vitest</span> <span class="pre">run</span> <span class="pre">src/lib/control-plane/replay.test.ts</span></code>, <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">verify:chaos</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="threat-010-remote-execution-without-operator-consent">
+<h2>THREAT-010: Remote execution without operator consent<a class="headerlink" href="#threat-010-remote-execution-without-operator-consent" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Authorization boundary
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> A local command silently dispatches execution to a remote worker without the operator being aware of the trust boundary crossing.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p>Governance invariant INV-010: Remote execution requires explicit <code class="docutils literal notranslate"><span class="pre">NEMOCLAW_REMOTE_EXECUTION=1</span></code>.</p></li>
+<li><p>Governance invariant INV-011: Operator approval is explicit, per-request, never inferred from prior approvals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/remote-execution.ts</span></code> — Four-gate sequence: (1) flag check, (2) policy evaluation, (3) approval verification, (4) trust/attestation validation. Failure at any gate blocks transport.</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">executionPlanRequired</span></code> is set, execution without a valid plan is rejected as <code class="docutils literal notranslate"><span class="pre">authorization_denied</span></code>.</p></li>
+<li><p>Execution plan authorization validates intent hash, policy snapshot hash, and trust snapshot hash against current state; drift triggers rejection.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">verify:chaos</span></code> (approval-required blocking tests, trust-gating tests)</p>
+</section>
+<hr class="docutils" />
+<section id="threat-011-proofpack-export-integrity-compromise">
+<h2>THREAT-011: Proofpack / export integrity compromise<a class="headerlink" href="#threat-011-proofpack-export-integrity-compromise" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Evidence integrity
+<strong>Status:</strong> Partially mitigated
+<strong>Attack vector:</strong> Exported evidence bundles (receipts, plans, telemetry) are modified after export, creating a false audit trail.</p>
+<p><strong>Enforcement (current):</strong></p>
+<ul class="simple">
+<li><p>Replay envelopes include deterministic digests computed from sorted, serialized events.</p></li>
+<li><p>Governance invariant INV-018: Receipts are deterministically serialized with stable identifiers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/serde.ts</span></code> — Deterministic serialization ensures identical inputs produce identical digests.</p></li>
+</ul>
+<p><strong>Not yet implemented:</strong></p>
+<ul class="simple">
+<li><p>Cryptographic signing of export bundles (planned).</p></li>
+<li><p>Chain-of-custody envelope wrapping.</p></li>
+<li><p>External timestamping service integration.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="threat-012-unauthorized-privilege-escalation-via-trust-conflation">
+<h2>THREAT-012: Unauthorized privilege escalation via trust conflation<a class="headerlink" href="#threat-012-unauthorized-privilege-escalation-via-trust-conflation" title="Link to this heading">#</a></h2>
+<p><strong>Category:</strong> Authorization boundary
+<strong>Status:</strong> Mitigated
+<strong>Attack vector:</strong> A worker with high trust (based on telemetry or self-reported claims) bypasses policy evaluation to execute unauthorized work.</p>
+<p><strong>Enforcement:</strong></p>
+<ul class="simple">
+<li><p>Governance invariant INV-003: Trust is not authorization. Trust level is a classification signal; authorization requires explicit policy evaluation and operator approval.</p></li>
+<li><p>Governance invariant INV-004: Attestation is not trust. Valid attestation proves provenance, not truthfulness.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/lib/control-plane/types.ts</span></code> — <code class="docutils literal notranslate"><span class="pre">TrustLevel</span></code> and <code class="docutils literal notranslate"><span class="pre">AttestationStatus</span></code> are structurally separate from <code class="docutils literal notranslate"><span class="pre">PolicyDecision</span></code>.</p></li>
+<li><p>Policy gating precedes transport regardless of trust level in <code class="docutils literal notranslate"><span class="pre">remote-execution.ts</span></code>.</p></li>
+</ul>
+<p><strong>Verification:</strong> <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">verify:chaos</span></code> (trust-gating tests)</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="governance-threat-model.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Governance Threat Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="security-policy-model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Security Policy Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+
+
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#status-taxonomy">Status taxonomy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-001-credential-leakage-via-cli-output">THREAT-001: Credential leakage via CLI output</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-002-credential-persistence-in-config-files">THREAT-002: Credential persistence in config files</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-003-credential-leakage-via-urls">THREAT-003: Credential leakage via URLs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-004-secret-persistence-in-workspace-memory-writes">THREAT-004: Secret persistence in workspace memory writes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-005-command-injection-via-shell-interpretation">THREAT-005: Command injection via shell interpretation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-006-ssrf-via-dns-rebinding-toctou">THREAT-006: SSRF via DNS rebinding (TOCTOU)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-007-malicious-or-compromised-remote-worker">THREAT-007: Malicious or compromised remote worker</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-008-forged-telemetry-injection">THREAT-008: Forged telemetry injection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-009-replay-envelope-tampering">THREAT-009: Replay envelope tampering</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-010-remote-execution-without-operator-consent">THREAT-010: Remote execution without operator consent</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-011-proofpack-export-integrity-compromise">THREAT-011: Proofpack / export integrity compromise</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threat-012-unauthorized-privilege-escalation-via-trust-conflation">THREAT-012: Unauthorized privilege escalation via trust conflation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+
+<script type="text/javascript">if (typeof _satellite !== "undefined") {_satellite.pageBottom();}</script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+<a class="footer-brand logo" href="https://www.nvidia.com">
+  <img src="../_static/nvidia-logo-horiz-rgb-1c-blk-for-screen.svg" class="logo__image only-light" alt="NVIDIA"/>
+  <img src="../_static/nvidia-logo-horiz-rgb-1c-wht-for-screen.svg" class="logo__image only-dark" alt="NVIDIA"/>
+</a></div>
+      
+        <div class="footer-item">
+
+<div class="footer-links">
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/">Privacy Policy</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/">Your Privacy Choices</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/">Terms of Service</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/accessibility/">Accessibility</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/about-nvidia/company-policies/">Corporate Policies</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/product-security/">Product Security</a>
+   | 
+  
+  
+  
+  <a class="external" href="https://www.nvidia.com/en-us/contact/">Contact</a>
+  
+  
+  
+</div>
+</div>
+      
+        <div class="footer-item">
+
+
+
+
+  <p class="copyright">
+    
+      Copyright © 2026, NVIDIA Corporation.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<script type="text/javascript">if (typeof _satellite !== "undefined") {_satellite.pageBottom();}</script>
+
+  </body>
+</html>
