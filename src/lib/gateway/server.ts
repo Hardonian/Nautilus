@@ -9,6 +9,17 @@ import { LocalGridNode } from "../core/grid";
 
 const gridNode = new LocalGridNode("gateway-node");
 
+function readRequestBody(req: http.IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => resolve(body));
+    req.on("error", reject);
+  });
+}
+
 export class ApiGateway {
   private server: http.Server | null = null;
 
@@ -62,30 +73,13 @@ export class ApiGateway {
       return;
     }
 
-    if (req.method === "POST" && req.url === "/grid/register") {
-      let body = "";
-      req.on("data", chunk => { body += chunk.toString(); });
-      req.on("end", () => {
-        try {
-          const data = JSON.parse(body);
-          if (!data.url) throw new Error("url required");
-          void gridNode.registerPeer(data.url);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ status: "registered" }));
-        } catch {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: "invalid request" }));
-        }
-        return;
-      }
-    } else if (req.method === "POST") {
+    if (req.method === "POST") {
+      void (async () => {
+        const body = await readRequestBody(req);
 
-      if (req.url === "/grid/register") {
-        let body = "";
-        req.on("data", chunk => { body += chunk.toString(); });
-        req.on("end", () => {
+        if (req.url === "/grid/register") {
           try {
-            const data = JSON.parse(body);
+            const data = JSON.parse(body) as { url?: string };
             if (!data.url) throw new Error("url required");
             void gridNode.registerPeer(data.url);
             res.writeHead(200, { "Content-Type": "application/json" });
@@ -94,40 +88,37 @@ export class ApiGateway {
             res.writeHead(400, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "invalid request" }));
           }
-        });
-        return;
-      }
+          return;
+        }
 
-      if (req.url === "/grid/workload") {
-        let body = "";
-        req.on("data", chunk => { body += chunk.toString(); });
-        req.on("end", () => {
+        if (req.url === "/grid/workload") {
           try {
-            const data = JSON.parse(body);
-            // In a real system, route this to the executor queue
+            const data = JSON.parse(body) as { executionId?: string };
             res.writeHead(202, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
           } catch {
             res.writeHead(400, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "invalid workload" }));
           }
-        });
-        return;
-      }
-
-      const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
-      if (statusMatch) {
-        const sandboxName = statusMatch[1];
-        try {
-          const data = JSON.parse(body);
-          // In a real system, route this to the executor queue
-          res.writeHead(202, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
-        } catch {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: "invalid workload" }));
+          return;
         }
-      });
+
+        const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
+        if (statusMatch) {
+          try {
+            const data = JSON.parse(body) as { executionId?: string };
+            res.writeHead(202, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
+          } catch {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "invalid workload" }));
+          }
+          return;
+        }
+
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "not found" }));
+      })();
       return;
     }
 
