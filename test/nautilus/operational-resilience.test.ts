@@ -9,6 +9,7 @@ import { scheduleDeterministically } from '../../src/lib/control-plane/scheduler
 import { OperationalMemoryLog } from '../../src/lib/control-plane/operational-memory';
 import { summarizeQueuePressure, summarizeExecutionTiming, summarizeSchedulerDecisions, summarizeDegradedStateAggregation } from '../../src/lib/control-plane/observability';
 import { reconcileStartupState, type ExecutionSnapshot } from '../../core/runtime/survivability';
+import { QueueGovernance } from '../../src/lib/control-plane/r5-queue-governance';
 
 // ---------------------------------------------------------------------------
 // Test helpers
@@ -220,6 +221,17 @@ describe('Queue pressure metrics', () => {
     expect(snapshot.starvationDetected).toBe(true);
     expect(snapshot.oldestPendingAgeMs).toBeGreaterThan(50);
   });
+
+  it('bounds queue timeline growth deterministically', () => {
+    const queue = new QueueGovernance({ maxCapacity: 10, maxRetries: 1, maxTimelineEvents: 3, now: () => '2026-01-01T00:00:00.000Z' });
+    queue.enqueue({ queueId: 'q1', idempotencyKey: 'k1', payload: {} });
+    queue.markRetry('q1');
+    queue.markRetry('q1'); // dead-letter
+    queue.markReplayed('q1');
+
+    expect(queue.timeline).toHaveLength(3);
+    expect(queue.timeline.map((e) => e.type)).toEqual(['retried', 'dead_letter', 'replayed']);
+  });
 });
 
 // ===========================================================================
@@ -300,6 +312,8 @@ describe('Routing stability under queue pressure', () => {
     expect(result.routingReceipt.candidateCount).toBe(1);
     expect(result.routingReceipt.selectedNodeId).toBe('n1');
     expect(result.routingReceipt.decidedAt).toBeTruthy();
+    expect(result.routingReceipt.scoringInputs[0]?.contextUtilization).toBeGreaterThan(0);
+    expect(result.routingReceipt.scoringInputs[0]?.vramHeadroom).toBeGreaterThan(0);
   });
 
   it('deterministic tie-break by nodeId on equal scores', () => {
@@ -317,6 +331,25 @@ describe('Routing stability under queue pressure', () => {
 
     // Equal scores, 'a-node' should win by lexicographic tie-break
     expect(result.decision.selected?.nodeId).toBe('a-node');
+  });
+
+  it('preserves capability inputs for not_selected candidates', () => {
+    const registry = createDeviceRegistry();
+    registry.register(node('winner', 32768, 100000, { queuePressure: 0.1 }));
+    registry.register(node('runner-up', 16384, 100000, { queuePressure: 0.2, queueDepth: 4 }));
+
+    const result = scheduleDeterministically({
+      request: baseRequest,
+      classification: defaultClassification,
+      registry,
+      policy: allowPolicy,
+      degradedStates: [],
+    });
+
+    const notSelected = result.decision.rejected.find((r) => r.nodeId === 'runner-up');
+    expect(notSelected?.rejectionReasons).toContain('not_selected');
+    expect(notSelected?.capabilityInputs.queueDepth).toBe(4);
+    expect(notSelected?.capabilityInputs.vramAvailableMb).toBe(16384);
   });
 });
 

@@ -25,7 +25,7 @@ export class QueueGovernance {
 
   readonly byKey = new Map<string, string>();
 
-  constructor(private readonly config: { maxCapacity: number; maxRetries: number; now?: () => string }) {}
+  constructor(private readonly config: { maxCapacity: number; maxRetries: number; maxTimelineEvents?: number; now?: () => string }) {}
 
   enqueue(item: Omit<QueueItem, "status" | "retryCount">):
     | { outcome: "admitted"; item: QueueItem }
@@ -34,13 +34,13 @@ export class QueueGovernance {
     const existingId = this.byKey.get(item.idempotencyKey);
     if (existingId) return { outcome: "existing", item: this.queue.get(existingId)! };
     if (this.queue.size >= this.config.maxCapacity) {
-      this.timeline.push({ at: this.now(), type: "load_shed", queueId: item.queueId, reason: "queue_over_capacity" });
+      this.pushTimeline({ at: this.now(), type: "load_shed", queueId: item.queueId, reason: "queue_over_capacity" });
       return { outcome: "load_shed", degraded: { state: "degraded", reason: "queue_over_capacity", backpressureReason: "max_capacity_reached", queueId: item.queueId } };
     }
     const next: QueueItem = { ...item, status: "queued", retryCount: 0 };
     this.queue.set(item.queueId, next);
     this.byKey.set(item.idempotencyKey, item.queueId);
-    this.timeline.push({ at: this.now(), type: "admitted", queueId: item.queueId });
+    this.pushTimeline({ at: this.now(), type: "admitted", queueId: item.queueId });
     return { outcome: "admitted", item: next };
   }
 
@@ -50,15 +50,23 @@ export class QueueGovernance {
     item.retryCount += 1;
     if (item.retryCount > this.config.maxRetries) {
       item.status = "dead_letter";
-      this.timeline.push({ at: this.now(), type: "dead_letter", queueId, reason: "retry_exhausted" });
+      this.pushTimeline({ at: this.now(), type: "dead_letter", queueId, reason: "retry_exhausted" });
       return item;
     }
-    this.timeline.push({ at: this.now(), type: "retried", queueId, reason: "retry_scheduled" });
+    this.pushTimeline({ at: this.now(), type: "retried", queueId, reason: "retry_scheduled" });
     return item;
   }
 
   markReplayed(queueId: string): void {
-    this.timeline.push({ at: this.now(), type: "replayed", queueId, reason: "replay_executed" });
+    this.pushTimeline({ at: this.now(), type: "replayed", queueId, reason: "replay_executed" });
+  }
+
+  private pushTimeline(event: QueueEvent): void {
+    this.timeline.push(event);
+    const limit = Math.max(1, this.config.maxTimelineEvents ?? 2048);
+    if (this.timeline.length > limit) {
+      this.timeline.splice(0, this.timeline.length - limit);
+    }
   }
 
   private now(): string {
