@@ -73,45 +73,72 @@ export class ApiGateway {
       return;
     }
 
-    if (req.method === "POST") {
-      void (async () => {
-        const body = await readRequestBody(req);
-
-        if (req.url === "/grid/register") {
-          try {
-            const data = JSON.parse(body) as { url?: string };
-            if (!data.url) throw new Error("url required");
-            void gridNode.registerPeer(data.url);
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ status: "registered" }));
-          } catch {
-            res.writeHead(400, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "invalid request" }));
-          }
-          return;
+      if (req.url === "/telemetry") {
+        try {
+          const deps = buildStatusCommandDeps(ROOT);
+          const report = getStatusReport(deps);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({
+            activeSandboxes: report.sandboxes.filter((s) => s.connected).length,
+            totalSandboxes: report.sandboxes.length,
+            timestamp: new Date().toISOString(),
+          }));
+        } catch (err: any) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: err.message }));
         }
+        return;
+      }
+    }
 
-        if (req.url === "/grid/workload") {
-          try {
-            const data = JSON.parse(body) as { executionId?: string };
-            res.writeHead(202, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
-          } catch {
-            res.writeHead(400, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "invalid workload" }));
-          }
-          return;
+    if (req.url === "/grid/register" && req.method === "POST") {
+      let body = "";
+      req.on("data", chunk => { body += chunk.toString(); });
+      req.on("end", () => {
+        try {
+          const data = JSON.parse(body);
+          if (!data.url) throw new Error("url required");
+          void gridNode.registerPeer(data.url);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "registered" }));
+        } catch {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "invalid request" }));
         }
+      });
+      return;
+    }
 
-        const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
-        if (statusMatch) {
-          try {
-            const data = JSON.parse(body) as { executionId?: string };
-            res.writeHead(202, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
-          } catch {
-            res.writeHead(400, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "invalid workload" }));
+    if (req.url === "/grid/workload" && req.method === "POST") {
+      let body = "";
+      req.on("data", chunk => { body += chunk.toString(); });
+      req.on("end", () => {
+        try {
+          const data = JSON.parse(body);
+          // In a real system, route this to the executor queue
+          res.writeHead(202, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "accepted", executionId: data.executionId }));
+        } catch {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "invalid workload" }));
+        }
+      });
+      return;
+    }
+      
+    if (req.method === "GET") {
+      const statusMatch = req.url?.match(/^\/sandbox\/([^/]+)\/status$/);
+      if (statusMatch) {
+        const sandboxName = statusMatch[1];
+        try {
+          const deps = buildStatusCommandDeps(ROOT);
+          const report = getStatusReport(deps);
+          // find sandbox by name
+          const sandbox = report.sandboxes.find((s) => s.name === sandboxName);
+          if (!sandbox) {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "sandbox not found" }));
+            return;
           }
           return;
         }
