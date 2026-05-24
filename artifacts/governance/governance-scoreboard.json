@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-05-24T00:58:54.396Z",
+  "overall": "pass",
+  "categories": {
+    "contractBoundaryIntegrity": "pass",
+    "threatSeamStatus": "pass",
+    "versionDriftStatus": "pass"
+  },
+  "verification": [
+    {
+      "command": "npm run verify:status-truth",
+      "status": "pass",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:threat-seams",
+      "status": "pass",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run verify:version-drift",
+      "status": "pass",
+      "exitCode": 0
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-05-24T00:58:49.418Z",
+  "schemaVersion": "1.0.0",
+  "components": [
+    {
+      "name": "control-plane",
+      "state": "implemented",
+      "implementationEvidence": [
+        "src/lib/control-plane/orchestration.ts",
+        "src/lib/control-plane/scheduler.ts"
+      ],
+      "testEvidence": [
+        "src/lib/control-plane/control-plane.test.ts",
+        "src/lib/control-plane/runtime-seams.test.ts"
+      ],
+      "docsEvidence": [
+        "docs/architecture/current-state.md",
+        "docs/architecture/target-state.md"
+      ],
+      "ciEvidence": [
+        ".github/workflows/ci.yml"
+      ],
+      "exportEvidence": [
+        "src/lib/control-plane/evidence-export.ts"
+      ],
+      "driftFindings": [],
+      "reasoning": "Control-plane modules and tests exist and are wired into verification scripts."
+    },
+    {
+      "name": "policy-egress-enforcement",
+      "state": "implemented",
+      "implementationEvidence": [
+        "src/lib/policies.ts",
+        "src/lib/private-networks.ts"
+      ],
+      "testEvidence": [
+        "test/ssrf-parity.test.ts",
+        "test/config-set-nested-ssrf.test.ts"
+      ],
+      "docsEvidence": [
+        "docs/verification/release-readiness.md"
+      ],
+      "ciEvidence": [
+        ".github/workflows/ci.yml"
+      ],
+      "exportEvidence": [],
+      "driftFindings": [],
+      "reasoning": "SSRF/policy tests and policy modules exist in repository truth paths."
+    },
+    {
+      "name": "proofpack-replay-governance",
+      "state": "implemented",
+      "implementationEvidence": [
+        "src/lib/control-plane/proofpack-ledger.ts",
+        "src/lib/control-plane/replay.ts"
+      ],
+      "testEvidence": [
+        "src/lib/control-plane/proofpack-ledger.test.ts"
+      ],
+      "docsEvidence": [
+        "docs/verification/release-readiness.md"
+      ],
+      "ciEvidence": [
+        ".github/workflows/ci.yml"
+      ],
+      "exportEvidence": [
+        "scripts/verify-proofpack.ts",
+        "scripts/verify-replay.ts"
+      ],
+      "driftFindings": [],
+      "reasoning": "Proofpack and replay verification surfaces are present and script-addressable."
+    }
+  ],
+  "staleClaims": []
+}

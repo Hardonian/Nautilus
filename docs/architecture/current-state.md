@@ -7,7 +7,7 @@
 
 ## Overview
 
-This section describes repository truth as of this commit only. NemoClaw currently provides CLI and plugin-driven sandbox lifecycle management, onboarding, provider/model selection, policy preset application, and diagnostics. It does not yet implement a dedicated deterministic control plane with device registry, scheduler, or receipt framework.
+This section describes repository truth as of this commit only. NemoClaw currently provides CLI and plugin-driven sandbox lifecycle management, onboarding, provider/model selection, policy preset application, and diagnostics. It implements deterministic control-plane modules (registry, scheduler, governance receipts) with ongoing hardening in threat seams and degraded-state taxonomy.
 
 ## Execution entrypoints
 

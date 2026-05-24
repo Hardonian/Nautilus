@@ -42,3 +42,10 @@ Unsupported-language audit completed across docs and code claims:
 - Cryptographic attestation is not implemented yet in this phase.
 - Remote execution is disabled by default and requires explicit opt-in flags.
 - No orchestration/Dynamo integration is implemented in this phase.
+
+
+## Verification runtime tiers
+
+- **Pre-merge (fast):** `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run verify:status-truth`, `npm run verify:version-drift`.
+- **Release:** `npm run verify:release-readiness`, `npm run verify:threat-seams`, `npm run verify:governance`, `npm run build`.
+- **Nightly/exhaustive:** `npm run test:full`, `npm run verify:all`, `npm run verify:proofpack`, `npm run verify:replay`, `npm run verify:export`.

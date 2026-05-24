@@ -1,0 +1,10 @@
+{
+  "allowed": [
+    {
+      "key": "devDependency:typescript",
+      "root": "^6.0.2",
+      "nemoclaw": "^5.4.0",
+      "reason": "nemoclaw plugin toolchain is pinned pending tsconfig migration closure"
+    }
+  ]
+}

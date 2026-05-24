@@ -24,6 +24,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Fast truth and drift gates
+        run: npm run verify:status-truth && npm run verify:version-drift
+
+      - name: Threat seam verification
+        run: npm run verify:threat-seams
+
+      - name: Governance scoreboard
+        run: npm run verify:governance
+
       - name: Release verification
         run: npm run verify:release-readiness
 
