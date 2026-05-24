@@ -50,16 +50,8 @@ export class ApiGateway {
   }
 
   private handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
-    if (req.method === "GET" && req.url === "/health") {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ status: "ok" }));
-      return;
-    }
-
-    if (req.method === "GET" && req.url === "/telemetry") {
-      try {
-        const deps = buildStatusCommandDeps(ROOT);
-        const report = getStatusReport(deps);
+    if (req.method === "GET" || req.method === "POST") {
+      if (req.url === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({
           activeSandboxes: report.sandboxes.filter((s) => s.connected).length,
