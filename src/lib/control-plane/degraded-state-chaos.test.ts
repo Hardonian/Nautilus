@@ -60,7 +60,7 @@ describe("degraded state chaos coverage", () => {
     expect(disabled.status).toBe("disabled");
     expect(denied.status).toBe("policy_denied");
     expect(approval.status).toBe("approval_required");
-    expect(stale.degradedReason).toBe("node_stale_or_unhealthy");
+    expect(stale.degradedReason).toBe("remote_execution_denied_untrusted");
     expect(transport.execute).not.toHaveBeenCalled();
   });
 
