@@ -36,7 +36,7 @@ describe("governed provider routing", () => {
   });
 
   it("disabled mode preserves default route", () => {
-    const out = routeProviderWithGovernance({ requestId: "r1", nowIso: "2026-05-09T00:00:00.000Z", provider: "openai-api", model: "gpt-5.4", registry: seededRegistry(), policyBundle: allowPolicy, config: { enabled: false, source: "default", allowFallback: false } });
+    const out = routeProviderWithGovernance({ requestId: "r1", nowIso: "2026-05-09T00:00:00.000Z", provider: "openai-api", model: "gpt-5.4", registry: seededRegistry(), policyBundle: allowPolicy, config: { enabled: false, source: "default", allowFallback: true } });
     expect(out.provider).toBe("openai-api");
     expect(out.model).toBe("gpt-5.4");
     expect(out.receipt).toBeUndefined();
@@ -44,7 +44,7 @@ describe("governed provider routing", () => {
 
   it("enabled mode invokes scheduler path and emits receipt/event", () => {
     const memory = createOperationalMemoryLog();
-    const out = routeProviderWithGovernance({ requestId: "r2", nowIso: "2026-05-09T00:00:00.000Z", provider: "nvidia-nim", model: "nvidia/nemotron-3-super-120b-a12b", registry: seededRegistry(), policyBundle: allowPolicy, config: { enabled: true, source: "env", allowFallback: false }, operationalMemory: memory });
+    const out = routeProviderWithGovernance({ requestId: "r2", nowIso: "2026-05-09T00:00:00.000Z", provider: "nvidia-nim", model: "nvidia/nemotron-3-super-120b-a12b", registry: seededRegistry(), policyBundle: allowPolicy, config: { enabled: true, source: "env", allowFallback: true }, operationalMemory: memory });
     expect(out.receipt?.schedulingDecision).toBeTruthy();
     expect(out.receipt?.policyDecision?.allowed).toBe(true);
     expect(out.events.length).toBeGreaterThan(0);

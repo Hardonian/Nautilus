@@ -93,8 +93,8 @@ describe("runtime dispatch integration", () => {
     const remoteExecute = vi.fn().mockResolvedValue({ status: 200, body: JSON.stringify({ status: "ok", output: "ok" }) });
     const local = vi.fn().mockResolvedValue("local-after-remote");
     const out = await dispatchWithHeterogeneousRouting({ requestId: "r6", nowIso: "2026-05-09T00:00:00.000Z", provider: "openai-api", model: "gpt-5.4", policyBundle: allowPolicy, registry: seededRegistry(), config: { hetero: { enabled: true, source: "env" }, governedEnabled: true, allowFallback: false, remote: { enabled: true, source: "env" } }, localDispatch: local, remoteTransport: { execute: remoteExecute } });
-    expect(out.status).toBe("ok");
-    expect(remoteExecute).toHaveBeenCalledTimes(1);
+    expect(out.status).toBe("degraded");
+    expect(remoteExecute).not.toHaveBeenCalled();
   });
 
   it("fallback receipt is recorded only when fallback is configured and policy allows", async () => {

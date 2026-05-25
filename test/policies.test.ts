@@ -1485,7 +1485,7 @@ Promise.resolve(require(${CLI_PATH}).mainPromise).finally(() => {
         expect(policies.loadPresetFromFile(file)).toBe(null);
         const msgs = errSpy.mock.calls.map((c) => c[0]);
         expect(
-          msgs.some((m) => typeof m === "string" && m.includes("must declare preset.name")),
+          msgs.some((m) => typeof m === "string" && m.includes("Preset schema validation failed") && m.includes("name")),
         ).toBe(true);
       } finally {
         errSpy.mockRestore();
@@ -1511,7 +1511,7 @@ Promise.resolve(require(${CLI_PATH}).mainPromise).finally(() => {
         expect(policies.loadPresetFromFile(file)).toBe(null);
         const msgs = errSpy.mock.calls.map((c) => c[0]);
         expect(
-          msgs.some((m) => typeof m === "string" && m.includes("missing network_policies")),
+          msgs.some((m) => typeof m === "string" && m.includes("Preset schema validation failed") && m.includes("network_policies")),
         ).toBe(true);
       } finally {
         errSpy.mockRestore();
