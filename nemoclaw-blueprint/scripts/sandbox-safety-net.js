@@ -129,19 +129,21 @@
     } catch (_) {}
   });
 
-  function installSignalHandler(signal) {
-    var handler = function () {
-      try {
-        process.stderr.write('[sandbox-safety-net] ' + signal + ' received \u2014 gateway shutting down\n');
-      } catch (_) {}
-      process.removeListener(signal, handler);
-      if (process.listenerCount(signal) === 0) {
-        process.kill(process.pid, signal);
-      }
-    };
-    process.on(signal, handler);
-  }
+  process.on('SIGTERM', function () {
+    try {
+      process.stderr.write('[sandbox-safety-net] SIGTERM received \u2014 gateway shutting down\n');
+    } catch (_) {}
+    if (process.listenerCount('SIGTERM') === 1) {
+      process.exit(143);
+    }
+  });
 
-  installSignalHandler('SIGTERM');
-  installSignalHandler('SIGINT');
+  process.on('SIGINT', function () {
+    try {
+      process.stderr.write('[sandbox-safety-net] SIGINT received \u2014 gateway shutting down\n');
+    } catch (_) {}
+    if (process.listenerCount('SIGINT') === 1) {
+      process.exit(130);
+    }
+  });
 })();
