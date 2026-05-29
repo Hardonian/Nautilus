@@ -1,0 +1,5 @@
+🎯 **What:** Fixed a command injection vulnerability in `resolveLinuxUnmount()` in `src/lib/share-command.ts`.
+⚠️ **Risk:** The `spawnSync` invocation dynamically interpolated the `cmd` variable into a shell string. Even though the variable is currently bound to a fixed array (`["fusermount3", "fusermount"]`), insecure interpolation practices pose a significant risk if the loop array is later augmented with external or attacker-controlled inputs.
+🛡️ **Solution:** Removed the string interpolation. Refactored the `sh -c` command to pass the binary name as a positional argument (`$1`), successfully neutralizing any command injection potential. Tests were appropriately updated and verified.
+
+Signed-off-by: Jules <jules@example.com>

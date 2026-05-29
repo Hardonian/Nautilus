@@ -107,6 +107,10 @@ describe("share-command helpers", () => {
   it("prefers fusermount3 over fusermount on Linux", () => {
     spawnSyncMock.mockImplementation((_cmd: string, args: string[]) => {
       const script = args[1] as string;
+      const positionalArg = args[3] as string;
+      if (script.includes("command -v") && positionalArg === "fusermount3") return { status: 0, stdout: "/usr/bin/fusermount3\n" };
+      if (script.includes("command -v") && positionalArg === "fusermount") return { status: 0, stdout: "/usr/bin/fusermount\n" };
+      // Fallback for old behaviour or other mock usages
       if (script.includes("fusermount3")) return { status: 0, stdout: "/usr/bin/fusermount3\n" };
       if (script.includes("fusermount")) return { status: 0, stdout: "/usr/bin/fusermount\n" };
       return { status: 1, stdout: "" };
@@ -118,6 +122,10 @@ describe("share-command helpers", () => {
   it("falls back to fusermount when fusermount3 is unavailable", () => {
     spawnSyncMock.mockImplementation((_cmd: string, args: string[]) => {
       const script = args[1] as string;
+      const positionalArg = args[3] as string;
+      if (script.includes("command -v") && positionalArg === "fusermount3") return { status: 1, stdout: "" };
+      if (script.includes("command -v") && positionalArg === "fusermount") return { status: 0, stdout: "/bin/fusermount\n" };
+      // Fallback for old behaviour
       if (script.includes("fusermount3")) return { status: 1, stdout: "" };
       if (script.includes("fusermount")) return { status: 0, stdout: "/bin/fusermount\n" };
       return { status: 1, stdout: "" };
