@@ -489,7 +489,6 @@ def build_config(env: dict | None = None) -> dict:
     providers = {
         provider_key: {
             "baseUrl": inference_base_url,
-            "apiKey": "unused",
             "api": inference_api,
             "models": [
                 {

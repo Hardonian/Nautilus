@@ -45,7 +45,7 @@ describe("findChannelConflicts", () => {
       {
         name: "alice",
         messagingChannels: ["telegram"],
-        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "hash-a" },
+        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "a70bf50e531ce1a817561f2f5d5b6645d4e806becf58ccc5e8cf6b8045a090a8" },
       },
       {
         name: "carol",
@@ -56,7 +56,7 @@ describe("findChannelConflicts", () => {
     expect(
       findChannelConflicts(
         "bob",
-        [{ channel: "telegram", credentialHashes: { TELEGRAM_BOT_TOKEN: "hash-a" } }],
+        [{ channel: "telegram", plaintextTokens: { TELEGRAM_BOT_TOKEN: "token-a" } }],
         registry,
       ),
     ).toEqual([{ channel: "telegram", sandbox: "alice", reason: "matching-token" }]);
@@ -67,13 +67,13 @@ describe("findChannelConflicts", () => {
       {
         name: "alice",
         messagingChannels: ["telegram"],
-        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "hash-a" },
+        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "a70bf50e531ce1a817561f2f5d5b6645d4e806becf58ccc5e8cf6b8045a090a8" },
       },
     ]);
     expect(
       findChannelConflicts(
         "bob",
-        [{ channel: "telegram", credentialHashes: { TELEGRAM_BOT_TOKEN: "hash-b" } }],
+        [{ channel: "telegram", plaintextTokens: { TELEGRAM_BOT_TOKEN: "token-b" } }],
         registry,
       ),
     ).toEqual([]);
@@ -125,12 +125,12 @@ describe("findAllOverlaps", () => {
       {
         name: "alice",
         messagingChannels: ["telegram"],
-        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "hash-a" },
+        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "a70bf50e531ce1a817561f2f5d5b6645d4e806becf58ccc5e8cf6b8045a090a8" },
       },
       {
         name: "bob",
         messagingChannels: ["telegram"],
-        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "hash-b" },
+        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "49e2bb7eab54cf09b409ffafd3fa8a8a955a60eb972faacaefbed3dbd3207132" },
       },
     ]);
     expect(findAllOverlaps(registry)).toEqual([]);
@@ -141,12 +141,12 @@ describe("findAllOverlaps", () => {
       {
         name: "alice",
         messagingChannels: ["telegram"],
-        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "hash-a" },
+        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "a70bf50e531ce1a817561f2f5d5b6645d4e806becf58ccc5e8cf6b8045a090a8" },
       },
       {
         name: "bob",
         messagingChannels: ["telegram"],
-        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "hash-a" },
+        providerCredentialHashes: { TELEGRAM_BOT_TOKEN: "a70bf50e531ce1a817561f2f5d5b6645d4e806becf58ccc5e8cf6b8045a090a8" },
       },
     ]);
     expect(findAllOverlaps(registry)).toEqual([

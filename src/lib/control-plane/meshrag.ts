@@ -121,14 +121,12 @@ export async function ingestRecords(input: { records: RetrievalIngestionRecord[]
   if (input.embedding.status() === "unavailable") return { accepted: [], degraded: ["embedding_adapter_unavailable"] };
   if (input.vectorStore.status() === "unavailable") return { accepted: [], degraded: ["vector_store_unavailable"] };
   if (input.vectorStore.status() === "degraded") degraded.push("vector_store_degraded");
-
-  const embeddedResults = await Promise.all(
-    input.records.map((record) => input.embedding.embed({ text: record.content }))
+  const rows = await Promise.all(
+    input.records.map(async (record) => {
+      const embedded = await input.embedding.embed({ text: record.content });
+      return { recordId: record.recordId, vector: embedded.vector, record };
+    })
   );
-
-  const rows = input.records.map((record, index) => ({
-    recordId: record.recordId, vector: embeddedResults[index].vector, record
-  }));
   await input.vectorStore.upsert(rows);
   return { accepted: rows.map((r) => r.recordId), degraded };
 }
