@@ -32,4 +32,4 @@ if [ ! -f "$CLI_JS" ]; then
   exit 0
 fi
 
-exec "$NODE_BIN" "$CLI_JS" internal dev npm-link-or-shim --repo-root "$REPO_ROOT"
+exec "$NODE_BIN" "$CLI_JS" internal dev npm-link-or-shim
