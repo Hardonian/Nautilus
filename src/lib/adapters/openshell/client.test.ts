@@ -70,8 +70,6 @@ describe("openshell helpers", () => {
     it("returns empty string when given empty string", () => {
       expect(stripAnsi("")).toBe("");
     });
-
-
   });
 
   it("parses semantic versions from CLI output", () => {
