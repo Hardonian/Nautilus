@@ -26,9 +26,7 @@
 //      "Unknown means crash" is the wrong default for shared
 //      infrastructure; "unknown means log loudly" is the right default.
 //
-//   4. Explicit shutdown signal handlers. Instead of a catch-all hack
-//      that intercepts process.exit (which masked legitimate shutdown
-//      signals in an earlier iteration), we listen for SIGTERM and
+//   4. Explicit shutdown signal handlers. We listen for SIGTERM and
 //      SIGINT to log explicitly and exit gracefully.
 //
 //   5. Only active when OPENSHELL_SANDBOX=1 (set by OpenShell at runtime),
