@@ -23,7 +23,7 @@ const docs = {
   target: readFileSync('docs/architecture/target-state.md', 'utf8'),
 };
 
-const rawFiles = execSync('rg --files src test docs .github/workflows scripts').toString('utf8').trim();
+const rawFiles = execSync('find src test docs .github/workflows scripts -type f').toString('utf8').trim();
 const files = rawFiles ? rawFiles.split('\n') : [];
 const hasFile = (pattern: RegExp) => files.some((f) => pattern.test(f));
 
