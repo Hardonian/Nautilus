@@ -68,6 +68,6 @@ export class CleanupRegistry {
     this.#ran = true;
     const items = [...this.#cleanup];
     this.#cleanup.clear();
-    for (const item of items) await item();
+    await Promise.all(items.map((item) => item()));
   }
 }
