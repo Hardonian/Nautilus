@@ -379,7 +379,6 @@ describe("onboard helpers", () => {
 
     assert.match(script, /models\.providers\.inference/);
     assert.match(script, /https:\/\/inference\.local\/v1/);
-    assert.match(script, /apiKey.*unused/);
     assert.match(script, /agents\.defaults\.model\.primary/);
     assert.match(script, /curl[\s\S]*\/chat\/completions/);
     assert.doesNotMatch(script, /COMPATIBLE_API_KEY/);

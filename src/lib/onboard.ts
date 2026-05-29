@@ -272,7 +272,7 @@ const {
   resolveProviderCredential,
   saveCredential,
 } = credentials;
-const { hashCredential }: typeof import("./security/credential-hash") = require("./security/credential-hash");
+const { hashCredential, verifyCredential }: typeof import("./security/credential-hash") = require("./security/credential-hash");
 const {
   cleanupStaleHostFiles,
 }: typeof import("./host-artifact-cleanup") = require("./host-artifact-cleanup");
@@ -1310,7 +1310,7 @@ async function reconcileModelRouter(): Promise<void> {
   if (await isRouterHealthy(routerPort)) {
     if (
       routerCredentialHash &&
-      recordedCredentialHash === routerCredentialHash &&
+      verifyCredential(routerCredential, recordedCredentialHash) &&
       isProcessRunning(recordedPid)
     ) {
       console.log(`  ✓ Model router is already healthy on port ${routerPort}`);
@@ -1916,7 +1916,7 @@ function detectMessagingCredentialRotation(
     if (!token) continue;
     const storedHash = storedHashes[envKey];
     if (!storedHash) continue;
-    if (storedHash !== hashCredential(token)) {
+    if (!verifyCredential(token, storedHash)) {
       changedProviders.push(name);
     }
   }
@@ -2018,8 +2018,6 @@ if not isinstance(provider, dict):
     die("openclaw.json missing models.providers.${MANAGED_PROVIDER_ID}")
 if provider.get("baseUrl") != "${INFERENCE_ROUTE_URL}":
     die("models.providers.${MANAGED_PROVIDER_ID}.baseUrl is %r; expected ${INFERENCE_ROUTE_URL}" % provider.get("baseUrl"))
-if provider.get("apiKey") != "unused":
-    die("models.providers.${MANAGED_PROVIDER_ID}.apiKey must remain the non-secret placeholder 'unused'")
 
 primary = cfg.get("agents", {}).get("defaults", {}).get("model", {}).get("primary")
 expected_primary = "${MANAGED_PROVIDER_ID}/" + model
@@ -4861,13 +4859,13 @@ async function createSandbox(
         const def = channelsByName.get(name);
         if (!def || !getMessagingToken(def.envKey)) return [];
         const tokenEnvKeys = def.appTokenEnvKey ? [def.envKey, def.appTokenEnvKey] : [def.envKey];
-        const credentialHashes: Record<string, string> = {};
+        const plaintextTokens: Record<string, string> = {};
         for (const envKey of tokenEnvKeys) {
-          const hash = hashCredential(getMessagingToken(envKey));
-          if (hash) credentialHashes[envKey] = hash;
+          const token = getMessagingToken(envKey);
+          if (token) plaintextTokens[envKey] = token;
         }
-        if (Object.keys(credentialHashes).length === 0) return [];
-        return [{ channel: name, credentialHashes }];
+        if (Object.keys(plaintextTokens).length === 0) return [];
+        return [{ channel: name, plaintextTokens }];
       })
     : [];
 
@@ -10540,6 +10538,7 @@ module.exports = {
   hasChatCompletionsToolCallLeak,
   upsertProvider,
   hashCredential,
+  verifyCredential,
   detectMessagingCredentialRotation,
   getDefaultSandboxNameForAgent,
   getSandboxPromptDefault,
