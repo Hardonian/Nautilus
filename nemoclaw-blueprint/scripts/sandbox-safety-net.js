@@ -26,10 +26,10 @@
 //      "Unknown means crash" is the wrong default for shared
 //      infrastructure; "unknown means log loudly" is the right default.
 //
-//   4. Explicit shutdown signal handlers. Instead of a catch-all hack
-//      that intercepts process.exit (which masked legitimate shutdown
-//      signals in an earlier iteration), we listen for SIGTERM and
-//      SIGINT to log explicitly and exit gracefully.
+//   4. No process.exit interception. An earlier iteration intercepted
+//      process.exit during swallow windows, which masked legitimate
+//      shutdown signals and was itself the kind of catch-all hack we
+//      want to avoid.
 //
 //   5. Only active when OPENSHELL_SANDBOX=1 (set by OpenShell at runtime),
 //      and only for gateway processes. The gateway can appear as the
@@ -130,16 +130,20 @@
   });
 
   process.on('SIGTERM', function () {
-    try {
-      process.stderr.write('[sandbox-safety-net] SIGTERM received \u2014 gateway shutting down\n');
-    } catch (_) {}
-    process.exit(143);
+    if (process.listenerCount('SIGTERM') === 1) {
+      try {
+        process.stderr.write('[sandbox-safety-net] SIGTERM received \u2014 gateway shutting down\n');
+      } catch (_) {}
+      process.exit(143);
+    }
   });
 
   process.on('SIGINT', function () {
-    try {
-      process.stderr.write('[sandbox-safety-net] SIGINT received \u2014 gateway shutting down\n');
-    } catch (_) {}
-    process.exit(130);
+    if (process.listenerCount('SIGINT') === 1) {
+      try {
+        process.stderr.write('[sandbox-safety-net] SIGINT received \u2014 gateway shutting down\n');
+      } catch (_) {}
+      process.exit(130);
+    }
   });
 })();
