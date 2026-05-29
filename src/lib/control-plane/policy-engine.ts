@@ -3,6 +3,7 @@
 
 import type { PolicyRule, PolicyEffect, PolicyReasonCode, PolicyEvaluationContext } from "./governance";
 import { deterministicSerialize } from "./serde";
+import { randomUUID } from "node:crypto";
 
 export type PolicyScope = "global" | "environment" | "runtime" | "worker" | "execution" | "operator" | "emergency";
 
@@ -211,7 +212,7 @@ export function evaluatePolicy(
   }
 
   const trace: PolicyEvaluationTrace = {
-    traceId: `trace-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    traceId: `trace-${Date.now()}-${randomUUID()}`,
     evaluatedAt: new Date().toISOString(),
     context,
     decisions: { nodes, edges },
@@ -269,7 +270,7 @@ export function mutatePolicyPack(
   const newDigest = computePolicyPackDigest(updatedPack);
 
   const mutation: PolicyMutationRecord = {
-    mutationId: `mut-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    mutationId: `mut-${Date.now()}-${randomUUID()}`,
     packId: pack.packId,
     timestamp: new Date().toISOString(),
     operator,
