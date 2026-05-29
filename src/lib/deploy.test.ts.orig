@@ -270,11 +270,6 @@ describe("Brev status helpers", () => {
     });
   });
 
-  it("returns null if JSON parsing fails", () => {
-    const status = findBrevInstanceStatus("invalid json", "target");
-    expect(status).toBeNull();
-  });
-
   it("classifies Brev failure states", () => {
     expect(
       isBrevInstanceFailed({
