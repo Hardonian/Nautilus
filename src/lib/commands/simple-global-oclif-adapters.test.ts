@@ -11,7 +11,6 @@ const mocks = vi.hoisted(() => ({
   listSandboxes: vi.fn(() => ({ sandboxes: [] })),
   resolveOpenshell: vi.fn(() => "/usr/bin/openshell"),
   runDebugCommandWithOptions: vi.fn(),
-  runDeployAction: vi.fn().mockResolvedValue(undefined),
   runGatewayTokenCommand: vi.fn(() => 0),
   runStartCommand: vi.fn().mockResolvedValue(undefined),
   runStopCommand: vi.fn(),
@@ -32,7 +31,6 @@ vi.mock("../gateway-token-command", () => ({
   runGatewayTokenCommand: mocks.runGatewayTokenCommand,
 }));
 vi.mock("../actions/global", () => ({
-  runDeployAction: mocks.runDeployAction,
   showRootHelp: mocks.showRootHelp,
   showVersion: mocks.showVersion,
 }));
@@ -51,7 +49,6 @@ vi.mock("../uninstall-command", () => ({
 vi.mock("../core/version", () => ({ getVersion: mocks.getVersion }));
 
 import DebugCliCommand from "./debug";
-import DeployCliCommand from "./deploy";
 import GatewayTokenCliCommand, { setGatewayTokenRuntimeBridgeFactoryForTest } from "./gateway-token";
 import DeprecatedStartCommand from "./deprecated/start";
 import DeprecatedStopCommand from "./deprecated/stop";
@@ -68,15 +65,13 @@ describe("simple global oclif adapters", () => {
     vi.clearAllMocks();
   });
 
-  it("maps debug and deploy parser output to actions", async () => {
+  it("maps debug parser output to actions", async () => {
     await DebugCliCommand.run(["--quick", "--output", "/tmp/debug.tar.gz", "--sandbox", "alpha"], rootDir);
-    await DeployCliCommand.run(["gpu-alpha"], rootDir);
 
     expect(mocks.runDebugCommandWithOptions).toHaveBeenCalledWith(
       { quick: true, output: "/tmp/debug.tar.gz", sandboxName: "alpha" },
       expect.objectContaining({ getDefaultSandbox: expect.any(Function), runDebug: expect.any(Function) }),
     );
-    expect(mocks.runDeployAction).toHaveBeenCalledWith("gpu-alpha");
   });
 
   it("builds debug defaults from the sandbox registry and OpenShell liveness", async () => {
