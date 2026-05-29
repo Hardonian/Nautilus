@@ -1,12 +1,5 @@
-💡 **What:** Replaced the sequential `for` loop in `CleanupRegistry.runOnce()` with a concurrent `await Promise.all()` execution.
+🎯 **What:** The `findBrevInstanceStatus` function parses an input JSON string. If `JSON.parse` fails (e.g. invalid JSON format), it has a `catch` block that suppresses the error and returns `null`. This behavior was entirely untested.
+📊 **Coverage:** Added a unit test covering the `JSON.parse` failure case inside `findBrevInstanceStatus`. It directly passes "invalid json" as the input to the parser and asserts it successfully returns `null`.
+✨ **Result:** Improved test coverage for `deploy.ts` and enhanced robustness guarantees against unhandled exceptions from improperly formatted CLI outputs.
 
-🎯 **Why:** The previous implementation awaited each async cleanup function sequentially. This means that if multiple cleanup tasks involved I/O, waiting for timers, or other non-blocking async operations, their delays compounded. By using `Promise.all()`, we can map the cleanup callbacks to promises and execute them all concurrently, which is significantly faster.
-
-📊 **Measured Improvement:** We established a benchmark with `vitest bench` to measure the performance of `runOnce` with 1,000 async cleanups (each simulating a 1ms delay).
-
-*   **Baseline:** The original sequential code ran at roughly **0.83 ops/sec** (approx. 1200ms mean time per run).
-*   **Improvement:** The optimized code ran at roughly **457 ops/sec** (approx. 2.18ms mean time per run).
-
-This results in a massive >500x speedup for the scenario with many asynchronous cleanup tasks.
-
-Signed-off-by: Jules <jules@example.com>
+Signed-off-by: Jules <jules@code.ai>
