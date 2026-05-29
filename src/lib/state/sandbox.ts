@@ -1208,10 +1208,12 @@ function restoreStateDirs(
 
   // Remove existing state dirs before extracting so stale files from
   // later snapshots don't persist after restoring an earlier one.
-  const rmCmd = localDirs.map((d) => `rm -rf -- ${shellQuote(`${dir}/${d}`)}`).join(" && ");
-  _log(`Cleaning target dirs before restore: ${rmCmd}`);
+  const rmCmd = "xargs -0 rm -rf --";
+  const rmInput = localDirs.map((d) => `${dir}/${d}`).join("\0");
+  _log(`Cleaning target dirs before restore via xargs null-terminated pipe`);
   const rmResult = spawnSync("ssh", [...sshArgs(configFile, sandboxName), rmCmd], {
-    stdio: ["ignore", "pipe", "pipe"],
+    input: rmInput,
+    stdio: ["pipe", "pipe", "pipe"],
     timeout: 30000,
   });
   if (rmResult.status !== 0 || rmResult.error || rmResult.signal) {
