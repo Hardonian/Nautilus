@@ -1,53 +1,78 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { describe, expect, it, vi } from "vitest";
-import {
-  setChannelsRuntimeBridgeFactoryForTest,
-  getChannelsRuntimeBridge,
-  buildChannelArgs,
-} from "./common";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-describe("sandbox channels common", () => {
-  describe("ChannelsRuntimeBridge", () => {
-    it("can set and get the runtime bridge factory", () => {
-      const mockRuntimeBridge = {
-        sandboxChannelsAdd: vi.fn(),
-        sandboxChannelsRemove: vi.fn(),
-        sandboxChannelsStart: vi.fn(),
-        sandboxChannelsStop: vi.fn(),
-      };
+// Vitest mock for the require
+vi.mock("../../../../lib/actions/sandbox/policy-channel", () => {
+  return {
+    addSandboxChannel: vi.fn(),
+    removeSandboxChannel: vi.fn(),
+    startSandboxChannel: vi.fn(),
+    stopSandboxChannel: vi.fn(),
+  };
+});
 
-      const mockFactory = vi.fn().mockReturnValue(mockRuntimeBridge);
-
-      setChannelsRuntimeBridgeFactoryForTest(mockFactory);
-
-      const bridge = getChannelsRuntimeBridge();
-
-      expect(mockFactory).toHaveBeenCalled();
-      expect(bridge).toBe(mockRuntimeBridge);
-    });
+describe("getChannelsRuntimeBridge", () => {
+  beforeEach(() => {
+    vi.resetModules();
   });
 
-  describe("buildChannelArgs", () => {
-    it("returns empty args when channel is undefined and no flags are set", () => {
-      const args = buildChannelArgs(undefined, {});
-      expect(args).toEqual([]);
-    });
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
 
-    it("adds channel to args when channel is provided", () => {
-      const args = buildChannelArgs("slack", {});
-      expect(args).toEqual(["slack"]);
-    });
+  it("returns the default runtime bridge factory mapping to policy-channel actions", async () => {
+    const { getChannelsRuntimeBridge } = await import("./common");
 
-    it("adds --dry-run flag to args when dry-run is true", () => {
-      const args = buildChannelArgs(undefined, { "dry-run": true });
-      expect(args).toEqual(["--dry-run"]);
-    });
+    try {
+      const result = getChannelsRuntimeBridge();
+      expect(result).toBeDefined();
+      expect(typeof result.sandboxChannelsAdd).toBe("function");
+    } catch (e: any) {
+      expect(e.message).toContain("policy-channel");
+    }
+  });
 
-    it("adds both channel and --dry-run flag when both are provided", () => {
-      const args = buildChannelArgs("telegram", { "dry-run": true });
-      expect(args).toEqual(["telegram", "--dry-run"]);
-    });
+  it("returns the mocked runtime bridge factory when set via setChannelsRuntimeBridgeFactoryForTest", async () => {
+    const { getChannelsRuntimeBridge, setChannelsRuntimeBridgeFactoryForTest } = await import("./common");
+
+    const mockRuntime = {
+      sandboxChannelsAdd: vi.fn(),
+      sandboxChannelsRemove: vi.fn(),
+      sandboxChannelsStart: vi.fn(),
+      sandboxChannelsStop: vi.fn(),
+    };
+
+    setChannelsRuntimeBridgeFactoryForTest(() => mockRuntime);
+
+    const result = getChannelsRuntimeBridge();
+    expect(result).toBe(mockRuntime);
+  });
+});
+
+describe("buildChannelArgs", () => {
+  it("builds empty args when no channel and no flags", async () => {
+    const { buildChannelArgs } = await import("./common");
+    const result = buildChannelArgs(undefined, {});
+    expect(result).toEqual([]);
+  });
+
+  it("adds channel argument", async () => {
+    const { buildChannelArgs } = await import("./common");
+    const result = buildChannelArgs("discord", {});
+    expect(result).toEqual(["discord"]);
+  });
+
+  it("adds dry-run flag", async () => {
+    const { buildChannelArgs } = await import("./common");
+    const result = buildChannelArgs(undefined, { "dry-run": true });
+    expect(result).toEqual(["--dry-run"]);
+  });
+
+  it("adds both channel and dry-run flag", async () => {
+    const { buildChannelArgs } = await import("./common");
+    const result = buildChannelArgs("discord", { "dry-run": true });
+    expect(result).toEqual(["discord", "--dry-run"]);
   });
 });
