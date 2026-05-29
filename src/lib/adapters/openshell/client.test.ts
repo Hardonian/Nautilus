@@ -50,35 +50,29 @@ function exitWithCode(code: number): never {
 
 describe("openshell helpers", () => {
   describe("stripAnsi", () => {
-    it("strips basic color codes", () => {
+    it("strips simple ANSI color codes", () => {
       expect(stripAnsi("\u001b[32mConnected\u001b[0m")).toBe("Connected");
     });
 
-    it("handles empty strings", () => {
-      expect(stripAnsi("")).toBe("");
+    it("strips complex ANSI codes with semicolons", () => {
+      expect(stripAnsi("\x1b[38;5;206mMagenta text\x1b[0m")).toBe("Magenta text");
+      expect(stripAnsi("\u001b[1;31mBold red\u001b[0m")).toBe("Bold red");
     });
 
-    it("handles strings without ANSI codes", () => {
+    it("strips multiple ANSI codes in a single string", () => {
+      expect(stripAnsi("\u001b[31mRed\u001b[0m and \u001b[32mGreen\u001b[0m")).toBe("Red and Green");
+    });
+
+    it("returns the original string if no ANSI codes are present", () => {
       expect(stripAnsi("Plain text")).toBe("Plain text");
     });
 
-    it("handles complex ANSI sequences (e.g., bold, background, rgb)", () => {
-      // Bold red text on yellow background
-      expect(stripAnsi("\x1b[1;31;43mWarning\x1b[0m")).toBe("Warning");
-      // RGB colors
-      expect(stripAnsi("\x1b[38;2;255;82;197mPink\x1b[0m")).toBe("Pink");
-      // Complex multi-sequence text
-      expect(stripAnsi("\x1b[1mBold\x1b[0m and \x1b[4mUnderline\x1b[0m")).toBe("Bold and Underline");
-    });
-
-    it("handles multiple ANSI sequences sequentially", () => {
-      expect(stripAnsi("\x1b[31m\x1b[1mRed Bold\x1b[0m\x1b[0m")).toBe("Red Bold");
-    });
-
-    it("handles undefined gracefully by falling back to default parameter", () => {
+    it("handles undefined and empty inputs", () => {
       expect(stripAnsi()).toBe("");
-      expect(stripAnsi(undefined)).toBe("");
+      expect(stripAnsi(undefined as any)).toBe("");
+      expect(stripAnsi("")).toBe("");
     });
+
 
   });
 
