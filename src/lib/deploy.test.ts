@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDeployEnvLines,
+  buildSshArgs,
   executeDeploy,
   findBrevInstanceStatus,
   inferDeployProvider,
@@ -133,6 +134,45 @@ describe("buildDeployEnvLines", () => {
     });
 
     expect(envLines).not.toContain("ALLOWED_CHAT_IDS='111,222'");
+  });
+});
+
+
+describe("buildSshArgs", () => {
+  it("returns the correct array of SSH arguments for a normal path", () => {
+    const args = buildSshArgs("/home/user/.ssh/known_hosts");
+    expect(args).toEqual([
+      "-o",
+      "UserKnownHostsFile=/home/user/.ssh/known_hosts",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "LogLevel=ERROR",
+    ]);
+  });
+
+  it("handles paths with spaces", () => {
+    const args = buildSshArgs("/home/user name/.ssh/known_hosts");
+    expect(args).toEqual([
+      "-o",
+      "UserKnownHostsFile=/home/user name/.ssh/known_hosts",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "LogLevel=ERROR",
+    ]);
+  });
+
+  it("handles empty string inputs", () => {
+    const args = buildSshArgs("");
+    expect(args).toEqual([
+      "-o",
+      "UserKnownHostsFile=",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "LogLevel=ERROR",
+    ]);
   });
 });
 
