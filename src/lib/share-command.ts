@@ -53,7 +53,7 @@ export function defaultShareMountDir(sandboxName: string): string {
  */
 export function resolveLinuxUnmount(): string | null {
   for (const cmd of ["fusermount3", "fusermount"]) {
-    const probe = spawnSync("sh", ["-c", `command -v ${cmd}`], {
+    const probe = spawnSync("sh", ["-c", 'command -v "$1"', "dummy", cmd], {
       encoding: "utf-8",
       stdio: ["ignore", "pipe", "ignore"],
     });

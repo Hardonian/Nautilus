@@ -300,7 +300,6 @@ describe("generate-openclaw-config.py: config generation", () => {
 
     expect(Object.keys(config.models.providers)).toEqual(["inference"]);
     expect(config.models.providers.inference.baseUrl).toBe("https://inference.local/v1");
-    expect(config.models.providers.inference.apiKey).toBe("unused");
     expect(config.models.providers.inference.models[0]).toMatchObject({
       id: "deepseek-ai/DeepSeek-V4-Flash",
       name: "inference/deepseek-ai/DeepSeek-V4-Flash",

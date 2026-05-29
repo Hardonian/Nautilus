@@ -1,0 +1,14 @@
+--- src/lib/deploy.test.ts
++++ src/lib/deploy.test.ts
+@@ -269,6 +269,11 @@
+     });
+   });
+
++  it("returns null if JSON parsing fails", () => {
++    const status = findBrevInstanceStatus("invalid json", "target");
++    expect(status).toBeNull();
++  });
++
+   it("classifies Brev failure states", () => {
+     expect(
+       isBrevInstanceFailed({

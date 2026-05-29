@@ -1004,6 +1004,14 @@ function checkSwapDiskSpace(): SwapResult | null {
   return null;
 }
 
+
+function isValidSwapPath(p: string): boolean {
+  if (!path.isAbsolute(p)) return false;
+  if (p.includes("..")) return false;
+  if (!/^[a-zA-Z0-9_.\-/]+$/.test(p)) return false;
+  return true;
+}
+
 function writeManagedSwapMarker(): void {
   const nemoclawDir = path.join(os.homedir(), ".nemoclaw");
   if (!fs.existsSync(nemoclawDir)) {
@@ -1017,49 +1025,59 @@ function writeManagedSwapMarker(): void {
   }
 }
 
-function cleanupPartialSwap(): void {
+function cleanupPartialSwap(swapPath: string = "/swapfile"): void {
+  if (!isValidSwapPath(swapPath)) return;
   try {
-    runCapture(["sudo", "swapoff", "/swapfile"], { ignoreError: true });
-    runCapture(["sudo", "rm", "-f", "/swapfile"], { ignoreError: true });
+    runCapture(["sudo", "swapoff", "--", swapPath], { ignoreError: true });
+    runCapture(["sudo", "rm", "-f", "--", swapPath], { ignoreError: true });
   } catch {
     // Best effort cleanup
   }
 }
 
-function createSwapfile(mem: MemoryInfo): SwapResult {
+function createSwapfile(mem: MemoryInfo, swapPath: string = "/swapfile"): SwapResult {
+  if (!isValidSwapPath(swapPath)) {
+    return { ok: false, reason: `Invalid swap path: ${swapPath}` };
+  }
+
   try {
     runCapture(
-      ["sudo", "dd", "if=/dev/zero", "of=/swapfile", "bs=1M", "count=4096", "status=none"],
+      ["sudo", "dd", "if=/dev/zero", `of=${swapPath}`, "bs=1M", "count=4096", "status=none"],
       {
         ignoreError: false,
       },
     );
-    runCapture(["sudo", "chmod", "600", "/swapfile"], { ignoreError: false });
-    runCapture(["sudo", "mkswap", "/swapfile"], { ignoreError: false });
-    runCapture(["sudo", "swapon", "/swapfile"], { ignoreError: false });
+    runCapture(["sudo", "chmod", "600", "--", swapPath], { ignoreError: false });
+    runCapture(["sudo", "mkswap", "--", swapPath], { ignoreError: false });
+    runCapture(["sudo", "swapon", "--", swapPath], { ignoreError: false });
     const fstab = runCapture(["sudo", "cat", "/etc/fstab"], { ignoreError: true });
+
+    // Escape swapPath for regex use
+    const escapedPath = swapPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pathRegex = new RegExp(`^\\s*${escapedPath}\\s`);
+
     if (
       !String(fstab || "")
         .split(/\r?\n/)
-        .some((line) => /^\/swapfile\s/.test(line.trim()))
+        .some((line) => pathRegex.test(line))
     ) {
       runCapture(["sudo", "tee", "-a", "/etc/fstab"], {
         ignoreError: false,
-        input: "/swapfile none swap sw 0 0\n",
+        input: `${swapPath} none swap sw 0 0\n`,
       });
     }
     writeManagedSwapMarker();
 
     return { ok: true, totalMB: mem.totalMB + 4096, swapCreated: true };
   } catch (err) {
-    cleanupPartialSwap();
+    cleanupPartialSwap(swapPath);
     const message = err instanceof Error ? err.message : String(err);
     return {
       ok: false,
       reason:
-        `swap creation failed: ${message}. Create swap manually:\n` +
-        "  sudo dd if=/dev/zero of=/swapfile bs=1M count=4096 status=none && sudo chmod 600 /swapfile && " +
-        "sudo mkswap /swapfile && sudo swapon /swapfile",
+        `swap creation swap creation failed: ${message}. Create swap manually:\n` +
+        `  sudo dd if=/dev/zero of=${swapPath} bs=1M count=4096 status=none && sudo chmod 600 -- ${swapPath} && ` +
+        `sudo mkswap -- ${swapPath} && sudo swapon -- ${swapPath}`,
     };
   }
 }

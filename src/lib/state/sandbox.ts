@@ -16,6 +16,7 @@ import {
   lstatSync,
   mkdirSync,
   readdirSync,
+  mkdtempSync,
   readFileSync,
   readlinkSync,
   rmSync,
@@ -464,7 +465,8 @@ function getSshConfig(sandboxName: string): string | null {
 }
 
 function writeTempSshConfig(sshConfig: string): string {
-  const tmpFile = path.join(os.tmpdir(), `nemoclaw-state-${process.pid}-${Date.now()}.conf`);
+  const tmpDir = mkdtempSync(path.join(os.tmpdir(), `nemoclaw-state-${process.pid}-`));
+  const tmpFile = path.join(tmpDir, 'ssh_config.conf');
   writeFileSync(tmpFile, sshConfig, { mode: 0o600 });
   return tmpFile;
 }
@@ -1139,6 +1141,7 @@ export function backupSandboxState(sandboxName: string, options: BackupOptions =
   } finally {
     try {
       require("node:fs").unlinkSync(configFile);
+      require("node:fs").rmdirSync(path.dirname(configFile));
     } catch {
       /* ignore */
     }
@@ -1205,10 +1208,12 @@ function restoreStateDirs(
 
   // Remove existing state dirs before extracting so stale files from
   // later snapshots don't persist after restoring an earlier one.
-  const rmCmd = localDirs.map((d) => `rm -rf -- ${shellQuote(`${dir}/${d}`)}`).join(" && ");
-  _log(`Cleaning target dirs before restore: ${rmCmd}`);
+  const rmCmd = "xargs -0 rm -rf --";
+  const rmInput = localDirs.map((d) => `${dir}/${d}`).join("\0");
+  _log(`Cleaning target dirs before restore via xargs null-terminated pipe`);
   const rmResult = spawnSync("ssh", [...sshArgs(configFile, sandboxName), rmCmd], {
-    stdio: ["ignore", "pipe", "pipe"],
+    input: rmInput,
+    stdio: ["pipe", "pipe", "pipe"],
     timeout: 30000,
   });
   if (rmResult.status !== 0 || rmResult.error || rmResult.signal) {
@@ -1375,6 +1380,7 @@ export function restoreSandboxState(sandboxName: string, backupPath: string): Re
   } finally {
     try {
       require("node:fs").unlinkSync(configFile);
+      require("node:fs").rmdirSync(path.dirname(configFile));
     } catch {
       /* ignore */
     }

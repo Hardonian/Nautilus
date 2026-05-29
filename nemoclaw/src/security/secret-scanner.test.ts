@@ -182,7 +182,7 @@ describe("scanForSecrets", () => {
 
     it("counts multiple occurrences of the same pattern", () => {
       const key1 = "nvapi-" + "aaaabbbbccccddddeeeefffff";
-      const key2 = "nvapi-" + "xxxxyyyyzzzzwwwwvvvvuuuuu";
+      const key2 = "nvapi-" + "bbbbccccddddeeeeffffggggg";
       const content = `first: ${key1}\nsecond: ${key2}`;
       const matches = scanForSecrets(content);
       const nvidiaMatches = matches.filter((m) => m.pattern === "NVIDIA API key");
