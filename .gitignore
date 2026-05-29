@@ -52,3 +52,4 @@ contracts/**/*.js
 contracts/**/*.js.map
 contracts/**/*.d.ts
 contracts/**/*.d.ts.map
+*.orig
