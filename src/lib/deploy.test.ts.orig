@@ -4,7 +4,6 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDeployEnvLines,
-  buildSshArgs,
   executeDeploy,
   findBrevInstanceStatus,
   inferDeployProvider,
@@ -12,31 +11,6 @@ import {
   isBrevInstanceReady,
 } from "../../dist/lib/deploy";
 import { validateName } from "../../dist/lib/runner";
-
-import { resolveRealHost } from "../../dist/lib/deploy";
-
-describe("resolveRealHost", () => {
-  it("extracts the real hostname from ssh -G output", () => {
-    const mockExecFileSync = (file: string, args: string[]) => {
-      if (file === "ssh" && args[0] === "-G" && args[1] === "my-alias") {
-        return "user example\nhostname real-host.example.com\nport 22\n";
-      }
-      return "";
-    };
-
-    const result = resolveRealHost("my-alias", mockExecFileSync);
-    expect(result).toBe("real-host.example.com");
-  });
-
-  it("falls back to the original name if hostname is not found in ssh -G output", () => {
-    const mockExecFileSync = (file: string, args: string[]) => {
-      return "user example\nport 22\n";
-    };
-
-    const result = resolveRealHost("my-alias", mockExecFileSync);
-    expect(result).toBe("my-alias");
-  });
-});
 
 describe("inferDeployProvider", () => {
   it("prefers an explicit provider override", () => {
@@ -134,45 +108,6 @@ describe("buildDeployEnvLines", () => {
     });
 
     expect(envLines).not.toContain("ALLOWED_CHAT_IDS='111,222'");
-  });
-});
-
-
-describe("buildSshArgs", () => {
-  it("returns the correct array of SSH arguments for a normal path", () => {
-    const args = buildSshArgs("/home/user/.ssh/known_hosts");
-    expect(args).toEqual([
-      "-o",
-      "UserKnownHostsFile=/home/user/.ssh/known_hosts",
-      "-o",
-      "StrictHostKeyChecking=yes",
-      "-o",
-      "LogLevel=ERROR",
-    ]);
-  });
-
-  it("handles paths with spaces", () => {
-    const args = buildSshArgs("/home/user name/.ssh/known_hosts");
-    expect(args).toEqual([
-      "-o",
-      "UserKnownHostsFile=/home/user name/.ssh/known_hosts",
-      "-o",
-      "StrictHostKeyChecking=yes",
-      "-o",
-      "LogLevel=ERROR",
-    ]);
-  });
-
-  it("handles empty string inputs", () => {
-    const args = buildSshArgs("");
-    expect(args).toEqual([
-      "-o",
-      "UserKnownHostsFile=",
-      "-o",
-      "StrictHostKeyChecking=yes",
-      "-o",
-      "LogLevel=ERROR",
-    ]);
   });
 });
 
@@ -333,11 +268,6 @@ describe("Brev status helpers", () => {
       build_status: "PENDING",
       shell_status: "NOT READY",
     });
-  });
-
-  it("returns null if JSON parsing fails", () => {
-    const status = findBrevInstanceStatus("invalid json", "target");
-    expect(status).toBeNull();
   });
 
   it("classifies Brev failure states", () => {
