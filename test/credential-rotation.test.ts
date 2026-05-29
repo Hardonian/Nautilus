@@ -17,6 +17,7 @@ type MessagingProvider = {
 
 type CredentialRotationInternals = {
   hashCredential: (value: string | null | undefined) => string | null;
+  verifyCredential: (value: string | null | undefined, hash: string | null | undefined) => boolean;
   detectMessagingCredentialRotation: (
     sandboxName: string,
     providers: MessagingProvider[],
@@ -31,6 +32,7 @@ function isCredentialRotationInternals(value: object | null): value is Credentia
   return (
     isRecord(value) &&
     typeof value.hashCredential === "function" &&
+    typeof value.verifyCredential === "function" &&
     typeof value.detectMessagingCredentialRotation === "function"
   );
 }
@@ -59,12 +61,13 @@ function loadRegistryModule(): typeof import("../dist/lib/state/registry.js") {
 
 describe("credential rotation detection", () => {
   let hashCredential: CredentialRotationInternals["hashCredential"];
+  let verifyCredential: CredentialRotationInternals["verifyCredential"];
   let detectMessagingCredentialRotation: CredentialRotationInternals["detectMessagingCredentialRotation"];
   let registry: typeof import("../dist/lib/state/registry.js");
 
   beforeEach(() => {
     // Fresh imports to avoid cross-test contamination
-    ({ hashCredential, detectMessagingCredentialRotation } = loadCredentialRotationInternals());
+    ({ hashCredential, verifyCredential, detectMessagingCredentialRotation } = loadCredentialRotationInternals());
     registry = loadRegistryModule();
   });
 
@@ -91,13 +94,15 @@ describe("credential rotation detection", () => {
 
     it("returns a 64-char hex SHA-256 hash for valid input", () => {
       const hash = hashCredential("my-secret-token");
-      expect(hash).toMatch(/^[0-9a-f]{64}$/);
+      expect(hash).toMatch(/^scrypt:[0-9a-f]{32}:[0-9a-f]+$/);
     });
 
-    it("produces consistent hashes for the same input", () => {
+    it("verifies consistent credentials for the same input", () => {
       const a = hashCredential("token-abc");
       const b = hashCredential("token-abc");
-      expect(a).toBe(b);
+      expect(a).not.toBe(b);
+      expect(verifyCredential("token-abc", a)).toBe(true);
+      expect(verifyCredential("token-abc", b)).toBe(true);
     });
 
     it("produces different hashes for different inputs", () => {
@@ -109,7 +114,9 @@ describe("credential rotation detection", () => {
     it("trims whitespace before hashing", () => {
       const a = hashCredential("  token  ");
       const b = hashCredential("token");
-      expect(a).toBe(b);
+      expect(a).not.toBe(b);
+      expect(verifyCredential("token", a)).toBe(true);
+      expect(verifyCredential("  token  ", b)).toBe(true);
     });
   });
 
