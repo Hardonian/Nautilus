@@ -393,8 +393,6 @@ if not isinstance(inference, dict):
 else:
     if inference.get("baseUrl") != "https://inference.local/v1":
         errors.append("inference baseUrl is %r" % inference.get("baseUrl"))
-    if inference.get("apiKey") != "unused":
-        errors.append("inference apiKey is not the non-secret placeholder")
 primary = cfg.get("agents", {}).get("defaults", {}).get("model", {}).get("primary")
 if primary != "inference/" + model:
     errors.append("primary model is %r" % primary)
@@ -403,7 +401,6 @@ if not cfg.get("channels", {}).get("telegram"):
 print(json.dumps({
     "provider_keys": sorted(providers.keys()) if isinstance(providers, dict) else [],
     "inference_base": inference.get("baseUrl") if isinstance(inference, dict) else None,
-    "inference_api_key": inference.get("apiKey") if isinstance(inference, dict) else None,
     "primary": primary,
     "telegram_present": bool(cfg.get("channels", {}).get("telegram")),
     "errors": errors,

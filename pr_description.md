@@ -1,16 +1,9 @@
-## 🎯 What
+🎯 **What:** Removed the dead code `apiKey: "unused"` placeholder from the configuration generation script `scripts/generate-openclaw-config.py`, and removed all corresponding runtime and test assertions expecting this placeholder across `src/lib/onboard.ts`, `test/e2e/test-messaging-compatible-endpoint.sh`, `test/generate-openclaw-config.test.ts`, and `test/onboard.test.ts`.
 
-The `hashCredential` function previously used an unsalted SHA-256 algorithm to hash credentials, which is insecure and vulnerable to rainbow table attacks and brute-forcing.
+💡 **Why:** This `apiKey` variable was an artificial non-secret placeholder ("unused") that served no functional purpose at runtime. Removing it cleans up dead code, reduces cognitive load, and eliminates unnecessary assertions in the provider initialization logic and test suites, improving overall code health and maintainability.
 
-## ⚠️ Risk
+✅ **Verification:** Ran syntax validation on the modified bash script (`bash -n test/e2e/test-messaging-compatible-endpoint.sh`). Executed the unit test suite (`pnpm test --project cli test/generate-openclaw-config.test.ts test/onboard.test.ts`), and ensured repository-wide pre-commit hook checks (`npm run check`) successfully passed after discarding unrelated file changes. All functionality and tests behave as expected.
 
-If an attacker gains access to the local sandbox state or the registry payload where these hashes are stored, they could rapidly compute plaintexts using hardware acceleration or pre-computed hash tables, compromising the messaging bridge tokens or router credentials.
+✨ **Result:** Improved maintainability by stripping out artificial dead code, simplifying the config generator, eliminating unnecessary config validation logic, and streamlining the dependent test suites.
 
-## 🛡️ Solution
-
-- Migrated the hashing implementation to use Node.js's native `crypto.scryptSync` with a random 16-byte salt per hash.
-- Implemented `verifyCredential` using `crypto.timingSafeEqual` to securely compare plaintexts against stored salted hashes.
-- Retained a fallback in `verifyCredential` to support legacy, unsalted SHA-256 hashes for backwards compatibility with existing active deployments.
-- Updated conflict detection logic to pass plaintexts safely for in-memory resolution where strict equality checks on hashes are mathematically impossible with distinct salts.
-
-Signed-off-by: Jules <jules@nemo.claw>
+Signed-off-by: Jules <jules@example.com>

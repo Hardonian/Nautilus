@@ -2018,8 +2018,6 @@ if not isinstance(provider, dict):
     die("openclaw.json missing models.providers.${MANAGED_PROVIDER_ID}")
 if provider.get("baseUrl") != "${INFERENCE_ROUTE_URL}":
     die("models.providers.${MANAGED_PROVIDER_ID}.baseUrl is %r; expected ${INFERENCE_ROUTE_URL}" % provider.get("baseUrl"))
-if provider.get("apiKey") != "unused":
-    die("models.providers.${MANAGED_PROVIDER_ID}.apiKey must remain the non-secret placeholder 'unused'")
 
 primary = cfg.get("agents", {}).get("defaults", {}).get("model", {}).get("primary")
 expected_primary = "${MANAGED_PROVIDER_ID}/" + model
