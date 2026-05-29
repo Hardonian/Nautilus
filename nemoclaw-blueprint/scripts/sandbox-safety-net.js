@@ -128,16 +128,20 @@
   });
 
   process.on('SIGTERM', function () {
-    try {
-      process.stderr.write('[sandbox-safety-net] SIGTERM received \u2014 gateway shutting down\n');
-    } catch (_) {}
-    process.exit(143);
+    if (process.listenerCount('SIGTERM') === 1) {
+      try {
+        process.stderr.write('[sandbox-safety-net] SIGTERM received \u2014 gateway shutting down\n');
+      } catch (_) {}
+      process.exit(143);
+    }
   });
 
   process.on('SIGINT', function () {
-    try {
-      process.stderr.write('[sandbox-safety-net] SIGINT received \u2014 gateway shutting down\n');
-    } catch (_) {}
-    process.exit(130);
+    if (process.listenerCount('SIGINT') === 1) {
+      try {
+        process.stderr.write('[sandbox-safety-net] SIGINT received \u2014 gateway shutting down\n');
+      } catch (_) {}
+      process.exit(130);
+    }
   });
 })();
