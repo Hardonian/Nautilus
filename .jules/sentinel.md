@@ -6,7 +6,7 @@
 
 **Prevention:** Use `run` instead of `runShell` where possible, taking advantage of the argv array parameter. Avoid passing un-sanitized user input into strings executed via the shell.
 
-## 2026-05-29 - [Sandbox SSH Command Injection]
-**Vulnerability:** Shell Command Injection via interpolation in `spawnSync('ssh')` when clearing sandbox state directories.
-**Learning:** `shellQuote` and shell array expansions can be unreliable when passed through SSH command boundaries, leading to potential RCE if filenames are attacker-controlled.
-**Prevention:** Avoid shell string interpolation for dynamic lists. Pass arguments as null-terminated strings via `stdin` to remote `xargs -0` for deterministic, un-interpolated execution.
+## 2026-05-29 - Prevent Option Injection / Arbitrary Command Execution in swapfile creation
+**Vulnerability:** The \`sudo\` system commands in \`src/lib/onboard/preflight.ts\` for creating the swapfile were missing end-of-options delimiters (\`--\`) and strict path validation. Although currently hardcoded, if parameterized, a user-supplied swapfile path could be used to inject arbitrary command-line options or traverse directories leading to privilege escalation as the root user.
+**Learning:** System commands executing via \`sudo\` inside the application, especially file manipulation tools, are often susceptible to argument injection if user input begins with a hyphen.
+**Prevention:** Always use the end-of-options delimiter (\`--\`) before path arguments in commands like \`chmod\`, \`rm\`, \`mkswap\`, \`swapon\`. Strictly validate paths to be absolute and safe against traversal (\`..\`), and sanitize the permitted character sets.
