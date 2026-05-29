@@ -5,8 +5,7 @@ import { Args, Command, Flags } from "@oclif/core";
 
 import { CLI_NAME } from "../../cli/branding";
 import { prompt as askPrompt } from "../../credentials/store";
-import { runOpenshellProviderCommand } from "../../actions/global";
-import { OPENSHELL_OPERATION_TIMEOUT_MS } from "../../adapters/openshell/timeouts";
+import { resetProviderCredentials } from "../../../cli/commands/credentials/reset";
 import { isBridgeProviderName, recoverGatewayOrExit } from "./common";
 
 export default class CredentialsResetCommand extends Command {
@@ -63,12 +62,8 @@ export default class CredentialsResetCommand extends Command {
 
     await recoverGatewayOrExit("reach");
 
-    const result = runOpenshellProviderCommand(["provider", "delete", key], {
-      ignoreError: true,
-      stdio: ["ignore", "pipe", "pipe"],
-      timeout: OPENSHELL_OPERATION_TIMEOUT_MS,
-    });
-    if (result.status === 0) {
+    const result = resetProviderCredentials(key);
+    if (result.success) {
       this.log(`  Removed provider '${key}' from the OpenShell gateway.`);
       this.log(`  Re-run '${CLI_NAME} onboard' to enter a new value.`);
       return;
