@@ -1,11 +1,4 @@
-## 2025-02-27 - Command Injection in docker pull
-
-**Vulnerability:** In `src/lib/inference/vllm.ts`, the `pullImage` function was susceptible to command injection because the `profile.image` value was directly interpolated into a shell string executed via `runShell`. An attacker who could control `profile.image` could inject arbitrary shell commands.
-
-**Learning:** When invoking external commands like `docker`, one should prefer spawning the command directly with its arguments in an array instead of concatenating them into a shell string.
-
-**Prevention:** Use `run` instead of `runShell` where possible, taking advantage of the argv array parameter. Avoid passing un-sanitized user input into strings executed via the shell.
-## 2026-05-29 - [Insecure Randomness in Policy Engine]
- **Vulnerability:** `Math.random()` was used to generate `traceId` and `mutationId` within `policy-engine.ts`.
- **Learning:** Using `Math.random()` to generate IDs leaves them vulnerable to collision or prediction as it is not a cryptographically secure pseudo-random number generator (CSPRNG).
- **Prevention:** Always use `randomUUID()` or `randomBytes()` from the `node:crypto` library when creating identifiers to ensure cryptographic randomness and prevent collisions.
+## 2024-05-29 - [Insecure Temporary File Creation]
+ **Vulnerability:** Unsafe creation of temporary SSH config files with predictable names directly in `os.tmpdir()` (`/tmp`).
+ **Learning:** Using predictable file paths in shared directories like `/tmp` leaves the system vulnerable to symlink attacks or file hijacking, where an attacker can pre-create the file to gain unauthorized access or overwrite arbitrary files.
+ **Prevention:** Always use safe primitives like `fs.mkdtempSync` alongside `os.tmpdir()` to create a uniquely named, secure directory (`0700` permissions by default in Node.js) for placing sensitive temporary files.

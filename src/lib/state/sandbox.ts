@@ -16,6 +16,7 @@ import {
   lstatSync,
   mkdirSync,
   readdirSync,
+  mkdtempSync,
   readFileSync,
   readlinkSync,
   rmSync,
@@ -464,7 +465,8 @@ function getSshConfig(sandboxName: string): string | null {
 }
 
 function writeTempSshConfig(sshConfig: string): string {
-  const tmpFile = path.join(os.tmpdir(), `nemoclaw-state-${process.pid}-${Date.now()}.conf`);
+  const tmpDir = mkdtempSync(path.join(os.tmpdir(), `nemoclaw-state-${process.pid}-`));
+  const tmpFile = path.join(tmpDir, 'ssh_config.conf');
   writeFileSync(tmpFile, sshConfig, { mode: 0o600 });
   return tmpFile;
 }
@@ -1139,6 +1141,7 @@ export function backupSandboxState(sandboxName: string, options: BackupOptions =
   } finally {
     try {
       require("node:fs").unlinkSync(configFile);
+      require("node:fs").rmdirSync(path.dirname(configFile));
     } catch {
       /* ignore */
     }
@@ -1375,6 +1378,7 @@ export function restoreSandboxState(sandboxName: string, backupPath: string): Re
   } finally {
     try {
       require("node:fs").unlinkSync(configFile);
+      require("node:fs").rmdirSync(path.dirname(configFile));
     } catch {
       /* ignore */
     }

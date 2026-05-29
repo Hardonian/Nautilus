@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
+
+// SPDX-License-Identifier: Apache-2.0
 import { spawnSync } from "node:child_process";
 
 const suites = [
