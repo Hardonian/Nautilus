@@ -49,8 +49,31 @@ function exitWithCode(code: number): never {
 }
 
 describe("openshell helpers", () => {
-  it("strips ANSI sequences", () => {
-    expect(stripAnsi("\u001b[32mConnected\u001b[0m")).toBe("Connected");
+  describe("stripAnsi", () => {
+    it("strips simple ANSI color codes", () => {
+      expect(stripAnsi("\u001b[32mConnected\u001b[0m")).toBe("Connected");
+    });
+
+    it("strips complex ANSI codes with semicolons", () => {
+      expect(stripAnsi("\x1b[38;5;206mMagenta text\x1b[0m")).toBe("Magenta text");
+      expect(stripAnsi("\u001b[1;31mBold red\u001b[0m")).toBe("Bold red");
+    });
+
+    it("strips multiple ANSI codes in a single string", () => {
+      expect(stripAnsi("\u001b[31mRed\u001b[0m and \u001b[32mGreen\u001b[0m")).toBe("Red and Green");
+    });
+
+    it("returns the original string if no ANSI codes are present", () => {
+      expect(stripAnsi("Plain text")).toBe("Plain text");
+    });
+
+    it("handles undefined and empty inputs", () => {
+      expect(stripAnsi()).toBe("");
+      expect(stripAnsi(undefined as any)).toBe("");
+      expect(stripAnsi("")).toBe("");
+    });
+
+
   });
 
   it("parses semantic versions from CLI output", () => {
