@@ -129,21 +129,34 @@
     } catch (_) {}
   });
 
-  process.on('SIGTERM', function () {
-    if (process.listenerCount('SIGTERM') === 1) {
-      try {
-        process.stderr.write('[sandbox-safety-net] SIGTERM received \u2014 gateway shutting down\n');
-      } catch (_) {}
-      process.exit(143);
-    }
-  });
+  var _shutdownRequested = false;
+  function handleShutdownSignal(signal, exitCode) {
+    return function() {
+      if (_shutdownRequested) return;
+      _shutdownRequested = true;
 
-  process.on('SIGINT', function () {
-    if (process.listenerCount('SIGINT') === 1) {
       try {
-        process.stderr.write('[sandbox-safety-net] SIGINT received \u2014 gateway shutting down\n');
+        process.stderr.write('[sandbox-safety-net] ' + signal + ' received \u2014 gateway shutting down\n');
       } catch (_) {}
-      process.exit(130);
-    }
-  });
+
+      // Do NOT call process.exit() here immediately.
+      // This allows upstream shutdown handlers to run and clean up resources properly.
+      // The process will exit naturally when event loop is empty, or when those
+      // handlers call process.exit themselves.
+      // We set a fallback timeout in case shutdown handlers hang.
+      var fallbackTimer = setTimeout(function() {
+        try {
+          process.stderr.write('[sandbox-safety-net] ' + signal + ' shutdown timed out after 10s \u2014 forcing exit\n');
+        } catch (_) {}
+        process.exit(exitCode);
+      }, 10000);
+
+      // Don't let the timer keep the event loop alive if graceful shutdown finishes early
+      fallbackTimer.unref();
+    };
+  }
+
+  // Use prependListener so our log happens before other handlers run and potentially exit
+  process.prependListener('SIGTERM', handleShutdownSignal('SIGTERM', 143));
+  process.prependListener('SIGINT', handleShutdownSignal('SIGINT', 130));
 })();

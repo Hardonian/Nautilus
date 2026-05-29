@@ -23,10 +23,14 @@ const docs = {
   target: readFileSync("docs/architecture/target-state.md", "utf8"),
 };
 
-const rawFiles = execSync("rg --files src test docs .github/workflows scripts")
-  .toString("utf8")
-  .trim();
-const files = rawFiles ? rawFiles.split("\n") : [];
+let rawFiles = '';
+try {
+  rawFiles = execSync('rg --files src test docs .github/workflows scripts').toString('utf8').trim();
+} catch (error) {
+  // Fallback to git ls-files if ripgrep (rg) is not installed in the environment (e.g. CI)
+  rawFiles = execSync('git ls-files src test docs .github/workflows scripts').toString('utf8').trim();
+}
+const files = rawFiles ? rawFiles.split('\n') : [];
 const hasFile = (pattern: RegExp) => files.some((f) => pattern.test(f));
 
 const components: Component[] = [
