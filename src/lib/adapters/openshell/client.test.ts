@@ -54,22 +54,32 @@ describe("openshell helpers", () => {
       expect(stripAnsi("\u001b[32mConnected\u001b[0m")).toBe("Connected");
     });
 
-    it("strips multiple ANSI sequences in the same string", () => {
-      expect(stripAnsi("\x1b[31mError:\x1b[0m \x1b[1mSomething went wrong\x1b[22m")).toBe("Error: Something went wrong");
+    it("handles empty strings", () => {
+      expect(stripAnsi("")).toBe("");
     });
 
-    it("handles strings without ANSI sequences", () => {
-      expect(stripAnsi("Hello World")).toBe("Hello World");
+    it("handles strings without ANSI codes", () => {
+      expect(stripAnsi("Plain text")).toBe("Plain text");
     });
 
-    it("returns empty string when given no arguments or undefined", () => {
+    it("handles complex ANSI sequences (e.g., bold, background, rgb)", () => {
+      // Bold red text on yellow background
+      expect(stripAnsi("\x1b[1;31;43mWarning\x1b[0m")).toBe("Warning");
+      // RGB colors
+      expect(stripAnsi("\x1b[38;2;255;82;197mPink\x1b[0m")).toBe("Pink");
+      // Complex multi-sequence text
+      expect(stripAnsi("\x1b[1mBold\x1b[0m and \x1b[4mUnderline\x1b[0m")).toBe("Bold and Underline");
+    });
+
+    it("handles multiple ANSI sequences sequentially", () => {
+      expect(stripAnsi("\x1b[31m\x1b[1mRed Bold\x1b[0m\x1b[0m")).toBe("Red Bold");
+    });
+
+    it("handles undefined gracefully by falling back to default parameter", () => {
       expect(stripAnsi()).toBe("");
       expect(stripAnsi(undefined)).toBe("");
     });
 
-    it("returns empty string when given empty string", () => {
-      expect(stripAnsi("")).toBe("");
-    });
   });
 
   it("parses semantic versions from CLI output", () => {
