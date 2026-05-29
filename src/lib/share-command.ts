@@ -123,7 +123,9 @@ export async function runShareMount(
   }
 
   // Use a private temp directory to prevent symlink attacks on predictable paths.
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "nemoclaw-sshfs-"));
+  const baseTmpDir = path.join(process.env.HOME || os.homedir(), ".nemoclaw", "tmp");
+  fs.mkdirSync(baseTmpDir, { recursive: true, mode: 0o700 });
+  const tmpDir = fs.mkdtempSync(path.join(baseTmpDir, "nemoclaw-sshfs-"));
   const tmpFile = path.join(tmpDir, `${sandboxName}.conf`);
   fs.writeFileSync(tmpFile, sshConfigResult.output, { mode: 0o600, flag: "wx" });
   fs.mkdirSync(localMount, { recursive: true });
