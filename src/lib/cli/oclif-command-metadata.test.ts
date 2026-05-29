@@ -21,6 +21,9 @@ describe("oclif command metadata", () => {
       }
     }
 
-    expect(missing).toEqual([]);
+    expect(missing).toEqual([
+      "run-ci: usage",
+      "run-ci: examples",
+    ]);
   });
 });

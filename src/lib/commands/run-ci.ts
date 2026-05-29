@@ -13,6 +13,12 @@ export default class RunCiCommand extends NemoClawCommand {
   static id = "run-ci";
   static summary = "Run Nautilus execution loop headlessly for CI/CD";
   static description = "Execute a command securely with deterministic JSON output.";
+  static usage = "<%= config.bin %> <%= command.id %> --action <action>";
+  static examples = [
+    "<%= config.bin %> <%= command.id %> --action build",
+    "<%= config.bin %> <%= command.id %> --action deploy --fail-on-degraded"
+  ];
+
   static flags = {
     action: Flags.string({ char: "a", description: "The action to execute", required: true }),
     "fail-on-degraded": Flags.boolean({ description: "Exit with code 4 if execution degrades", default: false }),
