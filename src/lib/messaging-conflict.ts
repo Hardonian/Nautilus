@@ -15,6 +15,7 @@
 
 import type { SandboxEntry } from "./state/registry";
 import { getChannelDef, getChannelTokenKeys } from "./sandbox-channels";
+import { verifyCredential } from "./security/credential-hash";
 
 type ProbeResult = "present" | "absent" | "error";
 type ConflictReason = "matching-token" | "unknown-token";
@@ -33,7 +34,7 @@ interface ConflictRegistry {
 
 interface RequestedChannel {
   channel: string;
-  credentialHashes?: Record<string, string | null | undefined>;
+  plaintextTokens?: Record<string, string | null | undefined>;
 }
 
 type ChannelRequest = string | RequestedChannel;
@@ -58,7 +59,7 @@ const KNOWN_CHANNELS = Object.keys(PROVIDER_SUFFIXES);
 
 function normalizeRequest(request: ChannelRequest): RequestedChannel | null {
   if (typeof request === "string") {
-    return request ? { channel: request, credentialHashes: {} } : null;
+    return request ? { channel: request, plaintextTokens: {} } : null;
   }
   if (!request || typeof request.channel !== "string" || request.channel.length === 0) return null;
   return request;
@@ -78,18 +79,18 @@ function conflictReasonForRequest(
   request: RequestedChannel,
 ): ConflictReason | null {
   if (!hasStoredChannel(entry, request.channel)) return null;
-  const requestedHashes = request.credentialHashes || {};
+  const requestedTokens = request.plaintextTokens || {};
   const storedHashes = entry.providerCredentialHashes || {};
   const tokenKeys = getTokenKeys(request.channel);
-  const comparisonKeys = tokenKeys.length > 0 ? tokenKeys : Object.keys(requestedHashes);
+  const comparisonKeys = tokenKeys.length > 0 ? tokenKeys : Object.keys(requestedTokens);
   if (comparisonKeys.length === 0) return "unknown-token";
 
   let sawUnknown = false;
   for (const key of comparisonKeys) {
-    const requestedHash = requestedHashes[key] || null;
+    const requestedToken = requestedTokens[key] || null;
     const storedHash = storedHashes[key] || null;
-    if (requestedHash && storedHash) {
-      if (requestedHash === storedHash) return "matching-token";
+    if (requestedToken && storedHash) {
+      if (verifyCredential(requestedToken, storedHash)) return "matching-token";
       continue;
     }
     sawUnknown = true;
