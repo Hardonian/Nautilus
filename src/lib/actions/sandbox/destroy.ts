@@ -341,7 +341,8 @@ export async function destroySandbox(
       console.error(`  ${deleteOutput}`);
     }
     console.error(`  Failed to destroy sandbox '${sandboxName}'.`);
-    process.exit(deleteResult.status || 1);
+    process.exitCode = deleteResult.status || 1;
+    return;
   }
 
   const deleteSucceededOrAlreadyGone = deleteResult.status === 0 || alreadyGone;

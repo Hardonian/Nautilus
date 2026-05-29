@@ -41,7 +41,8 @@ export async function upgradeSandboxes(
   if (liveResult.status !== 0) {
     console.error("  Failed to query running sandboxes from OpenShell.");
     console.error("  Ensure OpenShell is running: openshell status");
-    process.exit(liveResult.status || 1);
+    process.exitCode = liveResult.status || 1;
+    return;
   }
   const liveNames = parseLiveSandboxNames(liveResult.output || "");
 
@@ -116,5 +117,8 @@ export async function upgradeSandboxes(
   console.log("");
   if (rebuilt > 0) console.log(`  ${G}✓${R} ${rebuilt} sandbox(es) rebuilt.`);
   if (failed > 0) console.log(`  ${YW}⚠${R} ${failed} sandbox(es) failed — see errors above.`);
-  if (failed > 0) process.exit(1);
+  if (failed > 0) {
+    process.exitCode = 1;
+    return;
+  }
 }

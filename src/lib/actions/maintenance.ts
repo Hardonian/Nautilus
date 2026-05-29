@@ -61,7 +61,8 @@ export function backupAll(): void {
     console.log(`  Backups stored in: ~/.nemoclaw/rebuild-backups/`);
   }
   if (failed > 0) {
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 }
 
@@ -76,11 +77,12 @@ export async function garbageCollectImages(
   try {
     imagesOutput = dockerListImagesFormat(
       "openshell/sandbox-from",
-      "{{.Repository}}:{{.Tag}}\t{{.Size}}",
+      "{{.Repository}}:{{.Tag}}\\t{{.Size}}",
     );
   } catch {
     console.error("  Failed to query Docker images. Is Docker running?");
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 
   const allImages = parseSandboxImageRows(imagesOutput);
@@ -139,5 +141,8 @@ export async function garbageCollectImages(
   console.log("");
   if (removed > 0) console.log(`  ${G}✓${R} Removed ${removed} orphaned image(s).`);
   if (failed > 0) console.log(`  ${YW}⚠${R} Failed to remove ${failed} image(s).`);
-  if (failed > 0) process.exit(1);
+  if (failed > 0) {
+    process.exitCode = 1;
+    return;
+  }
 }

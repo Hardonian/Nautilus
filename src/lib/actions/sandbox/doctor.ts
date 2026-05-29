@@ -659,7 +659,8 @@ export async function runSandboxDoctor(sandboxName: string, args: string[] = [])
   if (unknown.length > 0) {
     console.error(`  Unknown doctor argument${unknown.length === 1 ? "" : "s"}: ${unknown.join(" ")}`);
     console.error(`  Usage: ${CLI_NAME} <name> doctor [--json]`);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 
   const sb = registry.getSandbox(sandboxName);
@@ -696,5 +697,8 @@ export async function runSandboxDoctor(sandboxName: string, args: string[] = [])
   checks.push(cloudflaredDoctorCheck(sandboxName));
 
   const exitCode = renderDoctorReport(sandboxName, checks, asJson);
-  if (exitCode !== 0) process.exit(exitCode);
+  if (exitCode !== 0) {
+    process.exitCode = exitCode;
+    return;
+  }
 }
