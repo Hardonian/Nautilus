@@ -49,8 +49,29 @@ function exitWithCode(code: number): never {
 }
 
 describe("openshell helpers", () => {
-  it("strips ANSI sequences", () => {
-    expect(stripAnsi("\u001b[32mConnected\u001b[0m")).toBe("Connected");
+  describe("stripAnsi", () => {
+    it("strips basic color codes", () => {
+      expect(stripAnsi("\u001b[32mConnected\u001b[0m")).toBe("Connected");
+    });
+
+    it("strips multiple ANSI sequences in the same string", () => {
+      expect(stripAnsi("\x1b[31mError:\x1b[0m \x1b[1mSomething went wrong\x1b[22m")).toBe("Error: Something went wrong");
+    });
+
+    it("handles strings without ANSI sequences", () => {
+      expect(stripAnsi("Hello World")).toBe("Hello World");
+    });
+
+    it("returns empty string when given no arguments or undefined", () => {
+      expect(stripAnsi()).toBe("");
+      expect(stripAnsi(undefined)).toBe("");
+    });
+
+    it("returns empty string when given empty string", () => {
+      expect(stripAnsi("")).toBe("");
+    });
+
+
   });
 
   it("parses semantic versions from CLI output", () => {
