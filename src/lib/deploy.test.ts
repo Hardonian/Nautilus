@@ -12,6 +12,31 @@ import {
 } from "../../dist/lib/deploy";
 import { validateName } from "../../dist/lib/runner";
 
+import { resolveRealHost } from "../../dist/lib/deploy";
+
+describe("resolveRealHost", () => {
+  it("extracts the real hostname from ssh -G output", () => {
+    const mockExecFileSync = (file: string, args: string[]) => {
+      if (file === "ssh" && args[0] === "-G" && args[1] === "my-alias") {
+        return "user example\nhostname real-host.example.com\nport 22\n";
+      }
+      return "";
+    };
+
+    const result = resolveRealHost("my-alias", mockExecFileSync);
+    expect(result).toBe("real-host.example.com");
+  });
+
+  it("falls back to the original name if hostname is not found in ssh -G output", () => {
+    const mockExecFileSync = (file: string, args: string[]) => {
+      return "user example\nport 22\n";
+    };
+
+    const result = resolveRealHost("my-alias", mockExecFileSync);
+    expect(result).toBe("my-alias");
+  });
+});
+
 describe("inferDeployProvider", () => {
   it("prefers an explicit provider override", () => {
     const provider = inferDeployProvider("openai", {
