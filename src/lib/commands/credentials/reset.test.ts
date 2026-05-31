@@ -1,100 +1,133 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  prompt: vi.fn().mockResolvedValue("yes"),
-  recoverNamedGatewayRuntime: vi.fn().mockResolvedValue({ recovered: true }),
-  runOpenshellProviderCommand: vi.fn(),
+  prompt: vi.fn(),
+  recoverGatewayOrExit: vi.fn(),
+  isBridgeProviderName: vi.fn(),
 }));
 
 vi.mock("../../credentials/store", () => ({ prompt: mocks.prompt }));
-vi.mock("../../actions/global", () => ({
-  recoverNamedGatewayRuntime: mocks.recoverNamedGatewayRuntime,
-  runOpenshellProviderCommand: mocks.runOpenshellProviderCommand,
-}));
 vi.mock("./common", () => ({
-  isBridgeProviderName: vi.fn().mockImplementation((name) => name.includes("bridge")),
-  recoverGatewayOrExit: vi.fn().mockResolvedValue(undefined),
+  isBridgeProviderName: mocks.isBridgeProviderName,
+  recoverGatewayOrExit: mocks.recoverGatewayOrExit,
 }));
 
+import { resetProviderCredentials } from "../../../cli/commands/credentials/reset";
 import CredentialsResetCommand from "./reset";
+import { CLI_NAME } from "../../cli/branding";
 
-const rootDir = process.cwd();
+vi.mock("../../../cli/commands/credentials/reset", () => ({
+  resetProviderCredentials: vi.fn(),
+}));
 
-describe("credentials:reset oclif command source coverage", () => {
+class ProcessExitError extends Error {
+  constructor(public readonly code: number) {
+    super(`process.exit(${code})`);
+  }
+}
+
+describe("CredentialsResetCommand unit tests", () => {
+  let logSpy: ReturnType<typeof vi.spyOn>;
+  let errorSpy: ReturnType<typeof vi.spyOn>;
+  let exitSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.runOpenshellProviderCommand.mockReturnValue({ status: 0 });
 
-    // Silence console
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    // Mock exit to throw
-    vi.spyOn(process, "exit").mockImplementation(((code?: number) => {
-      throw new Error(`process.exit(${code})`);
-    }) as any);
+    exitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
+      throw new ProcessExitError(code ?? 1);
+    });
+
+    mocks.recoverGatewayOrExit.mockResolvedValue(undefined);
+    mocks.isBridgeProviderName.mockReturnValue(false);
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+  it("exits and logs error if provider arg is missing or starts with '-'", async () => {
+    // Missing provider
+    await expect(CredentialsResetCommand.run([])).rejects.toThrow(ProcessExitError);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Usage: nemoclaw credentials reset <PROVIDER> [--yes]"));
+
+    vi.clearAllMocks();
+    exitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
+      throw new ProcessExitError(code ?? 1);
+    });
+
+    // Invalid provider (oclif catches unknown flag in strict mode)
+    await expect(CredentialsResetCommand.run(["--invalid"])).rejects.toThrow();
   });
 
-  it("exits if no provider is passed", async () => {
-    await expect(CredentialsResetCommand.run([], rootDir)).rejects.toThrow("process.exit(1)");
-    expect(console.error).toHaveBeenCalledWith(expect.stringContaining("Usage: "));
+  it("exits and logs error if provider is a bridge provider name", async () => {
+    mocks.isBridgeProviderName.mockReturnValue(true);
+
+    await expect(CredentialsResetCommand.run(["bridge-name"])).rejects.toThrow(ProcessExitError);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("'bridge-name' is a per-sandbox messaging bridge, not a credential."));
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("channels remove"));
   });
 
-  it("exits if provider is a bridge provider", async () => {
-    await expect(CredentialsResetCommand.run(["my-bridge"], rootDir)).rejects.toThrow(
-      "process.exit(1)",
-    );
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("per-sandbox messaging bridge"),
-    );
+  it("logs 'Cancelled' and returns if user declines the prompt", async () => {
+    mocks.prompt.mockResolvedValue("N");
+
+    await CredentialsResetCommand.run(["nvidia-prod"]);
+
+    expect(mocks.prompt).toHaveBeenCalled();
+    expect(resetProviderCredentials).not.toHaveBeenCalled();
+
+    const logged = logSpy.mock.calls.map((call) => String(call[0])).join("");
+    expect(logged).toContain("Cancelled.");
   });
 
-  it("prompts for confirmation and exits if user cancels", async () => {
-    mocks.prompt.mockResolvedValueOnce("no");
-    await CredentialsResetCommand.run(["nvidia-prod"], rootDir);
-    expect(mocks.prompt).toHaveBeenCalledWith(
-      expect.stringContaining("Remove provider 'nvidia-prod'"),
-    );
-    expect(console.log).toHaveBeenCalledWith("  Cancelled.");
-    expect(mocks.runOpenshellProviderCommand).not.toHaveBeenCalled();
+  it("proceeds to remove credential if user accepts prompt", async () => {
+    mocks.prompt.mockResolvedValue("yes");
+    vi.mocked(resetProviderCredentials).mockReturnValue({ success: true });
+
+    await CredentialsResetCommand.run(["nvidia-prod"]);
+
+    expect(mocks.recoverGatewayOrExit).toHaveBeenCalledWith("reach");
+    expect(resetProviderCredentials).toHaveBeenCalledWith("nvidia-prod");
+
+    const logged = logSpy.mock.calls.map((call) => String(call[0])).join("");
+    expect(logged).toContain("Removed provider 'nvidia-prod'");
   });
 
-  it("skips prompt and deletes provider with --yes", async () => {
-    await CredentialsResetCommand.run(["nvidia-prod", "--yes"], rootDir);
+  it("skips prompt and proceeds if --yes flag is provided", async () => {
+    vi.mocked(resetProviderCredentials).mockReturnValue({ success: true });
+
+    await CredentialsResetCommand.run(["nvidia-prod", "--yes"]);
+
     expect(mocks.prompt).not.toHaveBeenCalled();
-    expect(mocks.runOpenshellProviderCommand).toHaveBeenCalledWith(
-      ["provider", "delete", "nvidia-prod"],
-      expect.any(Object),
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      "  Removed provider 'nvidia-prod' from the OpenShell gateway.",
-    );
+    expect(mocks.recoverGatewayOrExit).toHaveBeenCalledWith("reach");
+    expect(resetProviderCredentials).toHaveBeenCalledWith("nvidia-prod");
+
+    const logged = logSpy.mock.calls.map((call) => String(call[0])).join("");
+    expect(logged).toContain("Removed provider 'nvidia-prod'");
   });
 
-  it("logs error and exits if deletion fails", async () => {
-    mocks.runOpenshellProviderCommand.mockReturnValue({ status: 1, stderr: "failed" });
-    await expect(CredentialsResetCommand.run(["nvidia-prod", "--yes"], rootDir)).rejects.toThrow(
-      "process.exit(1)",
-    );
-    expect(console.error).toHaveBeenCalledWith("  Could not remove provider 'nvidia-prod'.");
-    expect(console.error).toHaveBeenCalledWith("  failed");
+  it("exits and logs error if gateway removal fails", async () => {
+    vi.mocked(resetProviderCredentials).mockReturnValue({ success: false, stderr: "gateway error" });
+
+    await expect(CredentialsResetCommand.run(["nvidia-prod", "--yes"])).rejects.toThrow(ProcessExitError);
+
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Could not remove provider 'nvidia-prod'."));
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("gateway error"));
   });
 
-  it("gives special error message if user tries to reset an env var name", async () => {
-    mocks.runOpenshellProviderCommand.mockReturnValue({ status: 1 });
-    await expect(CredentialsResetCommand.run(["NVIDIA_API_KEY", "--yes"], rootDir)).rejects.toThrow(
-      "process.exit(1)",
-    );
-    expect(console.error).toHaveBeenCalledWith("  Could not remove provider 'NVIDIA_API_KEY'.");
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("looks like a credential env variable name"),
-    );
+  it("provides helpful tip if provider name looks like an env var on failure", async () => {
+    vi.mocked(resetProviderCredentials).mockReturnValue({ success: false });
+
+    await expect(CredentialsResetCommand.run(["NVIDIA_API_KEY", "--yes"])).rejects.toThrow(ProcessExitError);
+
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("Could not remove provider 'NVIDIA_API_KEY'."));
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("'NVIDIA_API_KEY' looks like a credential env variable name."));
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(`Run '${CLI_NAME} credentials list' to see`));
   });
 });
