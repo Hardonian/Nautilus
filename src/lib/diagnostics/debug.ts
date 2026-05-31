@@ -55,6 +55,7 @@ function section(title: string): void {
 // ---------------------------------------------------------------------------
 
 import { redactFull as redact } from "../security/redact";
+
 export { redact };
 
 // ---------------------------------------------------------------------------
@@ -66,9 +67,9 @@ const TIMEOUT_MS = 30_000;
 
 function commandExists(cmd: string): boolean {
   try {
-    // Use sh -c with the command as a separate argument to avoid shell injection.
-    // While cmd values are hardcoded internally, this is defensive.
-    execFileSync("sh", ["-c", `command -v "$1"`, "--", cmd], {
+    // Avoid shell injection by passing the command as an argument to sh -c.
+    // Use single quotes to ensure no interpolation happens in JS.
+    execFileSync("sh", ["-c", 'command -v "$1"', "--", cmd], {
       stdio: ["ignore", "ignore", "ignore"],
     });
     return true;
