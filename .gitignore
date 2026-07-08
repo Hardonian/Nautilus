@@ -52,3 +52,17 @@ contracts/**/*.js
 contracts/**/*.js.map
 contracts/**/*.d.ts
 contracts/**/*.d.ts.map
+
+# --- Hardonian bootstrap kit ---
+# Hardonian standard ignores
+!.env.example
+!.env.template
+.venv/
+venv/
+build/
+target/
+*.log
+.idea/
+.vscode/
+.coverage
+htmlcov/
