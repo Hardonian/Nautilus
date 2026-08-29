@@ -17,10 +17,10 @@ import type { CommandDef } from "./command-registry";
 
 describe("command-registry", () => {
   describe("COMMANDS array", () => {
-    it("should contain exactly 54 commands", () => {
-      // 25 global (20 visible + 5 hidden help/version aliases)
+    it("should contain exactly 56 commands", () => {
+      // 27 global (22 visible + 5 hidden help/version aliases)
       // 29 sandbox (23 visible + 6 hidden shields/config)
-      expect(COMMANDS).toHaveLength(54);
+      expect(COMMANDS).toHaveLength(56);
     });
 
     it("should have no duplicate usage strings", () => {
@@ -39,9 +39,9 @@ describe("command-registry", () => {
   });
 
   describe("globalCommands()", () => {
-    it("should return exactly 25 entries", () => {
-      // 20 visible + 5 hidden (help, --help, -h, --version, -v)
-      expect(globalCommands()).toHaveLength(25);
+    it("should return exactly 27 entries", () => {
+      // 22 visible + 5 hidden (help, --help, -h, --version, -v)
+      expect(globalCommands()).toHaveLength(27);
     });
 
     it("every entry has scope global", () => {
@@ -65,10 +65,10 @@ describe("command-registry", () => {
   });
 
   describe("visibleCommands()", () => {
-    it("should exclude 11 hidden commands (43 visible)", () => {
+    it("should exclude 11 hidden commands (45 visible)", () => {
       // 5 hidden global (help, --help, -h, --version, -v) +
       // 6 hidden sandbox (shields×3, config get/set/rotate-token)
-      expect(visibleCommands()).toHaveLength(43);
+      expect(visibleCommands()).toHaveLength(45);
     });
 
     it("no visible command has hidden=true", () => {
@@ -146,7 +146,7 @@ describe("command-registry", () => {
   });
 
   describe("globalCommandTokens()", () => {
-    it("returns the exact set of 22 global command tokens", () => {
+    it("returns the exact set of 24 global command tokens", () => {
       const tokens = globalCommandTokens();
       const expected = new Set([
         "onboard",
@@ -162,6 +162,8 @@ describe("command-registry", () => {
         "debug",
         "uninstall",
         "credentials",
+        "gateway",
+        "run-ci",
         "backup-all",
         "capability-report",
         "upgrade-sandboxes",

@@ -93,7 +93,11 @@
     "verify:threat-seams": "tsx scripts/verify-threat-seams.ts",
     "verify:version-drift": "tsx scripts/verify-version-drift.ts",
     "verify:governance": "tsx scripts/verify-governance.ts",
-    "verify:parity-bins": "vitest run test/nemohermes-alias.test.ts test/internal-cli.test.ts"
+    "verify:parity-bins": "vitest run test/nemohermes-alias.test.ts test/internal-cli.test.ts",
+    "doctor": "tsx scripts/release/doctor.ts",
+    "verification:summary": "tsx scripts/release/verification-summary.ts",
+    "release:artifacts": "tsx scripts/release/generate-artifacts.ts",
+    "release:assemble": "bash scripts/release/assemble-release.sh"
   },
   "dependencies": {
     "@oclif/core": "^4.10.5",

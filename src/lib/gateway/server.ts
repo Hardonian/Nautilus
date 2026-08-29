@@ -60,12 +60,16 @@ export class ApiGateway {
         const deps = buildStatusCommandDeps(ROOT);
         const report = getStatusReport(deps);
         sendJson(res, 200, {
-          activeSandboxes: report.sandboxes.filter((s) => s.connected).length,
+          status: "ok",
+          activeSandboxes: report.sandboxes.filter((sandbox) => sandbox.connected).length,
           totalSandboxes: report.sandboxes.length,
           timestamp: new Date().toISOString(),
         });
       } catch (error) {
-        sendJson(res, 500, { error: (error as Error).message });
+        sendJson(res, 503, {
+          status: "degraded",
+          error: error instanceof Error ? error.message : "status unavailable",
+        });
       }
       return;
     }

@@ -509,11 +509,14 @@ const cmd = process.argv[process.argv.length - 1] || "";
 const existingDirs = ${JSON.stringify(existingDirs)};
 fs.appendFileSync(${JSON.stringify(sshLog)}, JSON.stringify({ cmd }) + "\\n");
 function readStdin() {
+  const chunks = [];
   for (;;) {
     const buf = Buffer.alloc(65536);
     const n = fs.readSync(0, buf, 0, buf.length, null);
     if (n === 0) break;
+    chunks.push(buf.subarray(0, n));
   }
+  return Buffer.concat(chunks).toString("utf8");
 }
 if (cmd.includes("[ -d ")) {
   process.stdout.write(existingDirs.join("\\n") + "\\n");
@@ -532,7 +535,8 @@ if (cmd.includes("tar -cf -")) {
   process.exit(2);
 }
 if (cmd.includes("rm -rf") || cmd.includes("tar --no-same-owner")) {
-  readStdin();
+  const stdin = readStdin();
+  fs.appendFileSync(${JSON.stringify(sshLog)}, JSON.stringify({ cmd, stdin }) + "\\n");
   process.exit(0);
 }
 if (cmd.includes("chown") || cmd.includes("[ -r ")) {
@@ -561,11 +565,15 @@ process.exit(0);
         .readFileSync(sshLog, "utf-8")
         .trim()
         .split("\n")
-        .map((line) => JSON.parse(line).cmd as string);
-      const cleanupCommand = loggedCommands.find((cmd) => cmd.includes("rm -rf"));
-      expect(cleanupCommand).toContain("/sandbox/.openclaw/workspace");
-      expect(cleanupCommand).toContain("/sandbox/.openclaw/extensions");
-      expect(cleanupCommand).not.toContain("/sandbox/.openclaw/agents");
+        .map((line: string) => JSON.parse(line) as { cmd: string; stdin?: string });
+      const cleanup = loggedCommands.find(
+        (entry: { cmd: string; stdin?: string }) => entry.cmd.includes("xargs -0 rm -rf") && entry.stdin !== undefined,
+      );
+      expect(cleanup?.cmd).toBe("xargs -0 rm -rf --");
+      const cleanupPaths = cleanup?.stdin?.split("\0").filter(Boolean) ?? [];
+      expect(cleanupPaths).toContain("/sandbox/.openclaw/workspace");
+      expect(cleanupPaths).toContain("/sandbox/.openclaw/extensions");
+      expect(cleanupPaths).not.toContain("/sandbox/.openclaw/agents");
     } finally {
       if (oldOpenshell === undefined) {
         delete process.env.NEMOCLAW_OPENSHELL_BIN;

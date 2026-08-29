@@ -36,8 +36,9 @@ describe('Export Signer', () => {
     const payload = { test: true };
     const signed = signExport(payload);
 
-    // Tamper signature
-    signed.signature = signed.signature.replace('A', 'B');
+    // Tamper one Base64 character deterministically (the original may not contain "A").
+    const replacement = signed.signature[0] === 'A' ? 'B' : 'A';
+    signed.signature = `${replacement}${signed.signature.slice(1)}`;
 
     const isValid = verifyExport(signed);
     expect(isValid).toBe(false);

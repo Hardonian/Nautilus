@@ -12,6 +12,7 @@ const COMMAND_PATHS = {
   credentials: path.join(REPO_ROOT, "dist", "lib", "commands", "credentials.js"),
   list: path.join(REPO_ROOT, "dist", "lib", "commands", "credentials", "list.js"),
   reset: path.join(REPO_ROOT, "dist", "lib", "commands", "credentials", "reset.js"),
+  resetAction: path.join(REPO_ROOT, "dist", "cli", "commands", "credentials", "reset.js"),
 };
 const GLOBAL_ACTIONS_PATH = path.join(REPO_ROOT, "dist", "lib", "actions", "global.js");
 type CredentialsCommandClasses = {

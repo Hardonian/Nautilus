@@ -565,6 +565,10 @@
       "aliases": [],
       "args": {},
       "description": "Execute a command securely with deterministic JSON output.",
+      "examples": [
+        "<%= config.bin %> run-ci --action \"inspect runtime\"",
+        "<%= config.bin %> run-ci --action \"inspect runtime\" --fail-on-degraded"
+      ],
       "flags": {
         "help": {
           "char": "h",
@@ -597,6 +601,9 @@
       "pluginType": "core",
       "strict": true,
       "summary": "Run Nautilus execution loop headlessly for CI/CD",
+      "usage": [
+        "run-ci --action <action> [--fail-on-degraded]"
+      ],
       "enableJsonFlag": false,
       "display": [
         {
@@ -1230,6 +1237,104 @@
         "upgrade-sandboxes"
       ]
     },
+    "root:help": {
+      "aliases": [],
+      "args": {},
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "root:help",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": false,
+      "summary": "Show help",
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw help",
+          "description": "Show help",
+          "group": "Getting Started",
+          "hidden": true,
+          "scope": "global",
+          "order": 44
+        },
+        {
+          "usage": "nemoclaw --help",
+          "description": "Show help",
+          "group": "Getting Started",
+          "hidden": true,
+          "scope": "global",
+          "order": 45
+        },
+        {
+          "usage": "nemoclaw -h",
+          "description": "Show help",
+          "group": "Getting Started",
+          "hidden": true,
+          "scope": "global",
+          "order": 46
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "root",
+        "help.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "root:help",
+        "help:root"
+      ]
+    },
+    "root:version": {
+      "aliases": [],
+      "args": {},
+      "flags": {},
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "root:version",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Show version",
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw --version",
+          "description": "Show version",
+          "group": "Getting Started",
+          "hidden": true,
+          "scope": "global",
+          "order": 47
+        },
+        {
+          "usage": "nemoclaw -v",
+          "description": "Show version",
+          "group": "Getting Started",
+          "hidden": true,
+          "scope": "global",
+          "order": 48
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "root",
+        "version.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "root:version",
+        "version:root"
+      ]
+    },
     "credentials:list": {
       "aliases": [],
       "args": {},
@@ -1344,110 +1449,13 @@
         "reset:credentials"
       ]
     },
-    "root:help": {
+    "gateway:start": {
       "aliases": [],
       "args": {},
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "root:help",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": false,
-      "summary": "Show help",
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw help",
-          "description": "Show help",
-          "group": "Getting Started",
-          "hidden": true,
-          "scope": "global",
-          "order": 44
-        },
-        {
-          "usage": "nemoclaw --help",
-          "description": "Show help",
-          "group": "Getting Started",
-          "hidden": true,
-          "scope": "global",
-          "order": 45
-        },
-        {
-          "usage": "nemoclaw -h",
-          "description": "Show help",
-          "group": "Getting Started",
-          "hidden": true,
-          "scope": "global",
-          "order": 46
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "root",
-        "help.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "root:help",
-        "help:root"
-      ]
-    },
-    "root:version": {
-      "aliases": [],
-      "args": {},
-      "flags": {},
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "root:version",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Show version",
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw --version",
-          "description": "Show version",
-          "group": "Getting Started",
-          "hidden": true,
-          "scope": "global",
-          "order": 47
-        },
-        {
-          "usage": "nemoclaw -v",
-          "description": "Show version",
-          "group": "Getting Started",
-          "hidden": true,
-          "scope": "global",
-          "order": 48
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "root",
-        "version.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "root:version",
-        "version:root"
-      ]
-    },
-    "tunnel:start": {
-      "aliases": [],
-      "args": {},
-      "description": "Start the cloudflared public-URL tunnel for the default sandbox dashboard.",
+      "description": "Starts a lightweight HTTP server to expose status and health endpoints to 3rd-party clients.",
       "examples": [
-        "<%= config.bin %> tunnel start"
+        "<%= config.bin %> gateway start",
+        "<%= config.bin %> gateway start --port 8080"
       ],
       "flags": {
         "help": {
@@ -1456,90 +1464,50 @@
           "name": "help",
           "allowNo": false,
           "type": "boolean"
+        },
+        "port": {
+          "char": "p",
+          "description": "Port to listen on",
+          "name": "port",
+          "default": 8080,
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
         }
       },
       "hasDynamicHelp": false,
       "hiddenAliases": [],
-      "id": "tunnel:start",
+      "id": "gateway:start",
       "pluginAlias": "nemoclaw",
       "pluginName": "nemoclaw",
       "pluginType": "core",
       "strict": true,
-      "summary": "Start the cloudflared public-URL tunnel",
+      "summary": "Start the API Gateway server",
       "usage": [
-        "tunnel start"
+        "gateway start [--port <port>]"
       ],
       "enableJsonFlag": false,
       "display": [
         {
-          "usage": "nemoclaw tunnel start",
-          "description": "Start the cloudflared public-URL tunnel",
+          "usage": "nemoclaw gateway start",
+          "flags": "[--port <port>]",
+          "description": "Start the local API gateway",
           "group": "Services",
           "scope": "global",
-          "order": 32
+          "order": 36
         }
       ],
       "isESM": false,
       "relativePath": [
         "dist",
         "commands",
-        "tunnel",
+        "gateway",
         "start.js"
       ],
       "aliasPermutations": [],
       "permutations": [
-        "tunnel:start",
-        "start:tunnel"
-      ]
-    },
-    "tunnel:stop": {
-      "aliases": [],
-      "args": {},
-      "description": "Stop the cloudflared public-URL tunnel for the default sandbox dashboard.",
-      "examples": [
-        "<%= config.bin %> tunnel stop"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "tunnel:stop",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Stop the cloudflared public-URL tunnel",
-      "usage": [
-        "tunnel stop"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw tunnel stop",
-          "description": "Stop the cloudflared public-URL tunnel",
-          "group": "Services",
-          "scope": "global",
-          "order": 33
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "tunnel",
-        "stop.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "tunnel:stop",
-        "stop:tunnel"
+        "gateway:start",
+        "start:gateway"
       ]
     },
     "sandbox:connect": {
@@ -2149,6 +2117,1648 @@
         "status:sandbox"
       ]
     },
+    "tunnel:start": {
+      "aliases": [],
+      "args": {},
+      "description": "Start the cloudflared public-URL tunnel for the default sandbox dashboard.",
+      "examples": [
+        "<%= config.bin %> tunnel start"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "tunnel:start",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Start the cloudflared public-URL tunnel",
+      "usage": [
+        "tunnel start"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw tunnel start",
+          "description": "Start the cloudflared public-URL tunnel",
+          "group": "Services",
+          "scope": "global",
+          "order": 32
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "tunnel",
+        "start.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "tunnel:start",
+        "start:tunnel"
+      ]
+    },
+    "tunnel:stop": {
+      "aliases": [],
+      "args": {},
+      "description": "Stop the cloudflared public-URL tunnel for the default sandbox dashboard.",
+      "examples": [
+        "<%= config.bin %> tunnel stop"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "tunnel:stop",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Stop the cloudflared public-URL tunnel",
+      "usage": [
+        "tunnel stop"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw tunnel stop",
+          "description": "Stop the cloudflared public-URL tunnel",
+          "group": "Services",
+          "scope": "global",
+          "order": 33
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "tunnel",
+        "stop.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "tunnel:stop",
+        "stop:tunnel"
+      ]
+    },
+    "sandbox:config:get": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Read sanitized sandbox agent configuration.",
+      "examples": [
+        "<%= config.bin %> sandbox config get alpha",
+        "<%= config.bin %> sandbox config get alpha --key model --format yaml"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "key": {
+          "description": "Dotpath to read from the sanitized config",
+          "name": "key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "format": {
+          "description": "Output format",
+          "name": "format",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "options": [
+            "json",
+            "yaml"
+          ],
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:config:get",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Get sandbox configuration",
+      "usage": [
+        "<name> [--key dotpath] [--format json|yaml]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> config get",
+          "description": "Get sandbox configuration",
+          "flags": "[--key <dotpath>] [--format json|yaml]",
+          "group": "Sandbox Management",
+          "hidden": true,
+          "scope": "sandbox",
+          "order": 28
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "config",
+        "get.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:config:get",
+        "config:sandbox:get",
+        "config:get:sandbox",
+        "sandbox:get:config",
+        "get:sandbox:config",
+        "get:config:sandbox"
+      ]
+    },
+    "sandbox:config:set": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Set sandbox agent configuration with new-path and SSRF validation.",
+      "examples": [
+        "<%= config.bin %> alpha config set --key model --value nvidia/nemotron",
+        "<%= config.bin %> alpha config set --key web_search --value true --restart"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "key": {
+          "description": "Dotpath to update in the config",
+          "name": "key",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "value": {
+          "description": "Value to write; JSON values are parsed when possible",
+          "name": "value",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "restart": {
+          "description": "Signal the sandbox agent process to reload after writing",
+          "name": "restart",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "config-accept-new-path": {
+          "description": "Allow creating a config key that does not already exist",
+          "name": "config-accept-new-path",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:config:set",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Set sandbox configuration",
+      "usage": [
+        "<name> config set --key <dotpath> --value <value> [--restart] [--config-accept-new-path]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> config set",
+          "description": "Set sandbox configuration with SSRF validation",
+          "group": "Sandbox Management",
+          "hidden": true,
+          "scope": "sandbox",
+          "order": 29
+        },
+        {
+          "usage": "nemoclaw <name> config rotate-token",
+          "description": "Rotate sandbox provider credentials",
+          "group": "Sandbox Management",
+          "hidden": true,
+          "scope": "sandbox",
+          "order": 30
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "config",
+        "set.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:config:set",
+        "config:sandbox:set",
+        "config:set:sandbox",
+        "sandbox:set:config",
+        "set:sandbox:config",
+        "set:config:sandbox"
+      ]
+    },
+    "sandbox:channels:add": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "channel": {
+          "description": "Messaging channel",
+          "name": "channel",
+          "required": true
+        }
+      },
+      "description": "Store credentials for a messaging channel and queue a sandbox rebuild.",
+      "examples": [
+        "<%= config.bin %> sandbox channels add alpha telegram"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Preview the change without applying it",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:channels:add",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Save messaging channel credentials and rebuild",
+      "usage": [
+        "<name> <channel> [--dry-run]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> channels add",
+          "description": "Save credentials and rebuild",
+          "flags": "<channel> [--dry-run]",
+          "group": "Messaging Channels",
+          "scope": "sandbox",
+          "order": 21
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "channels",
+        "add.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:channels:add",
+        "channels:sandbox:add",
+        "channels:add:sandbox",
+        "sandbox:add:channels",
+        "add:sandbox:channels",
+        "add:channels:sandbox"
+      ]
+    },
+    "sandbox:channels:list": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "List supported messaging channels for a sandbox.",
+      "examples": [
+        "<%= config.bin %> sandbox channels list alpha"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:channels:list",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "List supported messaging channels",
+      "usage": [
+        "<name>"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> channels list",
+          "description": "List supported messaging channels",
+          "group": "Messaging Channels",
+          "scope": "sandbox",
+          "order": 20
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "channels",
+        "list.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:channels:list",
+        "channels:sandbox:list",
+        "channels:list:sandbox",
+        "sandbox:list:channels",
+        "list:sandbox:channels",
+        "list:channels:sandbox"
+      ]
+    },
+    "sandbox:channels:remove": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "channel": {
+          "description": "Messaging channel",
+          "name": "channel",
+          "required": true
+        }
+      },
+      "description": "Remove credentials for a messaging channel and queue a sandbox rebuild.",
+      "examples": [
+        "<%= config.bin %> sandbox channels remove alpha slack --dry-run"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Preview the change without applying it",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:channels:remove",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Clear messaging channel credentials and rebuild",
+      "usage": [
+        "<name> <channel> [--dry-run]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> channels remove",
+          "description": "Remove a configured messaging channel",
+          "flags": "<channel> [--dry-run]",
+          "group": "Messaging Channels",
+          "scope": "sandbox",
+          "order": 22
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "channels",
+        "remove.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:channels:remove",
+        "channels:sandbox:remove",
+        "channels:remove:sandbox",
+        "sandbox:remove:channels",
+        "remove:sandbox:channels",
+        "remove:channels:sandbox"
+      ]
+    },
+    "sandbox:channels:start": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "channel": {
+          "description": "Messaging channel",
+          "name": "channel",
+          "required": true
+        }
+      },
+      "description": "Re-enable a previously stopped messaging channel.",
+      "examples": [
+        "<%= config.bin %> sandbox channels start alpha discord"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Preview the change without applying it",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:channels:start",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Re-enable a stopped messaging channel",
+      "usage": [
+        "<name> <channel> [--dry-run]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> channels start",
+          "description": "Re-enable a previously stopped channel",
+          "flags": "<channel> [--dry-run]",
+          "group": "Messaging Channels",
+          "scope": "sandbox",
+          "order": 24
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "channels",
+        "start.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:channels:start",
+        "channels:sandbox:start",
+        "channels:start:sandbox",
+        "sandbox:start:channels",
+        "start:sandbox:channels",
+        "start:channels:sandbox"
+      ]
+    },
+    "sandbox:channels:stop": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "channel": {
+          "description": "Messaging channel",
+          "name": "channel",
+          "required": true
+        }
+      },
+      "description": "Disable a messaging channel while keeping credentials in the gateway.",
+      "examples": [
+        "<%= config.bin %> sandbox channels stop alpha discord"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Preview the change without applying it",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:channels:stop",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Disable channel without wiping credentials",
+      "usage": [
+        "<name> <channel> [--dry-run]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> channels stop",
+          "description": "Disable channel (keeps credentials)",
+          "flags": "<channel> [--dry-run]",
+          "group": "Messaging Channels",
+          "scope": "sandbox",
+          "order": 23
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "channels",
+        "stop.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:channels:stop",
+        "channels:sandbox:stop",
+        "channels:stop:sandbox",
+        "sandbox:stop:channels",
+        "stop:sandbox:channels",
+        "stop:channels:sandbox"
+      ]
+    },
+    "sandbox:gateway:token": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Print the OpenClaw gateway auth token for a running sandbox to stdout.",
+      "examples": [
+        "<%= config.bin %> alpha gateway-token",
+        "<%= config.bin %> alpha gateway-token --quiet"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "quiet": {
+          "char": "q",
+          "description": "Suppress the stderr security warning",
+          "name": "quiet",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:gateway:token",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Print the OpenClaw gateway auth token to stdout",
+      "usage": [
+        "<name> gateway-token [--quiet|-q]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> gateway-token",
+          "description": "Print the OpenClaw gateway auth token to stdout",
+          "flags": "[--quiet|-q]",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 14
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "gateway",
+        "token.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:gateway:token",
+        "gateway:sandbox:token",
+        "gateway:token:sandbox",
+        "sandbox:token:gateway",
+        "token:sandbox:gateway",
+        "token:gateway:sandbox"
+      ]
+    },
+    "sandbox:policy:add": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "preset": {
+          "description": "Policy preset name",
+          "name": "preset",
+          "required": false
+        }
+      },
+      "description": "Add a built-in or custom policy preset to a sandbox.",
+      "examples": [
+        "<%= config.bin %> sandbox policy add alpha slack --yes",
+        "<%= config.bin %> sandbox policy add alpha --from-file ./policy.yaml --dry-run",
+        "<%= config.bin %> sandbox policy add alpha --from-dir ./policies --yes"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "yes": {
+          "char": "y",
+          "description": "Skip the confirmation prompt",
+          "name": "yes",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "force": {
+          "description": "Skip the confirmation prompt",
+          "name": "force",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Preview without applying",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "from-file": {
+          "description": "Load one custom preset YAML file",
+          "exclusive": [
+            "from-dir"
+          ],
+          "name": "from-file",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "from-dir": {
+          "description": "Load all custom preset YAML files in a directory",
+          "exclusive": [
+            "from-file"
+          ],
+          "name": "from-dir",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:policy:add",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Add a network or filesystem policy preset",
+      "usage": [
+        "<name> [preset] [--yes|-y] [--dry-run] [--from-file <path>] [--from-dir <path>]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> policy-add",
+          "description": "Add a network or filesystem policy preset",
+          "flags": "(--yes, -y, --dry-run, --from-file <path>, --from-dir <path>)",
+          "group": "Policy Presets",
+          "scope": "sandbox",
+          "order": 17
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "policy",
+        "add.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:policy:add",
+        "policy:sandbox:add",
+        "policy:add:sandbox",
+        "sandbox:add:policy",
+        "add:sandbox:policy",
+        "add:policy:sandbox"
+      ]
+    },
+    "sandbox:policy:list": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "List built-in and custom policy presets and show which are applied.",
+      "examples": [
+        "<%= config.bin %> sandbox policy list alpha"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:policy:list",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "List policy presets",
+      "usage": [
+        "<name>"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> policy-list",
+          "description": "List presets (● = applied)",
+          "group": "Policy Presets",
+          "scope": "sandbox",
+          "order": 19
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "policy",
+        "list.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:policy:list",
+        "policy:sandbox:list",
+        "policy:list:sandbox",
+        "sandbox:list:policy",
+        "list:sandbox:policy",
+        "list:policy:sandbox"
+      ]
+    },
+    "sandbox:policy:remove": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "preset": {
+          "description": "Policy preset name",
+          "name": "preset",
+          "required": false
+        }
+      },
+      "description": "Remove a built-in or custom policy preset from a sandbox.",
+      "examples": [
+        "<%= config.bin %> sandbox policy remove alpha slack --yes",
+        "<%= config.bin %> sandbox policy remove alpha slack --dry-run"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "yes": {
+          "char": "y",
+          "description": "Skip the confirmation prompt",
+          "name": "yes",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "force": {
+          "description": "Skip the confirmation prompt",
+          "name": "force",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "dry-run": {
+          "description": "Preview without applying",
+          "name": "dry-run",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:policy:remove",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Remove an applied policy preset",
+      "usage": [
+        "<name> [preset] [--yes|-y] [--dry-run]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> policy-remove",
+          "description": "Remove an applied policy preset (built-in or custom)",
+          "flags": "(--yes, -y, --dry-run)",
+          "group": "Policy Presets",
+          "scope": "sandbox",
+          "order": 18
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "policy",
+        "remove.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:policy:remove",
+        "policy:sandbox:remove",
+        "policy:remove:sandbox",
+        "sandbox:remove:policy",
+        "remove:sandbox:policy",
+        "remove:policy:sandbox"
+      ]
+    },
+    "sandbox:skill:install": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "skillPath": {
+          "description": "Skill directory or direct path to SKILL.md",
+          "name": "skillPath",
+          "required": true
+        }
+      },
+      "description": "Validate a local SKILL.md directory and upload it to a running sandbox.",
+      "examples": [
+        "<%= config.bin %> sandbox skill install alpha ./my-skill",
+        "<%= config.bin %> sandbox skill install alpha ./my-skill/SKILL.md"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:skill:install",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Deploy a skill directory to the sandbox",
+      "usage": [
+        "<name> <path>"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> skill install",
+          "description": "Deploy a skill directory to the sandbox",
+          "group": "Skills",
+          "scope": "sandbox",
+          "order": 16
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "skill",
+        "install.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:skill:install",
+        "skill:sandbox:install",
+        "skill:install:sandbox",
+        "sandbox:install:skill",
+        "install:sandbox:skill",
+        "install:skill:sandbox"
+      ]
+    },
+    "sandbox:share:mount": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "sandboxPath": {
+          "description": "Path inside the sandbox to mount",
+          "name": "sandboxPath",
+          "required": false
+        },
+        "localMountPoint": {
+          "description": "Host path for the SSHFS mount",
+          "name": "localMountPoint",
+          "required": false
+        }
+      },
+      "description": "Mount a sandbox path on the host using SSHFS over OpenShell's SSH proxy.",
+      "examples": [
+        "<%= config.bin %> sandbox share mount alpha",
+        "<%= config.bin %> sandbox share mount alpha /workspace ~/mnt/alpha"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:share:mount",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Mount sandbox filesystem on the host",
+      "usage": [
+        "<name> [sandbox-path] [local-mount-point]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> share mount",
+          "description": "Mount sandbox filesystem on the host via SSHFS",
+          "flags": "[sandbox-path] [local-mount-point]",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 10
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "share",
+        "mount.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:share:mount",
+        "share:sandbox:mount",
+        "share:mount:sandbox",
+        "sandbox:mount:share",
+        "mount:sandbox:share",
+        "mount:share:sandbox"
+      ]
+    },
+    "sandbox:share:status": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "localMountPoint": {
+          "description": "Host mount path to check",
+          "name": "localMountPoint",
+          "required": false
+        }
+      },
+      "description": "Check whether a sandbox filesystem share is currently mounted on the host.",
+      "examples": [
+        "<%= config.bin %> sandbox share status alpha",
+        "<%= config.bin %> sandbox share status alpha ~/mnt/alpha"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:share:status",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Show sandbox share mount status",
+      "usage": [
+        "<name> [local-mount-point]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> share status",
+          "description": "Check whether the sandbox filesystem is currently mounted",
+          "flags": "[local-mount-point]",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 12
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "share",
+        "status.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:share:status",
+        "share:sandbox:status",
+        "share:status:sandbox",
+        "sandbox:status:share",
+        "status:sandbox:share",
+        "status:share:sandbox"
+      ]
+    },
+    "sandbox:share:unmount": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "localMountPoint": {
+          "description": "Host mount path to unmount",
+          "name": "localMountPoint",
+          "required": false
+        }
+      },
+      "description": "Unmount a previously mounted sandbox filesystem from the host.",
+      "examples": [
+        "<%= config.bin %> sandbox share unmount alpha",
+        "<%= config.bin %> sandbox share unmount alpha ~/mnt/alpha"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:share:unmount",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Unmount a shared sandbox filesystem",
+      "usage": [
+        "<name> [local-mount-point]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> share unmount",
+          "description": "Unmount a previously mounted sandbox filesystem",
+          "flags": "[local-mount-point]",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 11
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "share",
+        "unmount.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:share:unmount",
+        "share:sandbox:unmount",
+        "share:unmount:sandbox",
+        "sandbox:unmount:share",
+        "unmount:sandbox:share",
+        "unmount:share:sandbox"
+      ]
+    },
+    "sandbox:snapshot:create": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Create an auto-versioned snapshot of sandbox workspace state.",
+      "examples": [
+        "<%= config.bin %> sandbox snapshot create alpha",
+        "<%= config.bin %> sandbox snapshot create alpha --name before-upgrade"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "name": {
+          "description": "Optional snapshot label",
+          "name": "name",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:snapshot:create",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Create a snapshot of sandbox state",
+      "usage": [
+        "<name> [--name <label>]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> snapshot create",
+          "description": "Create a snapshot of sandbox state",
+          "flags": "[--name <name>]",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 7
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "snapshot",
+        "create.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:snapshot:create",
+        "snapshot:sandbox:create",
+        "snapshot:create:sandbox",
+        "sandbox:create:snapshot",
+        "create:sandbox:snapshot",
+        "create:snapshot:sandbox"
+      ]
+    },
+    "sandbox:snapshot:list": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "List available snapshots for a sandbox.",
+      "examples": [
+        "<%= config.bin %> sandbox snapshot list alpha"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:snapshot:list",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "List available snapshots",
+      "usage": [
+        "<name>"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> snapshot list",
+          "description": "List available snapshots",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 8
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "snapshot",
+        "list.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:snapshot:list",
+        "snapshot:sandbox:list",
+        "snapshot:list:sandbox",
+        "sandbox:list:snapshot",
+        "list:sandbox:snapshot",
+        "list:snapshot:sandbox"
+      ]
+    },
+    "sandbox:snapshot:restore": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        },
+        "selector": {
+          "description": "Snapshot version, name, or timestamp",
+          "name": "selector",
+          "required": false
+        }
+      },
+      "description": "Restore sandbox workspace state from a snapshot.",
+      "examples": [
+        "<%= config.bin %> sandbox snapshot restore alpha",
+        "<%= config.bin %> sandbox snapshot restore alpha v2",
+        "<%= config.bin %> sandbox snapshot restore alpha before-upgrade --to beta"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "to": {
+          "description": "Restore into another sandbox",
+          "name": "to",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hiddenAliases": [],
+      "id": "sandbox:snapshot:restore",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Restore state from a snapshot",
+      "usage": [
+        "<name> [selector] [--to <dst>]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> snapshot restore",
+          "description": "Restore state from a snapshot",
+          "flags": "[selector] [--to <dst>]",
+          "group": "Sandbox Management",
+          "scope": "sandbox",
+          "order": 9
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "snapshot",
+        "restore.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:snapshot:restore",
+        "snapshot:sandbox:restore",
+        "snapshot:restore:sandbox",
+        "sandbox:restore:snapshot",
+        "restore:sandbox:snapshot",
+        "restore:snapshot:sandbox"
+      ]
+    },
+    "sandbox:shields:down": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Temporarily lower sandbox shields.",
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "timeout": {
+          "description": "Duration before shields are restored",
+          "name": "timeout",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "reason": {
+          "description": "Reason for lowering shields",
+          "name": "reason",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        },
+        "policy": {
+          "description": "Policy to apply while shields are down",
+          "name": "policy",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "sandbox:shields:down",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Lower sandbox security shields",
+      "usage": [
+        "<name> [--timeout 5m] [--reason <text>] [--policy permissive]"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> shields down",
+          "description": "Lower sandbox security shields",
+          "group": "Sandbox Management",
+          "hidden": true,
+          "scope": "sandbox",
+          "order": 25
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "shields",
+        "down.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:shields:down",
+        "shields:sandbox:down",
+        "shields:down:sandbox",
+        "sandbox:down:shields",
+        "down:sandbox:shields",
+        "down:shields:sandbox"
+      ]
+    },
+    "sandbox:shields:status": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Show current sandbox shields state.",
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "sandbox:shields:status",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Show current shields state",
+      "usage": [
+        "<name>"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> shields status",
+          "description": "Show current shields state",
+          "group": "Sandbox Management",
+          "hidden": true,
+          "scope": "sandbox",
+          "order": 27
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "shields",
+        "status.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:shields:status",
+        "shields:sandbox:status",
+        "shields:status:sandbox",
+        "sandbox:status:shields",
+        "status:sandbox:shields",
+        "status:shields:sandbox"
+      ]
+    },
+    "sandbox:shields:up": {
+      "aliases": [],
+      "args": {
+        "sandboxName": {
+          "description": "Sandbox name",
+          "name": "sandboxName",
+          "required": true
+        }
+      },
+      "description": "Restore sandbox shields from the saved snapshot.",
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "sandbox:shields:up",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Raise sandbox security shields",
+      "usage": [
+        "<name>"
+      ],
+      "enableJsonFlag": false,
+      "display": [
+        {
+          "usage": "nemoclaw <name> shields up",
+          "description": "Raise sandbox security shields",
+          "group": "Sandbox Management",
+          "hidden": true,
+          "scope": "sandbox",
+          "order": 26
+        }
+      ],
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "sandbox",
+        "shields",
+        "up.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "sandbox:shields:up",
+        "shields:sandbox:up",
+        "shields:up:sandbox",
+        "sandbox:up:shields",
+        "up:sandbox:shields",
+        "up:shields:sandbox"
+      ]
+    },
     "internal:dev:npm-link-or-shim": {
       "aliases": [],
       "args": {},
@@ -2163,14 +3773,6 @@
           "name": "help",
           "allowNo": false,
           "type": "boolean"
-        },
-        "repo-root": {
-          "description": "Repository root to expose",
-          "hidden": true,
-          "name": "repo-root",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
         }
       },
       "hasDynamicHelp": false,
@@ -2183,7 +3785,7 @@
       "strict": true,
       "summary": "Internal: link the checkout CLI or create a dev shim",
       "usage": [
-        "internal dev npm-link-or-shim [--repo-root <path>]"
+        "internal dev npm-link-or-shim"
       ],
       "enableJsonFlag": false,
       "isESM": false,
@@ -2202,6 +3804,217 @@
         "internal:npm-link-or-shim:dev",
         "npm-link-or-shim:internal:dev",
         "npm-link-or-shim:dev:internal"
+      ]
+    },
+    "internal:uninstall:classify-shim": {
+      "aliases": [],
+      "args": {
+        "path": {
+          "description": "Shim path to classify",
+          "name": "path",
+          "required": true
+        }
+      },
+      "description": "Classify whether a shim path is safe for the uninstaller to remove.",
+      "examples": [
+        "<%= config.bin %> internal uninstall classify-shim ~/.local/bin/nemoclaw --json"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "json": {
+          "description": "Print classification as JSON",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "internal:uninstall:classify-shim",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Internal: classify a NemoClaw shim path",
+      "usage": [
+        "internal uninstall classify-shim <path> [--json]"
+      ],
+      "enableJsonFlag": false,
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "internal",
+        "uninstall",
+        "classify-shim.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "internal:uninstall:classify-shim",
+        "uninstall:internal:classify-shim",
+        "uninstall:classify-shim:internal",
+        "internal:classify-shim:uninstall",
+        "classify-shim:internal:uninstall",
+        "classify-shim:uninstall:internal"
+      ]
+    },
+    "internal:uninstall:plan": {
+      "aliases": [],
+      "args": {},
+      "description": "Build a deterministic uninstall plan without applying it.",
+      "examples": [
+        "nemoclaw internal uninstall plan --json --yes"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "json": {
+          "description": "Print the uninstall plan as JSON",
+          "name": "json",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "yes": {
+          "description": "Accepted for parity with run-plan; ignored while planning",
+          "name": "yes",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "delete-models": {
+          "description": "Plan removal of NemoClaw-pulled Ollama models",
+          "name": "delete-models",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "keep-openshell": {
+          "description": "Keep the openshell binary installed",
+          "name": "keep-openshell",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "gateway": {
+          "description": "Gateway name",
+          "name": "gateway",
+          "default": "nemoclaw",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "internal:uninstall:plan",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "Internal: build the NemoClaw uninstall plan",
+      "usage": [
+        "internal uninstall plan [--json] [--delete-models] [--keep-openshell]"
+      ],
+      "enableJsonFlag": false,
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "internal",
+        "uninstall",
+        "plan.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "internal:uninstall:plan",
+        "uninstall:internal:plan",
+        "uninstall:plan:internal",
+        "internal:plan:uninstall",
+        "plan:internal:uninstall",
+        "plan:uninstall:internal"
+      ]
+    },
+    "internal:uninstall:run-plan": {
+      "aliases": [],
+      "args": {},
+      "description": "Remove host-side NemoClaw resources.",
+      "examples": [
+        "nemoclaw internal uninstall run-plan --yes"
+      ],
+      "flags": {
+        "help": {
+          "char": "h",
+          "description": "Show CLI help.",
+          "name": "help",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "yes": {
+          "description": "Skip the confirmation prompt",
+          "name": "yes",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "keep-openshell": {
+          "description": "Leave the openshell binary installed",
+          "name": "keep-openshell",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "delete-models": {
+          "description": "Remove NemoClaw-pulled Ollama models",
+          "name": "delete-models",
+          "allowNo": false,
+          "type": "boolean"
+        },
+        "gateway": {
+          "description": "Gateway name",
+          "name": "gateway",
+          "default": "nemoclaw",
+          "hasDynamicHelp": false,
+          "multiple": false,
+          "type": "option"
+        }
+      },
+      "hasDynamicHelp": false,
+      "hidden": true,
+      "hiddenAliases": [],
+      "id": "internal:uninstall:run-plan",
+      "pluginAlias": "nemoclaw",
+      "pluginName": "nemoclaw",
+      "pluginType": "core",
+      "strict": true,
+      "summary": "NemoClaw Uninstaller",
+      "usage": [
+        "internal uninstall run-plan [--yes] [--keep-openshell] [--delete-models]"
+      ],
+      "enableJsonFlag": false,
+      "isESM": false,
+      "relativePath": [
+        "dist",
+        "commands",
+        "internal",
+        "uninstall",
+        "run-plan.js"
+      ],
+      "aliasPermutations": [],
+      "permutations": [
+        "internal:uninstall:run-plan",
+        "uninstall:internal:run-plan",
+        "uninstall:run-plan:internal",
+        "internal:run-plan:uninstall",
+        "run-plan:internal:uninstall",
+        "run-plan:uninstall:internal"
       ]
     },
     "internal:dns:fix-coredns": {
@@ -2573,1759 +4386,6 @@
         "internal:resolve-release-tag:installer",
         "resolve-release-tag:internal:installer",
         "resolve-release-tag:installer:internal"
-      ]
-    },
-    "internal:uninstall:classify-shim": {
-      "aliases": [],
-      "args": {
-        "path": {
-          "description": "Shim path to classify",
-          "name": "path",
-          "required": true
-        }
-      },
-      "description": "Classify whether a shim path is safe for the uninstaller to remove.",
-      "examples": [
-        "<%= config.bin %> internal uninstall classify-shim ~/.local/bin/nemoclaw --json"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "json": {
-          "description": "Print classification as JSON",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "internal:uninstall:classify-shim",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Internal: classify a NemoClaw shim path",
-      "usage": [
-        "internal uninstall classify-shim <path> [--json]"
-      ],
-      "enableJsonFlag": false,
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "internal",
-        "uninstall",
-        "classify-shim.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "internal:uninstall:classify-shim",
-        "uninstall:internal:classify-shim",
-        "uninstall:classify-shim:internal",
-        "internal:classify-shim:uninstall",
-        "classify-shim:internal:uninstall",
-        "classify-shim:uninstall:internal"
-      ]
-    },
-    "internal:uninstall:plan": {
-      "aliases": [],
-      "args": {},
-      "description": "Build a deterministic uninstall plan without applying it.",
-      "examples": [
-        "nemoclaw internal uninstall plan --json --yes"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "json": {
-          "description": "Print the uninstall plan as JSON",
-          "name": "json",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "yes": {
-          "description": "Accepted for parity with run-plan; ignored while planning",
-          "name": "yes",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "delete-models": {
-          "description": "Plan removal of NemoClaw-pulled Ollama models",
-          "name": "delete-models",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "keep-openshell": {
-          "description": "Keep the openshell binary installed",
-          "name": "keep-openshell",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "gateway": {
-          "description": "Gateway name",
-          "name": "gateway",
-          "default": "nemoclaw",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "internal:uninstall:plan",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Internal: build the NemoClaw uninstall plan",
-      "usage": [
-        "internal uninstall plan [--json] [--delete-models] [--keep-openshell]"
-      ],
-      "enableJsonFlag": false,
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "internal",
-        "uninstall",
-        "plan.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "internal:uninstall:plan",
-        "uninstall:internal:plan",
-        "uninstall:plan:internal",
-        "internal:plan:uninstall",
-        "plan:internal:uninstall",
-        "plan:uninstall:internal"
-      ]
-    },
-    "internal:uninstall:run-plan": {
-      "aliases": [],
-      "args": {},
-      "description": "Remove host-side NemoClaw resources.",
-      "examples": [
-        "nemoclaw internal uninstall run-plan --yes"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "yes": {
-          "description": "Skip the confirmation prompt",
-          "name": "yes",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "keep-openshell": {
-          "description": "Leave the openshell binary installed",
-          "name": "keep-openshell",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "delete-models": {
-          "description": "Remove NemoClaw-pulled Ollama models",
-          "name": "delete-models",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "gateway": {
-          "description": "Gateway name",
-          "name": "gateway",
-          "default": "nemoclaw",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "internal:uninstall:run-plan",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "NemoClaw Uninstaller",
-      "usage": [
-        "internal uninstall run-plan [--yes] [--keep-openshell] [--delete-models]"
-      ],
-      "enableJsonFlag": false,
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "internal",
-        "uninstall",
-        "run-plan.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "internal:uninstall:run-plan",
-        "uninstall:internal:run-plan",
-        "uninstall:run-plan:internal",
-        "internal:run-plan:uninstall",
-        "run-plan:internal:uninstall",
-        "run-plan:uninstall:internal"
-      ]
-    },
-    "sandbox:channels:add": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "channel": {
-          "description": "Messaging channel",
-          "name": "channel",
-          "required": true
-        }
-      },
-      "description": "Store credentials for a messaging channel and queue a sandbox rebuild.",
-      "examples": [
-        "<%= config.bin %> sandbox channels add alpha telegram"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "dry-run": {
-          "description": "Preview the change without applying it",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:channels:add",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Save messaging channel credentials and rebuild",
-      "usage": [
-        "<name> <channel> [--dry-run]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> channels add",
-          "description": "Save credentials and rebuild",
-          "flags": "<channel> [--dry-run]",
-          "group": "Messaging Channels",
-          "scope": "sandbox",
-          "order": 21
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "channels",
-        "add.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:channels:add",
-        "channels:sandbox:add",
-        "channels:add:sandbox",
-        "sandbox:add:channels",
-        "add:sandbox:channels",
-        "add:channels:sandbox"
-      ]
-    },
-    "sandbox:channels:list": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "List supported messaging channels for a sandbox.",
-      "examples": [
-        "<%= config.bin %> sandbox channels list alpha"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:channels:list",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "List supported messaging channels",
-      "usage": [
-        "<name>"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> channels list",
-          "description": "List supported messaging channels",
-          "group": "Messaging Channels",
-          "scope": "sandbox",
-          "order": 20
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "channels",
-        "list.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:channels:list",
-        "channels:sandbox:list",
-        "channels:list:sandbox",
-        "sandbox:list:channels",
-        "list:sandbox:channels",
-        "list:channels:sandbox"
-      ]
-    },
-    "sandbox:channels:remove": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "channel": {
-          "description": "Messaging channel",
-          "name": "channel",
-          "required": true
-        }
-      },
-      "description": "Remove credentials for a messaging channel and queue a sandbox rebuild.",
-      "examples": [
-        "<%= config.bin %> sandbox channels remove alpha slack --dry-run"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "dry-run": {
-          "description": "Preview the change without applying it",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:channels:remove",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Clear messaging channel credentials and rebuild",
-      "usage": [
-        "<name> <channel> [--dry-run]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> channels remove",
-          "description": "Remove a configured messaging channel",
-          "flags": "<channel> [--dry-run]",
-          "group": "Messaging Channels",
-          "scope": "sandbox",
-          "order": 22
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "channels",
-        "remove.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:channels:remove",
-        "channels:sandbox:remove",
-        "channels:remove:sandbox",
-        "sandbox:remove:channels",
-        "remove:sandbox:channels",
-        "remove:channels:sandbox"
-      ]
-    },
-    "sandbox:channels:start": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "channel": {
-          "description": "Messaging channel",
-          "name": "channel",
-          "required": true
-        }
-      },
-      "description": "Re-enable a previously stopped messaging channel.",
-      "examples": [
-        "<%= config.bin %> sandbox channels start alpha discord"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "dry-run": {
-          "description": "Preview the change without applying it",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:channels:start",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Re-enable a stopped messaging channel",
-      "usage": [
-        "<name> <channel> [--dry-run]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> channels start",
-          "description": "Re-enable a previously stopped channel",
-          "flags": "<channel> [--dry-run]",
-          "group": "Messaging Channels",
-          "scope": "sandbox",
-          "order": 24
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "channels",
-        "start.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:channels:start",
-        "channels:sandbox:start",
-        "channels:start:sandbox",
-        "sandbox:start:channels",
-        "start:sandbox:channels",
-        "start:channels:sandbox"
-      ]
-    },
-    "sandbox:channels:stop": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "channel": {
-          "description": "Messaging channel",
-          "name": "channel",
-          "required": true
-        }
-      },
-      "description": "Disable a messaging channel while keeping credentials in the gateway.",
-      "examples": [
-        "<%= config.bin %> sandbox channels stop alpha discord"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "dry-run": {
-          "description": "Preview the change without applying it",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:channels:stop",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Disable channel without wiping credentials",
-      "usage": [
-        "<name> <channel> [--dry-run]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> channels stop",
-          "description": "Disable channel (keeps credentials)",
-          "flags": "<channel> [--dry-run]",
-          "group": "Messaging Channels",
-          "scope": "sandbox",
-          "order": 23
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "channels",
-        "stop.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:channels:stop",
-        "channels:sandbox:stop",
-        "channels:stop:sandbox",
-        "sandbox:stop:channels",
-        "stop:sandbox:channels",
-        "stop:channels:sandbox"
-      ]
-    },
-    "sandbox:config:get": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Read sanitized sandbox agent configuration.",
-      "examples": [
-        "<%= config.bin %> sandbox config get alpha",
-        "<%= config.bin %> sandbox config get alpha --key model --format yaml"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "key": {
-          "description": "Dotpath to read from the sanitized config",
-          "name": "key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "format": {
-          "description": "Output format",
-          "name": "format",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "options": [
-            "json",
-            "yaml"
-          ],
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:config:get",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Get sandbox configuration",
-      "usage": [
-        "<name> [--key dotpath] [--format json|yaml]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> config get",
-          "description": "Get sandbox configuration",
-          "flags": "[--key <dotpath>] [--format json|yaml]",
-          "group": "Sandbox Management",
-          "hidden": true,
-          "scope": "sandbox",
-          "order": 28
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "config",
-        "get.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:config:get",
-        "config:sandbox:get",
-        "config:get:sandbox",
-        "sandbox:get:config",
-        "get:sandbox:config",
-        "get:config:sandbox"
-      ]
-    },
-    "sandbox:config:set": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Set sandbox agent configuration with new-path and SSRF validation.",
-      "examples": [
-        "<%= config.bin %> alpha config set --key model --value nvidia/nemotron",
-        "<%= config.bin %> alpha config set --key web_search --value true --restart"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "key": {
-          "description": "Dotpath to update in the config",
-          "name": "key",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "value": {
-          "description": "Value to write; JSON values are parsed when possible",
-          "name": "value",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "restart": {
-          "description": "Signal the sandbox agent process to reload after writing",
-          "name": "restart",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "config-accept-new-path": {
-          "description": "Allow creating a config key that does not already exist",
-          "name": "config-accept-new-path",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:config:set",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Set sandbox configuration",
-      "usage": [
-        "<name> config set --key <dotpath> --value <value> [--restart] [--config-accept-new-path]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> config set",
-          "description": "Set sandbox configuration with SSRF validation",
-          "group": "Sandbox Management",
-          "hidden": true,
-          "scope": "sandbox",
-          "order": 29
-        },
-        {
-          "usage": "nemoclaw <name> config rotate-token",
-          "description": "Rotate sandbox provider credentials",
-          "group": "Sandbox Management",
-          "hidden": true,
-          "scope": "sandbox",
-          "order": 30
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "config",
-        "set.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:config:set",
-        "config:sandbox:set",
-        "config:set:sandbox",
-        "sandbox:set:config",
-        "set:sandbox:config",
-        "set:config:sandbox"
-      ]
-    },
-    "sandbox:gateway:token": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Print the OpenClaw gateway auth token for a running sandbox to stdout.",
-      "examples": [
-        "<%= config.bin %> alpha gateway-token",
-        "<%= config.bin %> alpha gateway-token --quiet"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "quiet": {
-          "char": "q",
-          "description": "Suppress the stderr security warning",
-          "name": "quiet",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:gateway:token",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Print the OpenClaw gateway auth token to stdout",
-      "usage": [
-        "<name> gateway-token [--quiet|-q]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> gateway-token",
-          "description": "Print the OpenClaw gateway auth token to stdout",
-          "flags": "[--quiet|-q]",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 14
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "gateway",
-        "token.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:gateway:token",
-        "gateway:sandbox:token",
-        "gateway:token:sandbox",
-        "sandbox:token:gateway",
-        "token:sandbox:gateway",
-        "token:gateway:sandbox"
-      ]
-    },
-    "sandbox:policy:add": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "preset": {
-          "description": "Policy preset name",
-          "name": "preset",
-          "required": false
-        }
-      },
-      "description": "Add a built-in or custom policy preset to a sandbox.",
-      "examples": [
-        "<%= config.bin %> sandbox policy add alpha slack --yes",
-        "<%= config.bin %> sandbox policy add alpha --from-file ./policy.yaml --dry-run",
-        "<%= config.bin %> sandbox policy add alpha --from-dir ./policies --yes"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "yes": {
-          "char": "y",
-          "description": "Skip the confirmation prompt",
-          "name": "yes",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "force": {
-          "description": "Skip the confirmation prompt",
-          "name": "force",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "dry-run": {
-          "description": "Preview without applying",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "from-file": {
-          "description": "Load one custom preset YAML file",
-          "exclusive": [
-            "from-dir"
-          ],
-          "name": "from-file",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "from-dir": {
-          "description": "Load all custom preset YAML files in a directory",
-          "exclusive": [
-            "from-file"
-          ],
-          "name": "from-dir",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:policy:add",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Add a network or filesystem policy preset",
-      "usage": [
-        "<name> [preset] [--yes|-y] [--dry-run] [--from-file <path>] [--from-dir <path>]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> policy-add",
-          "description": "Add a network or filesystem policy preset",
-          "flags": "(--yes, -y, --dry-run, --from-file <path>, --from-dir <path>)",
-          "group": "Policy Presets",
-          "scope": "sandbox",
-          "order": 17
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "policy",
-        "add.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:policy:add",
-        "policy:sandbox:add",
-        "policy:add:sandbox",
-        "sandbox:add:policy",
-        "add:sandbox:policy",
-        "add:policy:sandbox"
-      ]
-    },
-    "sandbox:policy:list": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "List built-in and custom policy presets and show which are applied.",
-      "examples": [
-        "<%= config.bin %> sandbox policy list alpha"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:policy:list",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "List policy presets",
-      "usage": [
-        "<name>"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> policy-list",
-          "description": "List presets (● = applied)",
-          "group": "Policy Presets",
-          "scope": "sandbox",
-          "order": 19
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "policy",
-        "list.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:policy:list",
-        "policy:sandbox:list",
-        "policy:list:sandbox",
-        "sandbox:list:policy",
-        "list:sandbox:policy",
-        "list:policy:sandbox"
-      ]
-    },
-    "sandbox:policy:remove": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "preset": {
-          "description": "Policy preset name",
-          "name": "preset",
-          "required": false
-        }
-      },
-      "description": "Remove a built-in or custom policy preset from a sandbox.",
-      "examples": [
-        "<%= config.bin %> sandbox policy remove alpha slack --yes",
-        "<%= config.bin %> sandbox policy remove alpha slack --dry-run"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "yes": {
-          "char": "y",
-          "description": "Skip the confirmation prompt",
-          "name": "yes",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "force": {
-          "description": "Skip the confirmation prompt",
-          "name": "force",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "dry-run": {
-          "description": "Preview without applying",
-          "name": "dry-run",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:policy:remove",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Remove an applied policy preset",
-      "usage": [
-        "<name> [preset] [--yes|-y] [--dry-run]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> policy-remove",
-          "description": "Remove an applied policy preset (built-in or custom)",
-          "flags": "(--yes, -y, --dry-run)",
-          "group": "Policy Presets",
-          "scope": "sandbox",
-          "order": 18
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "policy",
-        "remove.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:policy:remove",
-        "policy:sandbox:remove",
-        "policy:remove:sandbox",
-        "sandbox:remove:policy",
-        "remove:sandbox:policy",
-        "remove:policy:sandbox"
-      ]
-    },
-    "sandbox:shields:down": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Temporarily lower sandbox shields.",
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "timeout": {
-          "description": "Duration before shields are restored",
-          "name": "timeout",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "reason": {
-          "description": "Reason for lowering shields",
-          "name": "reason",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        },
-        "policy": {
-          "description": "Policy to apply while shields are down",
-          "name": "policy",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "sandbox:shields:down",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Lower sandbox security shields",
-      "usage": [
-        "<name> [--timeout 5m] [--reason <text>] [--policy permissive]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> shields down",
-          "description": "Lower sandbox security shields",
-          "group": "Sandbox Management",
-          "hidden": true,
-          "scope": "sandbox",
-          "order": 25
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "shields",
-        "down.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:shields:down",
-        "shields:sandbox:down",
-        "shields:down:sandbox",
-        "sandbox:down:shields",
-        "down:sandbox:shields",
-        "down:shields:sandbox"
-      ]
-    },
-    "sandbox:shields:status": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Show current sandbox shields state.",
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "sandbox:shields:status",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Show current shields state",
-      "usage": [
-        "<name>"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> shields status",
-          "description": "Show current shields state",
-          "group": "Sandbox Management",
-          "hidden": true,
-          "scope": "sandbox",
-          "order": 27
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "shields",
-        "status.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:shields:status",
-        "shields:sandbox:status",
-        "shields:status:sandbox",
-        "sandbox:status:shields",
-        "status:sandbox:shields",
-        "status:shields:sandbox"
-      ]
-    },
-    "sandbox:shields:up": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Restore sandbox shields from the saved snapshot.",
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hidden": true,
-      "hiddenAliases": [],
-      "id": "sandbox:shields:up",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Raise sandbox security shields",
-      "usage": [
-        "<name>"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> shields up",
-          "description": "Raise sandbox security shields",
-          "group": "Sandbox Management",
-          "hidden": true,
-          "scope": "sandbox",
-          "order": 26
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "shields",
-        "up.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:shields:up",
-        "shields:sandbox:up",
-        "shields:up:sandbox",
-        "sandbox:up:shields",
-        "up:sandbox:shields",
-        "up:shields:sandbox"
-      ]
-    },
-    "sandbox:snapshot:create": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "Create an auto-versioned snapshot of sandbox workspace state.",
-      "examples": [
-        "<%= config.bin %> sandbox snapshot create alpha",
-        "<%= config.bin %> sandbox snapshot create alpha --name before-upgrade"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "name": {
-          "description": "Optional snapshot label",
-          "name": "name",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:snapshot:create",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Create a snapshot of sandbox state",
-      "usage": [
-        "<name> [--name <label>]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> snapshot create",
-          "description": "Create a snapshot of sandbox state",
-          "flags": "[--name <name>]",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 7
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "snapshot",
-        "create.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:snapshot:create",
-        "snapshot:sandbox:create",
-        "snapshot:create:sandbox",
-        "sandbox:create:snapshot",
-        "create:sandbox:snapshot",
-        "create:snapshot:sandbox"
-      ]
-    },
-    "sandbox:snapshot:list": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        }
-      },
-      "description": "List available snapshots for a sandbox.",
-      "examples": [
-        "<%= config.bin %> sandbox snapshot list alpha"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:snapshot:list",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "List available snapshots",
-      "usage": [
-        "<name>"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> snapshot list",
-          "description": "List available snapshots",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 8
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "snapshot",
-        "list.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:snapshot:list",
-        "snapshot:sandbox:list",
-        "snapshot:list:sandbox",
-        "sandbox:list:snapshot",
-        "list:sandbox:snapshot",
-        "list:snapshot:sandbox"
-      ]
-    },
-    "sandbox:snapshot:restore": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "selector": {
-          "description": "Snapshot version, name, or timestamp",
-          "name": "selector",
-          "required": false
-        }
-      },
-      "description": "Restore sandbox workspace state from a snapshot.",
-      "examples": [
-        "<%= config.bin %> sandbox snapshot restore alpha",
-        "<%= config.bin %> sandbox snapshot restore alpha v2",
-        "<%= config.bin %> sandbox snapshot restore alpha before-upgrade --to beta"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        },
-        "to": {
-          "description": "Restore into another sandbox",
-          "name": "to",
-          "hasDynamicHelp": false,
-          "multiple": false,
-          "type": "option"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:snapshot:restore",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Restore state from a snapshot",
-      "usage": [
-        "<name> [selector] [--to <dst>]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> snapshot restore",
-          "description": "Restore state from a snapshot",
-          "flags": "[selector] [--to <dst>]",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 9
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "snapshot",
-        "restore.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:snapshot:restore",
-        "snapshot:sandbox:restore",
-        "snapshot:restore:sandbox",
-        "sandbox:restore:snapshot",
-        "restore:sandbox:snapshot",
-        "restore:snapshot:sandbox"
-      ]
-    },
-    "sandbox:skill:install": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "skillPath": {
-          "description": "Skill directory or direct path to SKILL.md",
-          "name": "skillPath",
-          "required": true
-        }
-      },
-      "description": "Validate a local SKILL.md directory and upload it to a running sandbox.",
-      "examples": [
-        "<%= config.bin %> sandbox skill install alpha ./my-skill",
-        "<%= config.bin %> sandbox skill install alpha ./my-skill/SKILL.md"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:skill:install",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Deploy a skill directory to the sandbox",
-      "usage": [
-        "<name> <path>"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> skill install",
-          "description": "Deploy a skill directory to the sandbox",
-          "group": "Skills",
-          "scope": "sandbox",
-          "order": 16
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "skill",
-        "install.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:skill:install",
-        "skill:sandbox:install",
-        "skill:install:sandbox",
-        "sandbox:install:skill",
-        "install:sandbox:skill",
-        "install:skill:sandbox"
-      ]
-    },
-    "sandbox:share:mount": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "sandboxPath": {
-          "description": "Path inside the sandbox to mount",
-          "name": "sandboxPath",
-          "required": false
-        },
-        "localMountPoint": {
-          "description": "Host path for the SSHFS mount",
-          "name": "localMountPoint",
-          "required": false
-        }
-      },
-      "description": "Mount a sandbox path on the host using SSHFS over OpenShell's SSH proxy.",
-      "examples": [
-        "<%= config.bin %> sandbox share mount alpha",
-        "<%= config.bin %> sandbox share mount alpha /workspace ~/mnt/alpha"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:share:mount",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Mount sandbox filesystem on the host",
-      "usage": [
-        "<name> [sandbox-path] [local-mount-point]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> share mount",
-          "description": "Mount sandbox filesystem on the host via SSHFS",
-          "flags": "[sandbox-path] [local-mount-point]",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 10
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "share",
-        "mount.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:share:mount",
-        "share:sandbox:mount",
-        "share:mount:sandbox",
-        "sandbox:mount:share",
-        "mount:sandbox:share",
-        "mount:share:sandbox"
-      ]
-    },
-    "sandbox:share:status": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "localMountPoint": {
-          "description": "Host mount path to check",
-          "name": "localMountPoint",
-          "required": false
-        }
-      },
-      "description": "Check whether a sandbox filesystem share is currently mounted on the host.",
-      "examples": [
-        "<%= config.bin %> sandbox share status alpha",
-        "<%= config.bin %> sandbox share status alpha ~/mnt/alpha"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:share:status",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Show sandbox share mount status",
-      "usage": [
-        "<name> [local-mount-point]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> share status",
-          "description": "Check whether the sandbox filesystem is currently mounted",
-          "flags": "[local-mount-point]",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 12
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "share",
-        "status.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:share:status",
-        "share:sandbox:status",
-        "share:status:sandbox",
-        "sandbox:status:share",
-        "status:sandbox:share",
-        "status:share:sandbox"
-      ]
-    },
-    "sandbox:share:unmount": {
-      "aliases": [],
-      "args": {
-        "sandboxName": {
-          "description": "Sandbox name",
-          "name": "sandboxName",
-          "required": true
-        },
-        "localMountPoint": {
-          "description": "Host mount path to unmount",
-          "name": "localMountPoint",
-          "required": false
-        }
-      },
-      "description": "Unmount a previously mounted sandbox filesystem from the host.",
-      "examples": [
-        "<%= config.bin %> sandbox share unmount alpha",
-        "<%= config.bin %> sandbox share unmount alpha ~/mnt/alpha"
-      ],
-      "flags": {
-        "help": {
-          "char": "h",
-          "description": "Show CLI help.",
-          "name": "help",
-          "allowNo": false,
-          "type": "boolean"
-        }
-      },
-      "hasDynamicHelp": false,
-      "hiddenAliases": [],
-      "id": "sandbox:share:unmount",
-      "pluginAlias": "nemoclaw",
-      "pluginName": "nemoclaw",
-      "pluginType": "core",
-      "strict": true,
-      "summary": "Unmount a shared sandbox filesystem",
-      "usage": [
-        "<name> [local-mount-point]"
-      ],
-      "enableJsonFlag": false,
-      "display": [
-        {
-          "usage": "nemoclaw <name> share unmount",
-          "description": "Unmount a previously mounted sandbox filesystem",
-          "flags": "[local-mount-point]",
-          "group": "Sandbox Management",
-          "scope": "sandbox",
-          "order": 11
-        }
-      ],
-      "isESM": false,
-      "relativePath": [
-        "dist",
-        "commands",
-        "sandbox",
-        "share",
-        "unmount.js"
-      ],
-      "aliasPermutations": [],
-      "permutations": [
-        "sandbox:share:unmount",
-        "share:sandbox:unmount",
-        "share:unmount:sandbox",
-        "sandbox:unmount:share",
-        "unmount:sandbox:share",
-        "unmount:share:sandbox"
       ]
     }
   },

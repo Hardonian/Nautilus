@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-labels:
+      - "dependencies"
+    pull-request-labels:
+      - "dependencies"
+    automerge-type: "minor-patch"
+    automerge: true
+    allow: []
+    ignore:
+      - dependency-type: "direct"
+        update-type: "version-update:semver-major"
+      - dependency-type: "direct"
+        update-type: "version-update:semver-minor"
+      - dependency-type: "direct"
+        update-type: "version-update:semver-patch"

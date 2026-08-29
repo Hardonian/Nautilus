@@ -41,7 +41,7 @@ describe("CredentialsResetCommand unit tests", () => {
     errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     exitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
-      throw new ProcessExitError(code ?? 1);
+      throw new ProcessExitError(typeof code === "number" ? code : 1);
     });
 
     mocks.recoverGatewayOrExit.mockResolvedValue(undefined);
@@ -56,7 +56,7 @@ describe("CredentialsResetCommand unit tests", () => {
 
     vi.clearAllMocks();
     exitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
-      throw new ProcessExitError(code ?? 1);
+      throw new ProcessExitError(typeof code === "number" ? code : 1);
     });
 
     // Invalid provider (oclif catches unknown flag in strict mode)
@@ -80,7 +80,7 @@ describe("CredentialsResetCommand unit tests", () => {
     expect(mocks.prompt).toHaveBeenCalled();
     expect(resetProviderCredentials).not.toHaveBeenCalled();
 
-    const logged = logSpy.mock.calls.map((call) => String(call[0])).join("");
+    const logged = logSpy.mock.calls.map((call: unknown[]) => String(call[0])).join("");
     expect(logged).toContain("Cancelled.");
   });
 
@@ -93,7 +93,7 @@ describe("CredentialsResetCommand unit tests", () => {
     expect(mocks.recoverGatewayOrExit).toHaveBeenCalledWith("reach");
     expect(resetProviderCredentials).toHaveBeenCalledWith("nvidia-prod");
 
-    const logged = logSpy.mock.calls.map((call) => String(call[0])).join("");
+    const logged = logSpy.mock.calls.map((call: unknown[]) => String(call[0])).join("");
     expect(logged).toContain("Removed provider 'nvidia-prod'");
   });
 
@@ -106,7 +106,7 @@ describe("CredentialsResetCommand unit tests", () => {
     expect(mocks.recoverGatewayOrExit).toHaveBeenCalledWith("reach");
     expect(resetProviderCredentials).toHaveBeenCalledWith("nvidia-prod");
 
-    const logged = logSpy.mock.calls.map((call) => String(call[0])).join("");
+    const logged = logSpy.mock.calls.map((call: unknown[]) => String(call[0])).join("");
     expect(logged).toContain("Removed provider 'nvidia-prod'");
   });
 

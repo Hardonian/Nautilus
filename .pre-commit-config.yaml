@@ -52,7 +52,7 @@ repos:
     hooks:
       - id: no-force-added-ignored
         name: Reject force-added ignored files
-        entry: bash -c 'IGNORED=$(git ls-files --ignored --exclude-standard --cached -- "$@") && if [ -n "$IGNORED" ]; then echo "Force-added files that .gitignore would block:" && echo "$IGNORED" && exit 1; fi' --
+        entry: bash scripts/check-force-added-ignored.sh
         language: system
         always_run: true
         pass_filenames: false
@@ -174,14 +174,10 @@ repos:
       - id: shellcheck
         priority: 10
 
-  - repo: local
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: v2.14.0
     hooks:
       - id: hadolint
-        name: hadolint
-        entry: hadolint
-        language: system
-        files: (Dockerfile[^/]*|.*\.dockerfile)$
-        types: [file]
         priority: 10
 
   - repo: https://github.com/gitleaks/gitleaks

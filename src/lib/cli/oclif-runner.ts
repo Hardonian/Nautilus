@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { Config as OclifConfig, execute as executeOclif } from "@oclif/core";
+import { Config as OclifConfig } from "@oclif/core";
 
-import { CLI_NAME } from "./branding";
+import { CLI_DISPLAY_NAME, CLI_NAME } from "./branding";
 
 export interface OclifCommandRunOptions {
   rootDir: string;
@@ -64,14 +64,32 @@ function applyBrandedBin(config: OclifConfig): void {
       plugin.options.pjson = pjson;
     }
   }
+
+  // oclif loads help metadata from oclif.manifest.json when it is present.
+  // That manifest is generated with the canonical NemoClaw branding, so alias
+  // launchers must brand the loaded metadata as well as the command class and
+  // bin name. Keep this runtime-only: the published manifest remains stable.
+  const brand = (value: string): string =>
+    value.replaceAll("NemoClaw", CLI_DISPLAY_NAME).replace(/\bnemoclaw\b/g, CLI_NAME);
+  const brandValues = (value: unknown): void => {
+    if (!value || typeof value !== "object") return;
+    for (const [key, child] of Object.entries(value)) {
+      if (typeof child === "string") {
+        (value as Record<string, unknown>)[key] = brand(child);
+      } else {
+        brandValues(child);
+      }
+    }
+  };
+  for (const command of config.commands ?? []) brandValues(command);
 }
 
-export async function runRegisteredOclifCommand(
+async function runWithConfig(
+  config: OclifConfig,
   commandId: string,
   args: string[],
   opts: OclifCommandRunOptions,
 ): Promise<void> {
-  const config = await OclifConfig.load(opts.rootDir);
   applyBrandedBin(config);
   const errorLine = opts.error ?? console.error;
   const exit = opts.exit ?? ((code: number) => process.exit(code));
@@ -114,6 +132,25 @@ export async function runRegisteredOclifCommand(
   }
 }
 
+export async function runRegisteredOclifCommand(
+  commandId: string,
+  args: string[],
+  opts: OclifCommandRunOptions,
+): Promise<void> {
+  const config = await OclifConfig.load(opts.rootDir);
+  await runWithConfig(config, commandId, args, opts);
+}
+
 export async function runOclifArgv(args: string[], opts: OclifCommandRunOptions): Promise<void> {
-  await executeOclif({ args, dir: opts.rootDir });
+  const config = await OclifConfig.load(opts.rootDir);
+  const match = config.commands
+    .map((command) => ({ command, tokens: command.id.split(":") }))
+    .filter(({ tokens }) => tokens.every((token, index) => args[index] === token))
+    .sort((a, b) => b.tokens.length - a.tokens.length)[0];
+
+  if (!match) {
+    throw new Error(`Unknown oclif command: ${args.join(" ")}`);
+  }
+
+  await runWithConfig(config, match.command.id, args.slice(match.tokens.length), opts);
 }
