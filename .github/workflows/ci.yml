@@ -25,6 +25,8 @@ jobs:
           make build 2>/dev/null || cargo build --workspace 2>/dev/null || go build ./... 2>/dev/null || npm ci && npm run build 2>/dev/null || true
           make test 2>/dev/null || cargo test --workspace 2>/dev/null || go test ./... 2>/dev/null || npm test 2>/dev/null || true
       - name: Lint
+        run: |
+          make lint 2>/dev/null || cargo clippy --workspace --all-targets -- -D warnings 2>/dev/null || golangci-lint run 2>/dev/null || npm run lint 2>/dev/null || true
       - name: npm audit
         run: npm audit --audit-level=high
       - name: TypeScript check
@@ -33,8 +35,6 @@ jobs:
         run: pip install bandit && bandit -r src/
       - name: Python deps audit
         run: pip install pip-audit && pip-audit
-        run: |
-          make lint 2>/dev/null || cargo clippy --workspace --all-targets -- -D warnings 2>/dev/null || golangci-lint run 2>/dev/null || npm run lint 2>/dev/null || true
 
   security:
     runs-on: ubuntu-latest
