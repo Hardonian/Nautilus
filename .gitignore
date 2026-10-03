@@ -56,3 +56,6 @@ build/
 .idea/
 .vscode/
 *.log
+
+# Regenerable build artifacts (do not track)
+.turbo/
